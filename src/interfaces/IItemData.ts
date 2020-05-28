@@ -9,7 +9,7 @@ export interface IItemData {
     /** used to signify what item this is using a number, useful for
      * both quickly passing data between client and server and telling
      * apart every similar items even possibly items with the same name. */
-    id: number,
+    id: string,
 
     /** Used to signal to the system what type of item this will
      *  be used for things such as sorting and item activation. */
@@ -21,7 +21,6 @@ export interface IItemData {
     /** Used to construct a graphical representation of this item */
     spriteKey: string,
 
-    /** Used to specify various properties about the item, example key "poison" = "15"
-     *  then this item does 15 poison damage.*/
+    /** Used to specify various properties about the item */
     tags: {[key: string]: string}
 }

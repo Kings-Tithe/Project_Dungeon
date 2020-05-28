@@ -3,9 +3,8 @@
  * other items.
  */
 export interface IRecipeData {
-    /** Tells us what items are required to craft this item and how many of each
-     * first number is the ingredients item id and the second is the amount */
-    ingredients: {[key: number]: number},
+    /** Tells us what items are required to craft this item and how many of each */
+    ingredients: {[key: string]: number},
 
     /** Tells us what item is crafted by this recipe */
     result: number
