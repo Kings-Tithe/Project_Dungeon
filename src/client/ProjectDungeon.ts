@@ -1,5 +1,4 @@
-// ---> need this before first build
-//import * as Phaser from 'phaser';
+import * as Phaser from 'phaser';
 
 /**Dungeon_Project game configuration, including settings such as render type,
  * logical size, anti-aliasing, and more. */
@@ -10,7 +9,7 @@ const config: Phaser.Types.Core.GameConfig = {
     /** Primary scene objects */
     scene: [],
     /** Title to display on the game */
-    title: 'Dungeon_Project',
+    title: 'ProjectDungeon',
     /** Prevents anti-aliasing */
     render: {
         pixelArt: true
@@ -21,7 +20,7 @@ const config: Phaser.Types.Core.GameConfig = {
      * scaling of logical size (calculated) to actual size (window), The 
      * resolution we decided to go with was 720p */
     scale: {
-        parent: 'game',
+        parent: 'project-dungeon',
         mode: Phaser.Scale.FIT,
         width: 1280,
         height: 720
