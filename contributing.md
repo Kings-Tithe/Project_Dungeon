@@ -1,33 +1,69 @@
-The following is the commenting format used in the creation of this game. Each is outlined with an explanation and an example.
-### Naming
-When naming variables or classes anything verbose and descriptive should do the trick, consider the following examples:
-```javascript
+# Conventions & Structure for Contributing
+
+## Naming Conventions
+**With any type of identifier, such as classes, functions, and variables, we prefer verbose naming!**
+Yes, your college professors probably told you not to. But for this project, it doesn't matter. Verbose naming makes the intended use clearer and these days we are all using high resolution screens that can display a *lot* of text. That said, be reasonable with your identifiers. No one wants a variable called `theLunchMeatItemThatIsFoundInQuestNumberNineOnTheTable`.
+
+### Variables
+Variables are named using **camelCase**. This means they start with a lower case word, and subsequent words each start with an upper case letter.
+
+Consider the following examples:
+
+```js
 let bossClockInternalTimer;
 let playerSprite;
 let monsterSprite;
-class monster extends Phaser.Gameobjects.Sprite {};
-```
-When naming functions it should start with an action and be followed by a variable, class or general thing's name. Such actions might be
-things like create, update, get, set, move, destroy, sort and so on. The variable, class or general thing following that should be the
-thing being acted upon by the variable. In some cases it will just be the name of an action but most our functions will follow the above
-standard. examples:
-``` javascript
-createBossTimer(){};
-getRandomMonster(){};
-createPlayerHealthBar(){};
-updatePlayerHealthBar(){};
 ```
 
+### Functions
+Functions also utilize camelCase, with a special additional rule. The first word of a function should be a verb describing what the function does. The subsequent words should describe the associated subject. We'll call this format **verbNoun**.
+
+Example verbs: create, update, get, set, move, destroy
+
+Consider the following examples:
+
+```js
+createBossTimer();
+getRandomMonster();
+createPlayerHealthBar();
+updatePlayerHealthBar();
+```
+
+### Classes
+Classes utilize **PascalCase** for naming. Unlike camelCase, every word in a PascalCase identifier is starts upper case.
+
+Consider the following examples:
+
+```js
+class Warrior{}
+class ServerControl{}
+class NPCManager{}
+```
+
+### Interfaces
+Interfaces are named exactly like classes but should start with the capital letter `I`.
+
+Consider the following examples:
+
+```js
+interface ICharacterData{}
+interface ITileData{}
+interface IShopItem{}
+```
+
+## Comment Blocks
+We utilize JSDoc for comment blocks. Here's a nice cheatsheet: https://devhints.io/jsdoc
+
 ### Variables
-Variables should all start with a javascript style comment block explaining what it does. Example:
-``` javascript
+Variables should all start with a JSDoc style comment block explaining what it does. Example:
+```js
 /** variable used as an example of variable commenting standards */
 let myVar
 ```
 
 ### Interfaces
 Interfaces are basically a grouped and enumerated set of variables, as such they should simply be commented like a variables. Example:
-``` javascript
+```js
 /** This interface is used to store my first 3 variables used as an example of interface commenting */
 interface example {
   /** here is the first variable for this interface */
@@ -47,7 +83,7 @@ a list of member varibles seperated out by type and commented as described above
 for the class. Each function should have a comment block above it listing it's call, purpose, parameters and
 anything returned. Note in the below example how destroy is an example of a function only named after the action it
 performs talked about above in the section on function names. Example:
-``` javascript
+```js
 /** Example Class
  * Purpose: The purpose of this class is to generally show how our classes comments should be structured
  * This is by far the longest example on this page. Boss Timer is called by the example class as a off
@@ -86,7 +122,7 @@ class Example {
 
     /** createBossExample 
      * Creates and instantiates the boss
-     * @spriteKey used to construct a Phaser.Gameobjects.Sprite object */
+     * @param spriteKey used to construct a Phaser.Gameobjects.Sprite object */
     createBossExample(spriteKey: string){}
 
     /** updateBossHealth
