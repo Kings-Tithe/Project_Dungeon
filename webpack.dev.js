@@ -7,7 +7,7 @@ module.exports = merge(common, {
     devtool: 'inline-source-map',
 
     devServer: {
-        contentBase: path.resolve(__dirname, 'pack'),
+        contentBase: path.resolve(__dirname, 'build'),
         https: true
     },
 });

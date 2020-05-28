@@ -27,7 +27,7 @@ module.exports = {
 
     output: {
         filename: '[name].bundle.js',
-        path: path.resolve(__dirname, 'pack')
+        path: path.resolve(__dirname, 'compiled-js')
     },
 
     plugins: [
@@ -41,10 +41,8 @@ module.exports = {
         new CopyWebpackPlugin({
             patterns: [
                 {
-                    // from: path.resolve(__dirname, 'assets', '**', '*'),
-                    // to: path.resolve(__dirname, 'pack')
                     from: path.resolve(__dirname, 'assets'),
-                    to: path.resolve(__dirname, 'pack')
+                    to: path.resolve(__dirname, 'compiled-js', 'assets')
                 }
             ]
         }),

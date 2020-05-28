@@ -2,14 +2,14 @@
 var packager = require('electron-packager');
 var options = {
     'all': true,
-    'dir': './pack/client',
+    'dir': './compiled-js/client',
     'app-copyright': "King's Tithe, 2020",
     'app-version': '0.0.1',
     'asar': false,
     'extraResource': './assets',
     'icon': './app.ico',
     'name': 'ProjectDungeon',
-    'out': './build/client',
+    'out': './dist/client',
     'overwrite': true,
     'prune': true,
     'version': '0.0.1',
