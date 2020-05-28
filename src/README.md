@@ -6,5 +6,4 @@ and the server.
 Temporary Note:
 Subfolders meant to be on this folder go as follows (they won't upload to github while their empty):
 - client
-- interfaces
 - server
