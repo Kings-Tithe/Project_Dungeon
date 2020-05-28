@@ -1,0 +1,37 @@
+{
+  "name": "project_dungeon",
+  "version": "0.0.1",
+  "description": "Fantasy and Sci-Fi collide in this action-packed dungeon crawler from King's Tithe games.",
+  "main": "pack/launch.js",
+  "scripts": {
+    "dev": "webpack-dev-server --open --config webpack.dev.js",
+    "dev:server": "yarn pack:server && nodemon pack/server.js",
+    "dev:electron": "electron pack/launch.js",
+    "pack": "webpack --config webpack.prod.js",
+    "build": "yarn build:client && yarn build:server",
+    "build:client": "node electron-build.js",
+    "build:server": "pkg pack/server.js --out-path ./build/server --targets node12-linux-x64,node12-macos-x64,node12-win-x64"
+  },
+  "repository": "https://github.com/zachkingcade/Project_Dungeon.git",
+  "author": "King's Tithe <zachkingcade@gmail.com>",
+  "license": "None",
+  "private": true,
+  "dependencies": {
+    "phaser": "^3.23.0"
+  },
+  "devDependencies": {
+    "clean-webpack-plugin": "^3.0.0",
+    "copy-webpack-plugin": "^6.0.1",
+    "electron": "^9.0.0",
+    "electron-packager": "^14.2.1",
+    "html-webpack-plugin": "^4.3.0",
+    "nodemon": "^2.0.4",
+    "pkg": "^4.4.8",
+    "ts-loader": "^7.0.5",
+    "typescript": "^3.9.3",
+    "webpack": "^4.43.0",
+    "webpack-cli": "^3.3.11",
+    "webpack-dev-server": "^3.11.0",
+    "webpack-merge": "^4.2.2"
+  }
+}
