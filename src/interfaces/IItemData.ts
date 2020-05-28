@@ -6,6 +6,11 @@ export interface IItemData {
     /** Description to the player what this item is or does */
     description: string,
 
+    /** used to signify what item this is using a number, useful for
+     * both quickly passing data between client and server and telling
+     * apart every similar items even possibly items with the same name. */
+    id: number,
+
     /** Used to signal to the system what type of item this will
      *  be used for things such as sorting and item activation. */
     type: string,
