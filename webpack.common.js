@@ -38,12 +38,16 @@ module.exports = {
             // chunksSortMode: 'manual',
             // chunks: ['vendors', 'app']
         }),
-        new CopyWebpackPlugin([
-            {
-                from: path.resolve(__dirname, 'assets', '**', '*'),
-                to: path.resolve(__dirname, 'pack')
-            }
-        ]),
+        new CopyWebpackPlugin({
+            patterns: [
+                {
+                    // from: path.resolve(__dirname, 'assets', '**', '*'),
+                    // to: path.resolve(__dirname, 'pack')
+                    from: path.resolve(__dirname, 'assets'),
+                    to: path.resolve(__dirname, 'pack')
+                }
+            ]
+        }),
         new webpack.DefinePlugin({
             'typeof CANVAS_RENDERER': JSON.stringify(true),
             'typeof WEBGL_RENDERER': JSON.stringify(true)
