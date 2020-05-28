@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title><%= htmlWebpackPlugin.options.title %></title>
+    <meta charset="UTF-8">
+    <style>
+        /* White background and pixel based art */
+        body {
+            background: black;
+            image-rendering: pixelated;
+        }
+        /* Game object should not be taller than viewport */
+        #game {
+            max-height: 100vh;
+        }
+    </style>
+
+</head>
+
+<body>
+    <!--container for the phaser game-->
+    <div id="game"> </div>
+</body>
+
+</html>
