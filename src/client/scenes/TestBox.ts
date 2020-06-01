@@ -1,4 +1,5 @@
 import { rewireLoggingToElement } from '../tools/Console';
+import { px, py } from '../tools/PercentCoords';
 
 export class TestBox extends Phaser.Scene {
     create() {
@@ -9,6 +10,7 @@ export class TestBox extends Phaser.Scene {
         let container: HTMLDivElement = document.createElement('div');
         container.id = 'log-container';
         container.style.overflow = 'auto';
+        container.style.width = '300px';
         container.style.height = '150px';
         container.style.backgroundColor = '#222';
 
@@ -16,7 +18,7 @@ export class TestBox extends Phaser.Scene {
         outputText.id = 'log';
         container.appendChild(outputText);
 
-        this.add.dom(300, 300, container);
+        this.add.dom(px(100) - 150, py(100) - 75, container);
 
         rewireLoggingToElement(() => outputText, () => container, true);
 
