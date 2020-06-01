@@ -7,7 +7,9 @@
     "dev": "webpack-dev-server --open --config webpack.dev.js",
     "dev:server": "nodemon ./src/server/PDServer.ts",
     "dev:electron": "electron compiled-js/launch.js",
-    "compile": "webpack --config webpack.prod.js",
+    "compile": "yarn compile:client && yarn compile:server",
+    "compile:client": "webpack --config webpack.prod.js",
+    "compile:server": "tsc ./src/server/PDServer.ts --outFile ./compiled-js/server.js",
     "build": "yarn build:client && yarn build:server",
     "build:client": "node electron-build.js",
     "build:server": "pkg compiled-js/server.js --out-path ./dist/server --targets node12-linux-x64,node12-macos-x64,node12-win-x64"
