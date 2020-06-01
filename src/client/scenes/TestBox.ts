@@ -14,6 +14,15 @@ export class TestBox extends Phaser.Scene {
         container.style.height = '150px';
         container.style.backgroundColor = '#222';
 
+        let highlighting: HTMLStyleElement = document.createElement('style');
+        highlighting.type = 'text/css';
+        highlighting.innerHTML = ".log-warn { color: orange } \
+        .log-error { color: red } \
+        .log-info { color: skyblue } \
+        .log-log { color: silver } \
+        .log-warn, .log-error { font-weight: bold; }"
+        container.appendChild(highlighting)
+
         let outputText: HTMLPreElement = document.createElement('pre');
         outputText.id = 'log';
         container.appendChild(outputText);
