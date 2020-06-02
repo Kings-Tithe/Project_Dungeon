@@ -1,4 +1,5 @@
 import * as Phaser from 'phaser';
+import { TestWalk } from './scenes/TestWalk';
 
 /**Dungeon_Project game configuration, including settings such as render type,
  * logical size, anti-aliasing, and more. */
@@ -7,7 +8,7 @@ const config: Phaser.Types.Core.GameConfig = {
     /** Automatically determine how to render */
     type: Phaser.AUTO,
     /** Primary scene objects */
-    scene: [],
+    scene: [TestWalk],
     /** Title to display on the game */
     title: 'ProjectDungeon',
     /** Prevents anti-aliasing */
