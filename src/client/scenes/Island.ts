@@ -15,8 +15,29 @@ export class Island extends Phaser.Scene {
     /**Keys */
     keys: {[key: string]: Phaser.Input.Keyboard.Key}
 
+    /**Numbers */
+    /**Used to store the width of the tilemap in pixels */
+    tilemapWidthInPixels: number;
+    /**Used to store the height of the tilemap in Pixels */
+    tilemapHeightInPixels: number;
+    /**Stores the players set depth, not meant to change, 
+     * property depthOffSet uses this as a base by which to offset */
+    playerDepth: number;
+
+
     constructor(){
         super("Island")
+    }
+
+    /** used to instantiate objects and set inital values where they apply
+     * this runs in full before create()
+     */
+    init(){
+        this.tilemapHeightInPixels = 4800;
+        this.tilemapWidthInPixels = 4800;
+        this.cameras.main.setBounds(0,0,4800,4800);
+        this.keys = {};
+        this.playerDepth = 10;
     }
 
     /**Used to initally create all of our assets and set up the games scene/stage the
@@ -28,7 +49,6 @@ export class Island extends Phaser.Scene {
         this.createPlayerSprite();
         this.createKeys();
         /**Setup the main camera */
-        this.cameras.main.setBounds(0,0,4800,4800);
         this.cameras.main.startFollow(this.player,true);
     }
 
@@ -45,8 +65,9 @@ export class Island extends Phaser.Scene {
         let islandC = map.addTilesetImage("islandC");
         let backgroundLayer = map.createStaticLayer("background",[islandA1,islandA2],0,0);
         let forgroundLayer = map.createStaticLayer("foreground",[islandB,islandC],0,0);
-        backgroundLayer.depth = 0;
-        forgroundLayer.depth = 1;
+        //make sure the background layer allways appears below the player
+        backgroundLayer.depth = this.playerDepth - 1;
+        forgroundLayer.depth = this.playerDepth - 1;
     }
 
     /**Right now this just creates a test sprite dude to walk around the world with
@@ -55,7 +76,8 @@ export class Island extends Phaser.Scene {
      */
     createPlayerSprite(){
         /**Generate the inital sprite */
-        this.player = this.add.sprite(100,100,"character_template",0);
+        this.player = this.add.sprite(this.tilemapWidthInPixels/2,this.tilemapHeightInPixels/2,"character_template",0);
+        this.player.setDepth(this.playerDepth);
         /**Generate all the animations associated with this sprite */
         this.anims.create({
             key: 'right',
@@ -97,8 +119,6 @@ export class Island extends Phaser.Scene {
 
     /**Creates Phaser.Input.Keyboard.Key objects that can used for polling in the games update loop */
     createKeys(){
-        /**Instantiate keys, it's typing and format are declared above under member functions */ 
-        this.keys = {};
         /**Fill this.keys will all the keys we will need to poll in this scene */
         this.keys["up"] = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W);
         this.keys["left"] = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
