@@ -1,5 +1,6 @@
 import * as Phaser from 'phaser';
-import { TestWalk } from './scenes/TestWalk';
+import { Island } from './scenes/Island';
+import { LoadAssets } from './scenes/LoadAssets'
 
 /**Dungeon_Project game configuration, including settings such as render type,
  * logical size, anti-aliasing, and more. */
@@ -8,7 +9,7 @@ const config: Phaser.Types.Core.GameConfig = {
     /** Automatically determine how to render */
     type: Phaser.AUTO,
     /** Primary scene objects */
-    scene: [TestWalk],
+    scene: [LoadAssets, Island],
     /** Title to display on the game */
     title: 'ProjectDungeon',
     /** Prevents anti-aliasing */
@@ -32,5 +33,3 @@ const config: Phaser.Types.Core.GameConfig = {
  * will automatically transition to the first scene in the scene array.
  */
 new Phaser.Game(config);
-
-console.log("yay, the build script worked!");
