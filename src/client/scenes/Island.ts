@@ -74,7 +74,6 @@ export class Island extends Phaser.Scene {
 
         // Round physics positions to avoid ugly render artifacts
         hookToMethod(Phaser.Physics.Arcade.Body.prototype, 'update', function() {
-            console.log(this);
             this.x = Math.round(this.x);
             this.y = Math.round(this.y);
         });
