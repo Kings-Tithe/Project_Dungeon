@@ -157,6 +157,7 @@ export class Island extends Phaser.Scene {
      * if they are moves the character's sprite and changes animation accordingly
      */
     playerUpdateMovement(){
+        let body = <Phaser.Physics.Arcade.Body>this.player.body;
         /**for each direction each if the correct key is being pressed
          * if it is the check if the animation for that direction is playing
          * if not play it. Then move the player sprite in the correct direction.
@@ -165,7 +166,7 @@ export class Island extends Phaser.Scene {
             if(this.player.anims.getCurrentKey() != "up"){
                 this.anims.play("up", this.player);
             }
-            this.player.body
+            body.setVelocityY(-100);
         } else if(this.keys["left"].isDown){
             if(this.player.anims.getCurrentKey() != "left"){
                 this.anims.play("left", this.player);
@@ -185,6 +186,7 @@ export class Island extends Phaser.Scene {
             if(this.player.anims.getCurrentKey() != "idle"){
                 this.anims.play("idle", this.player);
             }
+            body.setVelocity(0);
         }
     }
 }
