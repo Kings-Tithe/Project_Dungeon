@@ -16,6 +16,14 @@ const config: Phaser.Types.Core.GameConfig = {
     render: {
         pixelArt: true
     },
+    /** Adds easy access to built in functions for collison */
+    physics: {
+        default: 'arcade',
+        arcade: {
+            gravity: { y: 0 },
+            debug: true
+        }
+    },
     /** Black background when nothing else is being displayed over it */
     backgroundColor: '000000',
     /**Game (canvas) attaches to the div with id 'game'. Scale manager ensures

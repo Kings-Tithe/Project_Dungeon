@@ -24,6 +24,26 @@ export class Island extends Phaser.Scene {
      * property depthOffSet uses this as a base by which to offset */
     playerDepth: number;
 
+    /**Tilemaps */
+    /**The main map used in this scene */
+    map: Phaser.Tilemaps.Tilemap;
+
+    /**Tilesets */
+    /**Tileset used to construct this.map */
+    islandA1: Phaser.Tilemaps.Tileset;
+    /**Tileset used to construct this.map */
+    islandA2: Phaser.Tilemaps.Tileset;
+    /**Tileset used to construct this.map */
+    islandB: Phaser.Tilemaps.Tileset;
+
+    /**Static Layers */
+    /**Is the basic background layer that everything else is placed over */
+    backgroundLayer: Phaser.Tilemaps.StaticTilemapLayer;
+    /**The layer of stuff the player walks on or into depending on the passThru property */
+    walkLayer: Phaser.Tilemaps.StaticTilemapLayer;
+    /**A layer of things that sit above the player and adds a sense of depth */
+    overheadLayer: Phaser.Tilemaps.StaticTilemapLayer;
+
 
     constructor(){
         super("Island")
@@ -48,7 +68,7 @@ export class Island extends Phaser.Scene {
         this.createTileMap();
         this.createPlayerSprite();
         this.createKeys();
-        /**Setup the main camera */
+        /**setup the main camera */
         this.cameras.main.startFollow(this.player,true);
     }
 
@@ -58,16 +78,19 @@ export class Island extends Phaser.Scene {
 
     /**Creates and puts together the primary tilemap for this scene*/
     createTileMap(){
-        let map = this.make.tilemap({key: "islandUpleft"});
-        //let islandA1 = map.addTilesetImage("islandA1");
-        //let islandA2 = map.addTilesetImage("islandA2");
-        //let islandB = map.addTilesetImage("islandB");
-        //let islandC = map.addTilesetImage("islandC");
-        //let backgroundLayer = map.createStaticLayer("background",[islandA1,islandA2],0,0);
-        //let forgroundLayer = map.createStaticLayer("foreground",[islandB,islandC],0,0);
-        //make sure the background layer allways appears below the player
-        //backgroundLayer.depth = this.playerDepth - 1;
-        //forgroundLayer.depth = this.playerDepth - 1;
+        this.map = this.make.tilemap({key: "islandUpleft"});
+        this.islandA1 = this.map.addTilesetImage("islandA1");
+        this.islandA2 = this.map.addTilesetImage("islandA2");
+        this.islandB = this.map.addTilesetImage("islandB");
+        this.backgroundLayer = this.map.createStaticLayer("background",[this.islandA1,this.islandA2],0,0);
+        this.walkLayer = this.map.createStaticLayer("walk",[this.islandB],0,0);
+        this.overheadLayer= this.map.createStaticLayer("overhead",[this.islandB],0,0);
+        /**make sure the layers appear where they are supposed to in relation to the player*/
+        this.backgroundLayer.depth = this.playerDepth - 1;
+        this.walkLayer.depth = this.playerDepth - 1;
+        this.overheadLayer.depth = this.playerDepth + 1;
+        /**set collision for the walk layer */
+        this.walkLayer.setCollisionByProperty({ passThru: false });
     }
 
     /**Right now this just creates a test sprite dude to walk around the world with
@@ -75,51 +98,54 @@ export class Island extends Phaser.Scene {
      * will construct the sprite for a character based on a player/characters interface
      */
     createPlayerSprite(){
-        /**Generate the inital sprite */
-        this.player = this.add.sprite(this.tilemapWidthInPixels/2,this.tilemapHeightInPixels/2,"character_template",0);
+        /**generate the inital sprite */
+        this.player = this.physics.add.sprite(this.tilemapWidthInPixels/2,this.tilemapHeightInPixels/2,"character_template",0);
         this.player.setDepth(this.playerDepth);
-        /**Generate all the animations associated with this sprite */
+        /**generate all the animations associated with this sprite */
         this.anims.create({
             key: 'right',
             frames: this.anims.generateFrameNumbers('character_template', { start: 8, end: 15 }),
             frameRate: 10,
             repeat: -1
         });
-        /**Animation for character walking left */
+        /**animation for character walking left */
         this.anims.create({
             key: 'up',
             frames: this.anims.generateFrameNumbers('character_template', { start: 16, end: 23 }),
             frameRate: 10,
             repeat: -1
         });
-        /**Animation for character walking left */
+        /**animation for character walking left */
         this.anims.create({
             key: 'down',
             frames: this.anims.generateFrameNumbers('character_template', { start: 24, end: 31 }),
             frameRate: 10,
             repeat: -1
         });
-        /**Animation for character walking left */
+        /**animation for character walking left */
         this.anims.create({
             key: 'left',
             frames: this.anims.generateFrameNumbers('character_template', { start: 32, end: 39 }),
             frameRate: 10,
             repeat: -1
         });
-        /**Animation used to reset the frame of the character sprite */
+        /**animation used to reset the frame of the character sprite */
         this.anims.create({
             key: 'idle',
             frames: this.anims.generateFrameNumbers('character_template', { end: 0 }),
             frameRate: 10,
             repeat: -1
         });
-        /**Set players inital animation */
+        /**set players inital animation */
         this.anims.play("idle", this.player);
+
+        /**adds collision for the walk layer and player */
+        this.physics.add.collider(this.player, this.walkLayer);
     }
 
-    /**Creates Phaser.Input.Keyboard.Key objects that can used for polling in the games update loop */
+    /**creates Phaser.Input.Keyboard.Key objects that can used for polling in the games update loop */
     createKeys(){
-        /**Fill this.keys will all the keys we will need to poll in this scene */
+        /**fill this.keys will all the keys we will need to poll in this scene */
         this.keys["up"] = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W);
         this.keys["left"] = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
         this.keys["down"] = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S);
@@ -131,7 +157,7 @@ export class Island extends Phaser.Scene {
      * if they are moves the character's sprite and changes animation accordingly
      */
     playerUpdateMovement(){
-        /**For each direction each if the correct key is being pressed
+        /**for each direction each if the correct key is being pressed
          * if it is the check if the animation for that direction is playing
          * if not play it. Then move the player sprite in the correct direction.
          */
@@ -139,7 +165,7 @@ export class Island extends Phaser.Scene {
             if(this.player.anims.getCurrentKey() != "up"){
                 this.anims.play("up", this.player);
             }
-            this.player.y -= 2;
+            this.player.body
         } else if(this.keys["left"].isDown){
             if(this.player.anims.getCurrentKey() != "left"){
                 this.anims.play("left", this.player);
