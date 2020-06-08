@@ -1,19 +1,20 @@
+import { hookToMethod } from "../tools/Hook";
+
 /**Scene with a basic starting example island for what the final one might look
  * like. This will be used to test new features and game mechanics that will be
  * used on the island.
  */
-
 export class Island extends Phaser.Scene {
 
     /**Member Varibles */
-    
+
     /**Sprites */
     /**Currently just a dude to walk around the world with and run some testing. 
      * Eventually will hold the sprite linked to the currently party leader character */
     player: Phaser.GameObjects.Sprite;
 
     /**Keys */
-    keys: {[key: string]: Phaser.Input.Keyboard.Key}
+    keys: { [key: string]: Phaser.Input.Keyboard.Key }
 
     /**Numbers */
     /**Used to store the width of the tilemap in pixels */
@@ -45,7 +46,7 @@ export class Island extends Phaser.Scene {
     overheadLayer: Phaser.Tilemaps.StaticTilemapLayer;
 
 
-    constructor(){
+    constructor() {
         super("Island")
     }
 
@@ -62,21 +63,28 @@ export class Island extends Phaser.Scene {
      * way we want. To keep things organized this will mostly call to methods that create
      * a particular part of the scene unless creating that thing takes a single command.
     */
-    create(){
+    create() {
         this.createTileMap();
         this.createPlayerSprite();
         this.createKeys();
         /**setup the main camera */
-        this.cameras.main.startFollow(this.player,true);
+        this.cameras.main.startFollow(this.player, true);
+
+        // Round physics positions to avoid ugly render artifacts
+        hookToMethod(Phaser.Physics.Arcade.Body.prototype, 'update', function() {
+            this.x = Math.round(this.x);
+            this.y = Math.round(this.y);
+        });
+        
     }
 
-    update(){
+    update() {
         this.playerUpdateMovement();
     }
 
     /**Creates and puts together the primary tilemap for this scene*/
-    createTileMap(){
-        this.map = this.make.tilemap({key: "islandUpleft"});
+    createTileMap() {
+        this.map = this.make.tilemap({ key: "islandUpleft" });
         this.islandA1 = this.map.addTilesetImage("islandA1");
         this.islandA2 = this.map.addTilesetImage("islandA2");
         this.islandB = this.map.addTilesetImage("islandB");
@@ -99,9 +107,9 @@ export class Island extends Phaser.Scene {
      * and run some testing. Eventually when we have actaully characters made this
      * will construct the sprite for a character based on a player/characters interface
      */
-    createPlayerSprite(){
+    createPlayerSprite() {
         /**generate the inital sprite */
-        this.player = this.physics.add.sprite(this.tilemapWidthInPixels/2,this.tilemapHeightInPixels/2,"character_template",0);
+        this.player = this.physics.add.sprite(this.tilemapWidthInPixels / 2, this.tilemapHeightInPixels / 2, "character_template", 0);
         this.player.setDepth(this.playerDepth);
         /**generate all the animations associated with this sprite */
         this.anims.create({
@@ -149,20 +157,20 @@ export class Island extends Phaser.Scene {
     }
 
     /**creates Phaser.Input.Keyboard.Key objects that can used for polling in the games update loop */
-    createKeys(){
+    createKeys() {
         /**fill this.keys will all the keys we will need to poll in this scene */
         this.keys["up"] = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W);
         this.keys["left"] = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
         this.keys["down"] = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S);
-        this.keys["right"] = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);   
+        this.keys["right"] = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
     }
-    
+
 
     /**Used to poll and see if and of the WASD keys are being pushed down
      * if they are moves the character's sprite and changes animation accordingly
      */
-    playerUpdateMovement(){
-        /**store the players body and type cast for use in the loop */
+    playerUpdateMovement() {
+        /**type casting the body to use arcade body methods */
         let body = <Phaser.Physics.Arcade.Body>this.player.body;
         /**reset bodies volocity to 0 */
         body.setVelocity(0);
@@ -170,28 +178,28 @@ export class Island extends Phaser.Scene {
          * if it is the check if the animation for that direction is playing
          * if not play it. Then move the player sprite in the correct direction.
          */
-        if (this.keys["up"].isDown){
-            if(this.player.anims.getCurrentKey() != "up"){
+        if (this.keys["up"].isDown) {
+            if (this.player.anims.getCurrentKey() != "up") {
                 this.anims.play("up", this.player);
             }
             body.setVelocityY(-100);
-        } else if(this.keys["left"].isDown){
-            if(this.player.anims.getCurrentKey() != "left"){
+        } else if (this.keys["left"].isDown) {
+            if (this.player.anims.getCurrentKey() != "left") {
                 this.anims.play("left", this.player);
             }
-            body.setVelocityX(-100);;
-        } else if(this.keys["down"].isDown){
-            if(this.player.anims.getCurrentKey() != "down"){
+            this.player.x -= 2;
+        } else if (this.keys["down"].isDown) {
+            if (this.player.anims.getCurrentKey() != "down") {
                 this.anims.play("down", this.player);
             }
-            body.setVelocityY(+100);
-        } else if(this.keys["right"].isDown){
-            if(this.player.anims.getCurrentKey()!= "right"){
+            this.player.y += 2;
+        } else if (this.keys["right"].isDown) {
+            if (this.player.anims.getCurrentKey() != "right") {
                 this.anims.play("right", this.player);
             }
             body.setVelocityX(+100);
         } else {
-            if(this.player.anims.getCurrentKey() != "idle"){
+            if (this.player.anims.getCurrentKey() != "idle") {
                 this.anims.play("idle", this.player);
             }
         }
