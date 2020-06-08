@@ -33,9 +33,9 @@ export class Island extends Phaser.Scene {
      * this runs in full before create()
      */
     init(){
-        this.tilemapHeightInPixels = 4800;
-        this.tilemapWidthInPixels = 4800;
-        this.cameras.main.setBounds(0,0,4800,4800);
+        this.tilemapHeightInPixels = 1600;
+        this.tilemapWidthInPixels = 1600;
+        this.cameras.main.setBounds(0,0,1600,1600);
         this.keys = {};
         this.playerDepth = 10;
     }
@@ -58,16 +58,16 @@ export class Island extends Phaser.Scene {
 
     /**Creates and puts together the primary tilemap for this scene*/
     createTileMap(){
-        let map = this.make.tilemap({ key: "island", tileWidth: 16, tileHeight: 16 });
-        let islandA1 = map.addTilesetImage("islandA1");
-        let islandA2 = map.addTilesetImage("islandA2");
-        let islandB = map.addTilesetImage("islandB");
-        let islandC = map.addTilesetImage("islandC");
-        let backgroundLayer = map.createStaticLayer("background",[islandA1,islandA2],0,0);
-        let forgroundLayer = map.createStaticLayer("foreground",[islandB,islandC],0,0);
+        let map = this.make.tilemap({key: "islandUpleft"});
+        //let islandA1 = map.addTilesetImage("islandA1");
+        //let islandA2 = map.addTilesetImage("islandA2");
+        //let islandB = map.addTilesetImage("islandB");
+        //let islandC = map.addTilesetImage("islandC");
+        //let backgroundLayer = map.createStaticLayer("background",[islandA1,islandA2],0,0);
+        //let forgroundLayer = map.createStaticLayer("foreground",[islandB,islandC],0,0);
         //make sure the background layer allways appears below the player
-        backgroundLayer.depth = this.playerDepth - 1;
-        forgroundLayer.depth = this.playerDepth - 1;
+        //backgroundLayer.depth = this.playerDepth - 1;
+        //forgroundLayer.depth = this.playerDepth - 1;
     }
 
     /**Right now this just creates a test sprite dude to walk around the world with
