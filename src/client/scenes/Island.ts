@@ -53,11 +53,9 @@ export class Island extends Phaser.Scene {
      * this runs in full before create()
      */
     init(){
-        this.tilemapHeightInPixels = 1600;
-        this.tilemapWidthInPixels = 1600;
-        this.cameras.main.setBounds(0,0,1600,1600);
         this.keys = {};
         this.playerDepth = 10;
+        this.cameras.main.setZoom(2);
     }
 
     /**Used to initally create all of our assets and set up the games scene/stage the
@@ -83,7 +81,7 @@ export class Island extends Phaser.Scene {
         this.islandA2 = this.map.addTilesetImage("islandA2");
         this.islandB = this.map.addTilesetImage("islandB");
         this.backgroundLayer = this.map.createStaticLayer("background",[this.islandA1,this.islandA2],0,0);
-        this.walkLayer = this.map.createStaticLayer("walk",[this.islandB],0,0);
+        this.walkLayer = this.map.createStaticLayer("walk",[this.islandA1,this.islandB],0,0);
         this.overheadLayer= this.map.createStaticLayer("overhead",[this.islandB],0,0);
         /**make sure the layers appear where they are supposed to in relation to the player*/
         this.backgroundLayer.depth = this.playerDepth - 1;
@@ -91,6 +89,10 @@ export class Island extends Phaser.Scene {
         this.overheadLayer.depth = this.playerDepth + 1;
         /**set collision for the walk layer */
         this.walkLayer.setCollisionByProperty({ passThru: false });
+        /**set veribles values to their proper values based on newly created tilemap */
+        this.tilemapHeightInPixels = this.map.heightInPixels;
+        this.tilemapWidthInPixels = this.map.widthInPixels;
+        this.cameras.main.setBounds(0,0,this.tilemapWidthInPixels,this.tilemapHeightInPixels);
     }
 
     /**Right now this just creates a test sprite dude to walk around the world with
@@ -139,8 +141,11 @@ export class Island extends Phaser.Scene {
         /**set players inital animation */
         this.anims.play("idle", this.player);
 
-        /**adds collision for the walk layer and player */
+        /**adds collision for the player */
         this.physics.add.collider(this.player, this.walkLayer);
+        let body = <Phaser.Physics.Arcade.Body>this.player.body;
+        body.setSize(16,16,false);
+        body.setOffset(8,16);
     }
 
     /**creates Phaser.Input.Keyboard.Key objects that can used for polling in the games update loop */
@@ -157,7 +162,10 @@ export class Island extends Phaser.Scene {
      * if they are moves the character's sprite and changes animation accordingly
      */
     playerUpdateMovement(){
+        /**store the players body and type cast for use in the loop */
         let body = <Phaser.Physics.Arcade.Body>this.player.body;
+        /**reset bodies volocity to 0 */
+        body.setVelocity(0);
         /**for each direction each if the correct key is being pressed
          * if it is the check if the animation for that direction is playing
          * if not play it. Then move the player sprite in the correct direction.
@@ -171,22 +179,21 @@ export class Island extends Phaser.Scene {
             if(this.player.anims.getCurrentKey() != "left"){
                 this.anims.play("left", this.player);
             }
-            this.player.x -= 2;
+            body.setVelocityX(-100);;
         } else if(this.keys["down"].isDown){
             if(this.player.anims.getCurrentKey() != "down"){
                 this.anims.play("down", this.player);
             }
-            this.player.y += 2;
+            body.setVelocityY(+100);
         } else if(this.keys["right"].isDown){
             if(this.player.anims.getCurrentKey()!= "right"){
                 this.anims.play("right", this.player);
             }
-            this.player.x += 2;
+            body.setVelocityX(+100);
         } else {
             if(this.player.anims.getCurrentKey() != "idle"){
                 this.anims.play("idle", this.player);
             }
-            body.setVelocity(0);
         }
     }
 }

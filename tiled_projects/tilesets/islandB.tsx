@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <tileset version="1.2" tiledversion="1.3.1" name="islandB" tilewidth="16" tileheight="16" tilecount="256" columns="16">
+ <editorsettings>
+  <export target="../../assets/tilemaps/islandUpleft.json" format="json"/>
+ </editorsettings>
  <image source="../../assets/images/tilesets/islandB.png" width="256" height="256"/>
  <tile id="0">
   <properties>
@@ -1163,17 +1166,17 @@
  </tile>
  <tile id="232">
   <properties>
-   <property name="passThru" type="bool" value="true"/>
+   <property name="passThru" type="bool" value="false"/>
   </properties>
  </tile>
  <tile id="233">
   <properties>
-   <property name="passThru" type="bool" value="true"/>
+   <property name="passThru" type="bool" value="false"/>
   </properties>
  </tile>
  <tile id="234">
   <properties>
-   <property name="passThru" type="bool" value="true"/>
+   <property name="passThru" type="bool" value="false"/>
   </properties>
  </tile>
  <tile id="235">
