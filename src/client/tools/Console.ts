@@ -27,6 +27,7 @@ export function rewireLoggingToElement(eleLocator: Function, eleOverflowLocator:
     fixLoggingFunc('error');
     fixLoggingFunc('info');
 
+    // Nested function used to fix individual logging commands
     function fixLoggingFunc(name) {
         console['old' + name] = console[name];
         console[name] = function (...args: any[]) {
@@ -48,6 +49,7 @@ export function rewireLoggingToElement(eleLocator: Function, eleOverflowLocator:
         };
     }
 
+    // Nested function used to add output elements to the console element
     function produceOutput(name, args) {
         return args.reduce((output, arg) => {
             return output +
@@ -55,5 +57,22 @@ export function rewireLoggingToElement(eleLocator: Function, eleOverflowLocator:
                 (typeof arg === "object" && (JSON || {}).stringify ? JSON.stringify(arg) : arg) +
                 "</span>&nbsp;";
         }, '');
+    }
+}
+
+export class Console {
+    constructor(scene: Phaser.Scene) {
+
+    }
+
+    htmlOutput(name, args: any[]) {
+        let combinedOutput = args.reduce((previousValue, currentValue) => {
+            let outputThisIteration = previousValue +
+                "<span class=\"log-" + (typeof currentValue) + " log-" + name + "\">" +
+                (typeof currentValue === "object" && (JSON || {}).stringify ? JSON.stringify(currentValue) : currentValue) +
+                "</span>&nbsp;";
+            return outputThisIteration;
+        }, '');
+        return combinedOutput;
     }
 }
