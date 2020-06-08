@@ -187,12 +187,12 @@ export class Island extends Phaser.Scene {
             if (this.player.anims.getCurrentKey() != "left") {
                 this.anims.play("left", this.player);
             }
-            this.player.x -= 2;
+            body.setVelocityX(-100);
         } else if (this.keys["down"].isDown) {
             if (this.player.anims.getCurrentKey() != "down") {
                 this.anims.play("down", this.player);
             }
-            this.player.y += 2;
+            body.setVelocityY(+100);
         } else if (this.keys["right"].isDown) {
             if (this.player.anims.getCurrentKey() != "right") {
                 this.anims.play("right", this.player);
