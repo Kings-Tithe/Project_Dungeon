@@ -157,7 +157,13 @@ export class Island extends Phaser.Scene {
      * if they are moves the character's sprite and changes animation accordingly
      */
     playerUpdateMovement(){
+        // Type casting the body to use arcade body methods
         let body = <Phaser.Physics.Arcade.Body>this.player.body;
+        // Avoiding partial decimal positions b/c that causes render artifacts
+        body.x = Math.round(body.x);
+        body.y = Math.round(body.y);
+        // Debug statement to check the position and make sure its working
+        console.log(body.position);
         /**for each direction each if the correct key is being pressed
          * if it is the check if the animation for that direction is playing
          * if not play it. Then move the player sprite in the correct direction.

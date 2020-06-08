@@ -14,7 +14,9 @@ const config: Phaser.Types.Core.GameConfig = {
     title: 'ProjectDungeon',
     /** Prevents anti-aliasing */
     render: {
-        pixelArt: true
+        pixelArt: true,
+        antialias: false,
+        roundPixels: true
     },
     /** Adds easy access to built in functions for collison */
     physics: {
