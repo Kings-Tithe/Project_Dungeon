@@ -31,7 +31,7 @@ export class LoadAssets extends Scene {
             "islandC": "I/images/tilesets/islandC.png",
 
             /** Spritesheet */
-            "character_template": "S/images/TemplateSpriteSheet.png",
+            "character_template": "S/images/gregTheTestDummy.png",
 
             /** Tilemaps */
             "islandUpleft": "T/tilemaps/islandUpleft.json",
