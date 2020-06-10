@@ -24,6 +24,8 @@ export class Island extends Phaser.Scene {
     /**Stores the players set depth, not meant to change, 
      * property depthOffSet uses this as a base by which to offset */
     playerDepth: number;
+    /**The speed at which the player walks, Will eventually be part of the player class*/
+    playerSpeed: number;
 
     /**Tilemaps */
     /**The main map used in this scene */
@@ -45,6 +47,11 @@ export class Island extends Phaser.Scene {
     /**A layer of things that sit above the player and adds a sense of depth */
     overheadLayer: Phaser.Tilemaps.StaticTilemapLayer;
 
+    /**String */
+    /**Used to store the direction the character is facing, will eventually be part of
+     * the character class */
+    characterDirection: string;
+
 
     constructor() {
         super("Island")
@@ -56,6 +63,7 @@ export class Island extends Phaser.Scene {
     init(){
         this.keys = {};
         this.playerDepth = 10;
+        this.playerSpeed = 150;
         this.cameras.main.setZoom(2);
     }
 
@@ -146,8 +154,37 @@ export class Island extends Phaser.Scene {
             frameRate: 10,
             repeat: -1
         });
+        /**animation used to reset the frame of the character sprite after walking up */
+        this.anims.create({
+            key: 'idle_up',
+            frames: this.anims.generateFrameNumbers('character_template', { start:1, end: 1 }),
+            frameRate: 10,
+            repeat: -1
+        });
+        /**animation used to reset the frame of the character sprite after walking down */
+        this.anims.create({
+            key: 'idle_down',
+            frames: this.anims.generateFrameNumbers('character_template', { end: 0 }),
+            frameRate: 10,
+            repeat: -1
+        });
+        /**animation used to reset the frame of the character sprite after walking left */
+        this.anims.create({
+            key: 'idle_left',
+            frames: this.anims.generateFrameNumbers('character_template', { start:3, end: 3 }),
+            frameRate: 10,
+            repeat: -1
+        });
+        /**animation used to reset the frame of the character sprite after walking right */
+        this.anims.create({
+            key: 'idle_right',
+            frames: this.anims.generateFrameNumbers('character_template', { start:2, end: 2 }),
+            frameRate: 10,
+            repeat: -1
+        });
         /**set players inital animation */
-        this.anims.play("idle", this.player);
+        this.anims.play("idle_down", this.player);
+        this.characterDirection = "down";
 
         /**adds collision for the player */
         this.physics.add.collider(this.player, this.walkLayer);
@@ -168,6 +205,8 @@ export class Island extends Phaser.Scene {
 
     /**Used to poll and see if and of the WASD keys are being pushed down
      * if they are moves the character's sprite and changes animation accordingly
+     * Will attempt to condense code when moving it into the player class, this was
+     * a first pass try if you will.
      */
     playerUpdateMovement() {
         /**type casting the body to use arcade body methods */
@@ -178,30 +217,72 @@ export class Island extends Phaser.Scene {
          * if it is the check if the animation for that direction is playing
          * if not play it. Then move the player sprite in the correct direction.
          */
-        if (this.keys["up"].isDown) {
+        /**Check the four two key combos */
+        if (this.keys["up"].isDown && this.keys["right"].isDown){
             if (this.player.anims.getCurrentKey() != "up") {
                 this.anims.play("up", this.player);
+                this.characterDirection = "up";
             }
-            body.setVelocityY(-100);
+            body.setVelocityX(this.playerSpeed/2);
+            body.setVelocityY(-this.playerSpeed/2);
+            console.log("up,right");
+        } else if (this.keys["up"].isDown && this.keys["left"].isDown){
+            if (this.player.anims.getCurrentKey() != "up") {
+                this.anims.play("up", this.player);
+                this.characterDirection = "up";
+            }
+            body.setVelocityX(-this.playerSpeed/2);
+            body.setVelocityY(-this.playerSpeed/2);
+            console.log("up,left");
+        } else if (this.keys["down"].isDown && this.keys["right"].isDown){
+            if (this.player.anims.getCurrentKey() != "down") {
+                this.anims.play("down", this.player);
+                this.characterDirection = "down";
+            }
+            body.setVelocityX(this.playerSpeed/2);
+            body.setVelocityY(this.playerSpeed/2);
+        } else if (this.keys["down"].isDown && this.keys["left"].isDown){
+            if (this.player.anims.getCurrentKey() != "down") {
+                this.anims.play("down", this.player);
+                this.characterDirection = "down";
+            }
+            body.setVelocityX(-this.playerSpeed/2);
+            body.setVelocityY(this.playerSpeed/2);
+        }
+        /**Check the four basic directions */
+        else if (this.keys["up"].isDown) {
+            if (this.player.anims.getCurrentKey() != "up") {
+                this.anims.play("up", this.player);
+                this.characterDirection = "up";
+            }
+            body.setVelocityY(-this.playerSpeed);
         } else if (this.keys["left"].isDown) {
             if (this.player.anims.getCurrentKey() != "left") {
                 this.anims.play("left", this.player);
+                this.characterDirection = "left";
             }
-            body.setVelocityX(-100);
+            body.setVelocityX(-this.playerSpeed);
         } else if (this.keys["down"].isDown) {
             if (this.player.anims.getCurrentKey() != "down") {
                 this.anims.play("down", this.player);
+                this.characterDirection = "down";
             }
-            body.setVelocityY(+100);
+            body.setVelocityY(this.playerSpeed);
         } else if (this.keys["right"].isDown) {
             if (this.player.anims.getCurrentKey() != "right") {
                 this.anims.play("right", this.player);
+                this.characterDirection = "right";
             }
-            body.setVelocityX(+100);
-        } else {
-            if (this.player.anims.getCurrentKey() != "idle") {
-                this.anims.play("idle", this.player);
+            body.setVelocityX(this.playerSpeed);
+        } 
+        /**If no buttons are being pressed */
+        else {
+            if (this.player.anims.getCurrentKey() != "idle_" + this.characterDirection) {
+                this.anims.play("idle_" + this.characterDirection, this.player);
             }
         }
+
+        //normalize the speed so we don't moveat weird speeds on diagonals
+        body.velocity.normalize().scale(this.playerSpeed);
     }
 }
