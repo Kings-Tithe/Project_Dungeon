@@ -1,8 +1,20 @@
 import { hookToMethod } from "../tools/Hook";
 
-/**Scene with a basic starting example island for what the final one might look
- * like. This will be used to test new features and game mechanics that will be
- * used on the island.
+/** Island
+ * Purpose: Phaser Scene with a basic starting example island for what the final
+ * one might look like. This will be used to test new features and game mechanics 
+ * that will be used on the island.
+ * 
+ * Functions:
+ * constructor
+ * init()
+ * create()
+ * update()
+ * createTileMap()
+ * createPlayerSprite()
+ * createKeys()
+ * playerUpdateMovement()
+ * 
  */
 export class Island extends Phaser.Scene {
 
@@ -52,7 +64,10 @@ export class Island extends Phaser.Scene {
      * the character class */
     characterDirection: string;
 
-
+    /**Calls to the parent constructor to construct the scene. Parents adds
+     * the key of the scene that is passed in below to the game objects list
+     * of Phaser scenes
+     */
     constructor() {
         super("Island")
     }
@@ -86,6 +101,9 @@ export class Island extends Phaser.Scene {
         
     }
 
+    /**A overwritten version of the game loop that is called 60 times
+     * a second by the game.
+     */
     update() {
         this.playerUpdateMovement();
     }
