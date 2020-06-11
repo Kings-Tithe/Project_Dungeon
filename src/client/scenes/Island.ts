@@ -79,10 +79,9 @@ export class Island extends Phaser.Scene {
     create() {
         this.createTileMap();
         this.createKeys();
-        this.main.createPlayerSprite(this, this.tilemapWidthInPixels/2, this.tilemapHeightInPixels/2);
-        this.main.addSpriteToScene(this);
+        this.main.addSpriteToScene(this, this.tilemapWidthInPixels/2, this.tilemapHeightInPixels/2);
         /**setup the main camera */
-        this.cameras.main.startFollow(this.main.characterSprite, true);
+        this.cameras.main.startFollow(this.main.sprite, true);
 
         // Round physics positions to avoid ugly render artifacts
         hookToMethod(Phaser.Physics.Arcade.Body.prototype, 'update', function() {

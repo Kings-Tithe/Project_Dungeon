@@ -121,87 +121,44 @@ export class Character {
         body.setOffset(8,16);
     }
 
-    // /**Used to poll and see if and of the WASD keys are being pushed down
-    //  * if they are moves the character's sprite and changes animation accordingly
-    //  * Will attempt to condense code when moving it into the player class, this was
-    //  * a first pass try if you will.
-    //  */
-    // playerUpdateMovement() {
-    //     /**type casting the body to use arcade body methods */
-    //     let body = <Phaser.Physics.Arcade.Body>this.player.body;
-    //     /**reset bodies volocity to 0 */
-    //     body.setVelocity(0);
-    //     /**for each direction each if the correct key is being pressed
-    //      * if it is the check if the animation for that direction is playing
-    //      * if not play it. Then move the player sprite in the correct direction.
-    //      */
-    //     /**Check the four two key combos */
-    //     if (this.keys["up"].isDown && this.keys["right"].isDown){
-    //         if (this.player.anims.getCurrentKey() != "up") {
-    //             this.anims.play("up", this.player);
-    //             this.characterDirection = "up";
-    //         }
-    //         body.setVelocityX(this.playerSpeed/2);
-    //         body.setVelocityY(-this.playerSpeed/2);
-    //         console.log("up,right");
-    //     } else if (this.keys["up"].isDown && this.keys["left"].isDown){
-    //         if (this.player.anims.getCurrentKey() != "up") {
-    //             this.anims.play("up", this.player);
-    //             this.characterDirection = "up";
-    //         }
-    //         body.setVelocityX(-this.playerSpeed/2);
-    //         body.setVelocityY(-this.playerSpeed/2);
-    //         console.log("up,left");
-    //     } else if (this.keys["down"].isDown && this.keys["right"].isDown){
-    //         if (this.player.anims.getCurrentKey() != "down") {
-    //             this.anims.play("down", this.player);
-    //             this.characterDirection = "down";
-    //         }
-    //         body.setVelocityX(this.playerSpeed/2);
-    //         body.setVelocityY(this.playerSpeed/2);
-    //     } else if (this.keys["down"].isDown && this.keys["left"].isDown){
-    //         if (this.player.anims.getCurrentKey() != "down") {
-    //             this.anims.play("down", this.player);
-    //             this.characterDirection = "down";
-    //         }
-    //         body.setVelocityX(-this.playerSpeed/2);
-    //         body.setVelocityY(this.playerSpeed/2);
-    //     }
-    //     /**Check the four basic directions */
-    //     else if (this.keys["up"].isDown) {
-    //         if (this.player.anims.getCurrentKey() != "up") {
-    //             this.anims.play("up", this.player);
-    //             this.characterDirection = "up";
-    //         }
-    //         body.setVelocityY(-this.playerSpeed);
-    //     } else if (this.keys["left"].isDown) {
-    //         if (this.player.anims.getCurrentKey() != "left") {
-    //             this.anims.play("left", this.player);
-    //             this.characterDirection = "left";
-    //         }
-    //         body.setVelocityX(-this.playerSpeed);
-    //     } else if (this.keys["down"].isDown) {
-    //         if (this.player.anims.getCurrentKey() != "down") {
-    //             this.anims.play("down", this.player);
-    //             this.characterDirection = "down";
-    //         }
-    //         body.setVelocityY(this.playerSpeed);
-    //     } else if (this.keys["right"].isDown) {
-    //         if (this.player.anims.getCurrentKey() != "right") {
-    //             this.anims.play("right", this.player);
-    //             this.characterDirection = "right";
-    //         }
-    //         body.setVelocityX(this.playerSpeed);
-    //     } 
-    //     /**If no buttons are being pressed */
-    //     else {
-    //         if (this.player.anims.getCurrentKey() != "idle_" + this.characterDirection) {
-    //             this.anims.play("idle_" + this.characterDirection, this.player);
-    //         }
-    //     }
+    /**Used to move the character in small increments, is meant to be used in an update loop
+     * positive x moves to the right, negative to the left. postive y moves down and negative
+     * move up. If the speed for x or y is set to 1 then it uses the characters standard speed
+     * otherwise it is set to the passed in number However if it is 0 then no movement will be taken.
+     * @param x positive moves right, negative moves left
+     * @param y positive moves down, negative moves up
+     */
+    characterUpdateMovement(x: number, y: number) {
+        /**type casting the body to use arcade body methods */
+        let body = <Phaser.Physics.Arcade.Body>this.sprite.body;
+        /**reset bodies volocity to 0 */
+        body.setVelocity(0);
 
-    //     //normalize the speed so we don't move at weird speeds on diagonals
-    //     body.velocity.normalize().scale(this.playerSpeed);
-    // }
+        /**Now we are gonna determine our speed and in what direction(s) */
+        if (x == 1){
+            
+        } else if {
+
+        } else {
+
+        }
+       
+        } else if (this.keys["right"].isDown) {
+            if (this.player.anims.getCurrentKey() != "right") {
+                this.anims.play("right", this.player);
+                this.characterDirection = "right";
+            }
+            body.setVelocityX(this.playerSpeed);
+        } 
+        /**If no buttons are being pressed */
+        else {
+            if (this.player.anims.getCurrentKey() != "idle_" + this.characterDirection) {
+                this.anims.play("idle_" + this.characterDirection, this.player);
+            }
+        }
+
+        //normalize the speed so we don't move at weird speeds on diagonals
+        body.velocity.normalize().scale(this.playerSpeed);
+    }
 
 }
