@@ -19,8 +19,35 @@ export class Character {
     /**Stores the characters set depth, only meant to change when changing party 
      * order, property depthOffSet uses this as a base by which to offset */
     depth: number;
-    /**The number of spaces this character can move in battle */
+
+    /**Numbers - Base Stats: these are the 4 basic stats most the games calculations
+     * for characters is based on */
+    /**Represents mental & focus based abilities, a character's wit, smarts
+     *  steady hand and rationale. */
+    focus: number;
+    /**Represents a characters survivability, their pain thresholds, poison
+     *  resistance, metabolism and strength of spirit. */
+    endurance: number;
+    /**Represents a character's momentum and mental pacing, their reflexes,
+     *  rate of action and defensive capability. */
+    speed: number;
+    /**Represents Physical power, a character's ability to crush, grapple, 
+     * slash, and generally exert force */
+    might: number;
+
+    /**Numbers - Indirect Stats: these are useful stats that are stored instead
+     * of constantly recalculate that are based on the above base stats */
+    /**The number of spaces this character can move in battle, based on speed stat */
     battleSpeed: number;
+    /**A measure of how healthy or close to death depending a character is. slightly
+     * affected by might and focus, greatly affected by endurance. */
+    life: number;
+    /**determines your changes of an attack being critical, greatly affected 
+     * by focus and speed */
+    criticalChance: number;
+    /**used as a cost for abilities and skills, increases with endurance, minor cost
+     * reduction with focus */
+    energy: number;
 
     /**String */
     /**Used to store the direction the character is facing */

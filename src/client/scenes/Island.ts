@@ -5,17 +5,6 @@ import { Character } from "../classes/Character";
  * Purpose: Phaser Scene with a basic starting example island for what the final
  * one might look like. This will be used to test new features and game mechanics 
  * that will be used on the island.
- * 
- * Functions:
- * constructor
- * init()
- * create()
- * update()
- * createTileMap()
- * createPlayerSprite()
- * createKeys()
- * playerUpdateMovement()
- * 
  */
 export class Island extends Phaser.Scene {
 
