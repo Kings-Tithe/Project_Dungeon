@@ -59,8 +59,10 @@ export class Character {
      * on our sprite */
     animationManager: Phaser.Animations.AnimationManager;
 
-    constructor(scene: Phaser.Scene){
-        this.animationManager = scene.anims;
+    /**Creates an instance of our character, this is passed an animation handler
+     * by the player class. */
+    constructor(animationManager: Phaser.Animations.AnimationManager){
+        this.animationManager = animationManager;
         this.depth = 10;
     }
 
@@ -80,6 +82,7 @@ export class Character {
         /**generate the inital sprite */
         this.sprite = scene.physics.add.sprite(x, y, spriteKey, 0);
         this.sprite.setDepth(this.depth);
+        this.sprite.ignoreDestroy = true;
         /**generate all the animations associated with this sprite */
         scene.anims.create({
             key: 'right',
@@ -214,8 +217,13 @@ export class Character {
         }
     }
 
+    moveTo(x:number, y:number){
+        this.sprite.setPosition(x,y);
+    }
+
     destroy(){
         this.sprite.destroy();
+        this.sprite = null;
     }
 
 }
