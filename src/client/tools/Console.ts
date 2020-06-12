@@ -1,70 +1,15 @@
 /**
- * Redirects the console's logging outputs to an HTML element.
- * @param eleLocator function to get the output element
- *   The following styling classes should exist on the output element:
- *     log-warn, log-error, log-info, log-log
- *   Examples:
- *     .log-warn { color: orange }
- *     .log-error { color: red }
- *     .log-info { color: skyblue }
- *     .log-log { color: silver }
- *     .log-warn, .log-error { font-weight: bold; }
- * @param eleOverflowLocator function to get the overflow element (container)
- *   The container element needs a style property for overflow and height.
- *   This helps us define how tall the output should be and whether we should
- *   make it scrollable. Example:
- *   #log-container { overflow: auto; height: 150px; }
- * @param autoScroll whether or not to automatically scroll to the bottom
- * 
- * Credit:
- * Benny Bottema
- * https://stackoverflow.com/questions/20256760/javascript-console-log-to-html 
- */
-export function rewireLoggingToElement(eleLocator: Function, eleOverflowLocator: Function, autoScroll: Boolean) {
-    fixLoggingFunc('log');
-    fixLoggingFunc('debug');
-    fixLoggingFunc('warn');
-    fixLoggingFunc('error');
-    fixLoggingFunc('info');
-
-    // Nested function used to fix individual logging commands
-    function fixLoggingFunc(name) {
-        console['old' + name] = console[name];
-        console[name] = function (...args: any[]) {
-            const output = produceOutput(name, args);
-            const eleLog = eleLocator();
-
-            if (autoScroll) {
-                const eleContainerLog = eleOverflowLocator();
-                const isScrolledToBottom = eleContainerLog.scrollHeight - eleContainerLog.clientHeight <= eleContainerLog.scrollTop + 1;
-                eleLog.innerHTML += output + "<br>";
-                if (isScrolledToBottom) {
-                    eleContainerLog.scrollTop = eleContainerLog.scrollHeight - eleContainerLog.clientHeight;
-                }
-            } else {
-                eleLog.innerHTML += output + "<br>";
-            }
-
-            console['old' + name].apply(undefined, args);
-        };
-    }
-
-    // Nested function used to add output elements to the console element
-    function produceOutput(name, args) {
-        return args.reduce((output, arg) => {
-            return output +
-                "<span class=\"log-" + (typeof arg) + " log-" + name + "\">" +
-                (typeof arg === "object" && (JSON || {}).stringify ? JSON.stringify(arg) : arg) +
-                "</span>&nbsp;";
-        }, '');
-    }
-}
-
-/**
  * In game console with output of error messages, feedback, and command inputs
  * for development (or cheating I guess)
  * Contains methods to manipulate the game console and rewire output from
  * the browser console to the game console.
+ * 
+ * Credit:
+ * I used a solution made by Stack Overflow user Benny Bottema for redirecting
+ * console output to HTML elements. Linked below is the question on
+ * Stack Overflow, and the user's profile.
+ * https://stackoverflow.com/questions/20256760/javascript-console-log-to-html
+ * https://stackoverflow.com/users/441662/benny-bottema
  */
 export class Console {
 
@@ -77,6 +22,22 @@ export class Console {
      */
     constructor(scene: Phaser.Scene) {
         this.scene = scene;
+    }
+
+    /**
+     * Redirects the output of all major console output functions to
+     * HTML game console as well as browser debug console.
+     * @param outputElement the <pre> output element which will contain console
+     * output
+     * @param outputContainerDiv the <div> which contains the output element,
+     * handles scrolling, and determines the consoles size and stlying in game 
+     */
+    rewireAll(outputElement: HTMLPreElement, outputContainerDiv: HTMLDivElement) {
+        this.rewireConsoleFunc('log', outputElement, outputContainerDiv);
+        this.rewireConsoleFunc('debug', outputElement, outputContainerDiv);
+        this.rewireConsoleFunc('warn', outputElement, outputContainerDiv);
+        this.rewireConsoleFunc('error', outputElement, outputContainerDiv);
+        this.rewireConsoleFunc('info', outputElement, outputContainerDiv);
     }
 
     /**
@@ -131,7 +92,7 @@ export class Console {
      * @param args a list of any loggable objects or values
      * @return an HTML formatted string of <span> tags
      */
-    static htmlLog(consoleFuncName: string, args: any[]) {
+    static htmlLog(consoleFuncName: string, args: any[]): String {
         // reduce runs a provided function on each element of an array, with
         // the intention that that function should return a merge of each of
         // the two.
