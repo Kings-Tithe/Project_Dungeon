@@ -80,13 +80,58 @@ export class Console {
     }
 
     /**
+     * Redirects the output of some console function to appear both in the
+     * browser console and some HTML elements which form the game's console
+     * @param consoleFuncName the name of the console function to redirect to
+     * HTML output
+     * @param outputElement the <pre> output element which will contain console
+     * output
+     * @param outputContainerDiv the <div> which contains the output element,
+     * handles scrolling, and determines the consoles size and stlying in game 
+     */
+    rewireConsoleFunc(consoleFuncName: string, outputElement: HTMLPreElement, outputContainerDiv: HTMLDivElement) {
+        // store the old version of the console function
+        console['_old_' + consoleFuncName] = console[consoleFuncName];
+
+        /**
+         * The new console function which outputs to both the browser console
+         * and to the game console (in HTML)
+         * @param args the objects to output as log, error, etc...
+         */
+        console[consoleFuncName] = function (...args: any[]) {
+            // get HTML span tags of the objects
+            const output = Console.htmlLog(consoleFuncName, args);
+            // add the html <span> texts to the <pre> output element
+            outputElement.innerHTML += output + "<br>";
+
+            // determine if game console is currently scrolled to the bottom
+            const isNotBottomed =
+                outputContainerDiv.scrollHeight
+                - outputContainerDiv.clientHeight
+                <= outputContainerDiv.scrollTop + 1;
+            // automatically scroll to the bottom when new console output
+            // is created
+            if (isNotBottomed) {
+                outputContainerDiv.scrollTop =
+                    outputContainerDiv.scrollHeight
+                    - outputContainerDiv.clientHeight;
+            }
+
+            // run the old function too, to print to the console
+            console['_old_' + name].apply(undefined, args);
+        };
+
+    };
+
+
+    /**
      * Produces an HTML formatted string of tags containing logged objects
      * @param consoleFunc the console function this output is for (syntax
      * highlighting relies on this)
      * @param args a list of any loggable objects or values
      * @return an HTML formatted string of <span> tags
      */
-    htmlLog(consoleFunc, args: any[]) {
+    static htmlLog(consoleFuncName: string, args: any[]) {
         // reduce runs a provided function on each element of an array, with
         // the intention that that function should return a merge of each of
         // the two.
@@ -97,8 +142,8 @@ export class Console {
             let outputThisIteration = previousValue +
                 // span tag, class corresponding with the type of variable
                 "<span class=\"log-" + (typeof currentValue)
-                // and logging function (consoleFunc)
-                + " log-" + consoleFunc + "\">" +
+                // and logging function (consoleFuncName)
+                + " log-" + consoleFuncName + "\">" +
                 // check if the value is an object or primitive data
                 (typeof currentValue === "object" && (JSON || {}).stringify ?
                     // add either json strings of objects or directly add
