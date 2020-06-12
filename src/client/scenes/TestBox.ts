@@ -1,4 +1,4 @@
-import { rewireLoggingToElement } from '../tools/Console';
+import { Console } from '../tools/Console';
 import { px, py } from '../tools/PercentCoords';
 
 export class TestBox extends Phaser.Scene {
@@ -7,6 +7,8 @@ export class TestBox extends Phaser.Scene {
     }
 
     createConsole() {
+        let gameConsole = new Console(this);
+
         let container: HTMLDivElement = document.createElement('div');
         container.id = 'log-container';
         container.style.overflow = 'auto';
@@ -20,8 +22,8 @@ export class TestBox extends Phaser.Scene {
         .log-error { color: red } \
         .log-info { color: skyblue } \
         .log-log { color: silver } \
-        .log-warn, .log-error { font-weight: bold; }"
-        container.appendChild(highlighting)
+        .log-warn, .log-error { font-weight: bold; }";
+        container.appendChild(highlighting);
 
         let outputText: HTMLPreElement = document.createElement('pre');
         outputText.id = 'log';
@@ -29,7 +31,7 @@ export class TestBox extends Phaser.Scene {
 
         this.add.dom(px(100) - 150, py(100) - 75, container);
 
-        rewireLoggingToElement(() => outputText, () => container, true);
+        gameConsole.rewireAll(outputText, container);
 
         for (let i = 0; i < 100; i++) {
             console.log(i);

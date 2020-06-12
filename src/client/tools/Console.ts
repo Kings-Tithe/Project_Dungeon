@@ -66,20 +66,20 @@ export class Console {
             outputElement.innerHTML += output + "<br>";
 
             // determine if game console is currently scrolled to the bottom
-            const isNotBottomed =
+            const bottomed =
                 outputContainerDiv.scrollHeight
                 - outputContainerDiv.clientHeight
                 <= outputContainerDiv.scrollTop + 1;
             // automatically scroll to the bottom when new console output
             // is created
-            if (isNotBottomed) {
+            if (!bottomed) {
                 outputContainerDiv.scrollTop =
                     outputContainerDiv.scrollHeight
                     - outputContainerDiv.clientHeight;
             }
 
             // run the old function too, to print to the console
-            console['_old_' + name].apply(undefined, args);
+            console['_old_' + consoleFuncName].apply(undefined, args);
         };
 
     };
