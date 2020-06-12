@@ -1,5 +1,6 @@
 import { hookToMethod } from "../tools/Hook";
 import { Character } from "../classes/Character";
+import { Controls } from "../classes/Controls";
 
 /** Island
  * Purpose: Phaser Scene with a basic starting example island for what the final
@@ -9,9 +10,6 @@ import { Character } from "../classes/Character";
 export class Island extends Phaser.Scene {
 
     /**Member Varibles */
-
-    /**Keys */
-    keys: { [key: string]: Phaser.Input.Keyboard.Key }
 
     /**Numbers */
     /**Used to store the width of the tilemap in pixels */
@@ -44,6 +42,9 @@ export class Island extends Phaser.Scene {
      * this will eventually be in the players party */
     main: Character;
 
+    /**control handler */
+    controls: Controls;
+
     /**Calls to the parent constructor to construct the scene. Parents adds
      * the key of the scene that is passed in below to the game objects list
      * of Phaser scenes
@@ -56,9 +57,9 @@ export class Island extends Phaser.Scene {
      * this runs in full before create()
      */
     init(){
-        this.keys = {};
         this.cameras.main.setZoom(2);
         this.main = new Character(this);
+        this.controls = new Controls(this);
     }
 
     /**Used to initally create all of our assets and set up the games scene/stage the
@@ -67,7 +68,6 @@ export class Island extends Phaser.Scene {
     */
     create() {
         this.createTileMap();
-        this.createKeys();
         this.main.addSpriteToScene(this, "gregTheTestDummy", this.tilemapWidthInPixels/2, this.tilemapHeightInPixels/2);
         /**adds collision for the player */
         this.physics.add.collider(this.main.sprite, this.walkLayer);
@@ -110,15 +110,6 @@ export class Island extends Phaser.Scene {
         this.cameras.main.setBounds(0,0,this.tilemapWidthInPixels,this.tilemapHeightInPixels);
     }
 
-    /**creates Phaser.Input.Keyboard.Key objects that can used for polling in the games update loop */
-    createKeys() {
-        /**fill this.keys will all the keys we will need to poll in this scene */
-        this.keys["up"] = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W);
-        this.keys["left"] = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
-        this.keys["down"] = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S);
-        this.keys["right"] = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
-    }
-
     /**Runs thru and checks what keys are being pressed making a call to
      * the character accordingly to move the character
      */
@@ -126,16 +117,16 @@ export class Island extends Phaser.Scene {
         let playerSpeed = 130;
         let x = 0;
         let y = 0;
-        if (this.keys["up"].isDown){
+        if (this.controls.isDown("walk up")){
             y -= playerSpeed;
         }
-        if (this.keys["down"].isDown){
+        if (this.controls.isDown("walk down")){
             y += playerSpeed;
         }
-        if (this.keys["left"].isDown){
+        if (this.controls.isDown("walk left")){
             x -= playerSpeed;
         }
-        if (this.keys["right"].isDown){
+        if (this.controls.isDown("walk right")){
             x += playerSpeed;
         }
         /**call to the player to move based on key presses */
