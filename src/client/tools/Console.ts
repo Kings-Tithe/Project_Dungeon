@@ -17,6 +17,8 @@ export class Console {
 
     // the scene this console object should be attached to
     scene: Phaser.Scene;
+    // the phaser dom object that references the html elements
+    dom: Phaser.GameObjects.DOMElement;
 
     // static HTML elements that are created once and re-used
     // the <pre> output element which will contain console output
@@ -36,7 +38,16 @@ export class Console {
         // Create the HTML elements forming the game console
         this.create();
         // Add the console to it's scene
-        this.scene.add.dom(px(100) - 150, py(100) - 75, Console.containerEl);
+        this.dom = this.scene.add.dom(px(100), py(100), Console.containerEl)
+            .setScrollFactor(0).setOrigin(1, 1);
+    }
+
+    setPosition(x: number, y: number) {
+        this.dom.setPosition(x, y);
+    }
+
+    setScale(scale: number) {
+        this.dom.setScale(scale);
     }
 
     create() {
