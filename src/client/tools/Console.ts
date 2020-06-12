@@ -60,19 +60,56 @@ export function rewireLoggingToElement(eleLocator: Function, eleOverflowLocator:
     }
 }
 
+/**
+ * In game console with output of error messages, feedback, and command inputs
+ * for development (or cheating I guess)
+ * Contains methods to manipulate the game console and rewire output from
+ * the browser console to the game console.
+ */
 export class Console {
-    constructor(scene: Phaser.Scene) {
 
+    // the scene this console object should be attached to
+    scene: Phaser.Scene;
+
+    /**
+     * Constructs a Console object
+     * @param scene the scene this console object should be attached to
+     */
+    constructor(scene: Phaser.Scene) {
+        this.scene = scene;
     }
 
-    htmlOutput(name, args: any[]) {
+    /**
+     * Produces an HTML formatted string of tags containing logged objects
+     * @param consoleFunc the console function this output is for (syntax
+     * highlighting relies on this)
+     * @param args a list of any loggable objects or values
+     * @return an HTML formatted string of <span> tags
+     */
+    htmlLog(consoleFunc, args: any[]) {
+        // reduce runs a provided function on each element of an array, with
+        // the intention that that function should return a merge of each of
+        // the two.
+        // ['a','b','c','d'] => ['ab','c','d'] => ['abc', 'd'] => 'abcd'
         let combinedOutput = args.reduce((previousValue, currentValue) => {
+            // we are adding to the previous value passed in (the current
+            // combined total)
             let outputThisIteration = previousValue +
-                "<span class=\"log-" + (typeof currentValue) + " log-" + name + "\">" +
-                (typeof currentValue === "object" && (JSON || {}).stringify ? JSON.stringify(currentValue) : currentValue) +
+                // span tag, class corresponding with the type of variable
+                "<span class=\"log-" + (typeof currentValue)
+                // and logging function (consoleFunc)
+                + " log-" + consoleFunc + "\">" +
+                // check if the value is an object or primitive data
+                (typeof currentValue === "object" && (JSON || {}).stringify ?
+                    // add either json strings of objects or directly add
+                    // primitive data to the resulting html string
+                    JSON.stringify(currentValue) : currentValue) +
+                // close the tag and spaces are nice
                 "</span>&nbsp;";
+            // send this current total to the next iteration of the reduction
             return outputThisIteration;
         }, '');
+        // return the final output, an html string of span tags
         return combinedOutput;
     }
 }
