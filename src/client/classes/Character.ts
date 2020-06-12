@@ -214,4 +214,8 @@ export class Character {
         }
     }
 
+    destroy(){
+        this.sprite.destroy();
+    }
+
 }
