@@ -69,7 +69,7 @@ export class Island extends Phaser.Scene {
     init(){
         this.keys = {};
         this.cameras.main.setZoom(2);
-        this.main = new Character;
+        this.main = new Character(this);
     }
 
     /**Used to initally create all of our assets and set up the games scene/stage the
@@ -79,7 +79,9 @@ export class Island extends Phaser.Scene {
     create() {
         this.createTileMap();
         this.createKeys();
-        this.main.addSpriteToScene(this, this.tilemapWidthInPixels/2, this.tilemapHeightInPixels/2);
+        this.main.addSpriteToScene(this, "gregTheTestDummy", this.tilemapWidthInPixels/2, this.tilemapHeightInPixels/2);
+        /**adds collision for the player */
+        this.physics.add.collider(this.main.sprite, this.walkLayer);
         /**setup the main camera */
         this.cameras.main.startFollow(this.main.sprite, true);
 
@@ -95,6 +97,7 @@ export class Island extends Phaser.Scene {
      * a second by the game.
      */
     update() {
+        this.poleCharactermovement();
     }
 
     /**Creates and puts together the primary tilemap for this scene*/
@@ -107,6 +110,9 @@ export class Island extends Phaser.Scene {
         this.walkLayer = this.map.createStaticLayer("walk",[this.islandA1,this.islandB],0,0);
         this.overheadLayer= this.map.createStaticLayer("overhead",[this.islandB],0,0);
         /**make sure the layers appear where they are supposed to in relation to the player*/
+        this.backgroundLayer.depth = 9;
+        this.walkLayer.depth = 9;
+        this.overheadLayer.depth = 11;
         /**set collision for the walk layer */
         this.walkLayer.setCollisionByProperty({ passThru: false });
         /**set veribles values to their proper values based on newly created tilemap */
@@ -115,10 +121,6 @@ export class Island extends Phaser.Scene {
         this.cameras.main.setBounds(0,0,this.tilemapWidthInPixels,this.tilemapHeightInPixels);
     }
 
-    
-    /**adds collision for the player */
-    // this.physics.add.collider(this.player, this.walkLayer);
-
     /**creates Phaser.Input.Keyboard.Key objects that can used for polling in the games update loop */
     createKeys() {
         /**fill this.keys will all the keys we will need to poll in this scene */
@@ -126,5 +128,28 @@ export class Island extends Phaser.Scene {
         this.keys["left"] = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
         this.keys["down"] = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S);
         this.keys["right"] = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
+    }
+
+    /**Runs thru and checks what keys are being pressed making a call to
+     * the character accordingly to move the character
+     */
+    poleCharactermovement(){
+        let playerSpeed = 130;
+        let x = 0;
+        let y = 0;
+        if (this.keys["up"].isDown){
+            y -= playerSpeed;
+        }
+        if (this.keys["down"].isDown){
+            y += playerSpeed;
+        }
+        if (this.keys["left"].isDown){
+            x -= playerSpeed;
+        }
+        if (this.keys["right"].isDown){
+            x += playerSpeed;
+        }
+        /**call to the player to move based on key presses */
+        this.main.UpdateMovement(x,y);
     }
 }
