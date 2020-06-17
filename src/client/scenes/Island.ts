@@ -69,10 +69,10 @@ export class Island extends Phaser.Scene {
     create() {
         this.createTileMap();
         this.player = new Player(this, this.tilemapWidthInPixels/2, this.tilemapHeightInPixels/2);
-        this.player.addPartyMemeberByKey("dregTheTestDummy");
-        this.player.addPartyMemeberByKey("gregTheTestDummy");
-        this.player.addPartyMemeberByKey("megTheTestDummy");
-        this.player.addPartyMemeberByKey("craigTheTestDummy");
+        this.player.addPartyMemberByKey("dregTheTestDummy");
+        this.player.addPartyMemberByKey("gregTheTestDummy");
+        this.player.addPartyMemberByKey("megTheTestDummy");
+        this.player.addPartyMemberByKey("craigTheTestDummy");
         this.player.addCollisionByLayer(this.walkLayer);
         /**setup the main camera */
         this.cameras.main.startFollow(this.player.party[0].sprite, true);
@@ -104,7 +104,7 @@ export class Island extends Phaser.Scene {
         /**make sure the layers appear where they are supposed to in relation to the player*/
         this.backgroundLayer.depth = 9;
         this.walkLayer.depth = 9;
-        this.overheadLayer.depth = 11;
+        this.overheadLayer.depth = 15;
         /**set collision for the walk layer */
         this.walkLayer.setCollisionByProperty({ passThru: false });
         /**set veribles values to their proper values based on newly created tilemap */

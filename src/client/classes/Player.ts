@@ -58,19 +58,31 @@ export class Player {
         this.startDepth = 10;
     }
 
-    addPartyMemeberByKey(key: string){
+    /**Adds a party member to the list by a passed in spritekey, this
+     * constructs a new character object to add a new member by the character
+     * object use addPartyMemberByObject() */
+    addPartyMemberByKey(key: string){
         //construct our new party member and add them to the party
         let newPartyMember = new Character(this.currentScene.anims);
         newPartyMember.createSprite(this.currentScene,key,this.x,this.y);
         this.party.push(newPartyMember);
     }
 
+    /**Adds a party member to the list by a passed in character object,
+     * to add a new member using a spritekey use addPartyMemberByKey() */
+    addPartyMemberByObject(newPartyMember: Character){
+        this.party.push(newPartyMember);
+    }
+
+    /**Adds collision for all party members for a passed in layer within the current scene */
     addCollisionByLayer(layer: Phaser.Tilemaps.StaticTilemapLayer | Phaser.Tilemaps.DynamicTilemapLayer){
         for (let i = 0; i < this.party.length; i++){
             this.currentScene.physics.add.collider(this.party[i].sprite, layer);
         }
     }
 
+    /**Pulls the current leader to the back of the party and moves up the party member
+     * currently behind the leader */
     changeLeader(){
         //set the timeout to be true to prevent rapid changing
         this.leaderChangeTimeOut = true;
@@ -93,7 +105,7 @@ export class Player {
     /**Adds a new position to the path and checks to make sure the path
      * has not grown bigger then 120 elements */
     addToPath(newX:number, newY:number, newFacing: string){
-        if (Math.abs(newX - this.path[0].x) > 4 || Math.abs(newY - this.path[0].y) > 4){
+        if (Math.abs(newX - this.path[0].x) > 3 || Math.abs(newY - this.path[0].y) > 3){
             let newlength = this.path.unshift({x:newX, y:newY, facing: newFacing});
             /*to help with performance we wait till it fill to 120 then splice off
             everyhting back down to 80 */
@@ -103,6 +115,10 @@ export class Player {
         }
     }
 
+    /**Meant to be used in sync with a scenes update loop, uses the path that follows the leader
+     * of the party and makes the other party member follow behind on the path, each being a set
+     * number of nodes behind the leader on the path, with a threshold of 2 pixels both ways for
+     * when to stop and allow the party member to idle. */
     updatePartyOnPath(){
         for(let i = 1; i < this.party.length; i++){
             if (this.path.length > i * 3){
@@ -130,6 +146,9 @@ export class Player {
         }
     }
 
+    /**runs thru and updates the depth of all party members, it sets the party members
+     * higher on the screen to have a lower depth then those lower on the screen allowing
+     * party members to apear behind other party members */
     updateDepth(){
         //declares the format of our array and instantiatesd it
         let heightArray: {index: number, y: number}[] = [];
