@@ -32,6 +32,9 @@ export class LoadAssets extends Scene {
 
             /** Spritesheet */
             "gregTheTestDummy": "S/images/gregTheTestDummy.png",
+            "dregTheTestDummy": "S/images/dregTheTestDummy.png",
+            "megTheTestDummy": "S/images/megTheTestDummy.png",
+            "craigTheTestDummy": "S/images/craigTheTestDummy.png",
 
             /** Tilemaps */
             "islandUpleft": "T/tilemaps/islandUpleft.json",

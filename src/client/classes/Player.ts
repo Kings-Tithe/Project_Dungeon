@@ -22,66 +22,89 @@ export class Player {
     y: number;
     /**The speed at which oue character move when in free roam */
     freeRoamSpeed: number;
+    /**Used to allow the sprites of the non-leader party member to follow the leader */
+    path: {x: number, y: number}[];
+
+    /**Boolean */
+    /**Used to tell if the party change is in timeout */
+    leaderChangeTimeOut: boolean;
 
     /**Characters */
     /**An array of characters that make up your party with the first one being the leader */
     party: Character[];
-    /**holds a reference to the current party leader held in the party array */
-    leader: Character;
 
     /**Controls */
     /**Control handler used to poll keys with an update loop */
     controls: Controls;
 
-    /**Misc */
-    /**The animation manager is global as such we just need a refernce to it
-     * this makes it so we don't need to store a scene to allow our party member
-     * to create and play their own animations */
-    animationManager: Phaser.Animations.AnimationManager;
+    /**scene */
+    /**Stores a refernce to the current scene */
+    currentScene: Phaser.Scene;
 
     constructor(scene: Phaser.Scene, x: number = 0, y: number = 0){
         this.money = 0;
         this.party = [];
         this.controls = new Controls(scene);
-        this.animationManager = scene.anims;
+        this.currentScene = scene;
         this.x = x;
         this.y = y;
-        this.freeRoamSpeed = 120;
+        this.freeRoamSpeed = 130;
+        this.leaderChangeTimeOut = false;
+        this.path = [];
+        this.path[0] = {x: this.x, y: this.y};
     }
 
-    addPartyMemeberByKey(scene: Phaser.Scene, key: string){
+    addPartyMemeberByKey(key: string){
         /**construct our new party member and add them to the party */
-        let newPartyMember = new Character(this.animationManager);
-        newPartyMember.createSprite(scene,key,this.x,this.y);
-        newPartyMember.sprite.setScale(0);
+        let newPartyMember = new Character(this.currentScene.anims);
+        newPartyMember.createSprite(this.currentScene,key,this.x,this.y);
+        //newPartyMember.sprite.setScale(0);
         this.party.push(newPartyMember);
-        /**check if the party has no leader(is empty), if so make this member it's leader */
-        if (this.leader == null){
-            this.leader = newPartyMember;
-            this.leader.sprite.setScale(1);
-            this.leader.moveTo(this.x,this.y);
-        }
     }
 
-    addPartyMemberByObject(member: Character){
-        this.party.push(member);
-        /**check if the party has no leader(is empty), if so make this member it's leader */
-        if (this.leader = null){
-            this.leader = member;
+    addCollisionByLayer(layer: Phaser.Tilemaps.StaticTilemapLayer | Phaser.Tilemaps.DynamicTilemapLayer){
+        for (let i = 0; i < this.party.length; i++){
+            this.currentScene.physics.add.collider(this.party[i].sprite, layer);
         }
     }
 
     changeLeader(){
+        /**set the timeout to be true to prevent rapid changing */
+        this.leaderChangeTimeOut = true;
         /**removes the current leader from the front and add them to the back */
-        let oldLeader = this.party.shift();
-        oldLeader.sprite.setScale(0);
-        this.x = oldLeader.sprite.x;
-        this.y = oldLeader.sprite.y;
-        this.party.push(oldLeader);
-        /**now make the new member */
-        this.leader = this.party[0];
-        this.leader.sprite.setScale(1);
-        this.leader.moveTo(this.x,this.y);
+        this.x = this.party[0].sprite.x;
+        this.y = this.party[0].sprite.y;
+        console.log(this.party[0].name, this.party[0].sprite.scale);
+        this.party.push(this.party.shift())
+        /**now set the new leader */
+        this.party[0].moveTo(this.x,this.y);
+        /**fix the current scenes main camera to follow the new leader */
+        this.currentScene.cameras.main.startFollow(this.party[0].sprite,true);
+        console.log(this.party[0].name, this.party[0].sprite.scale);
+
+        setTimeout(() => {this.leaderChangeTimeOut = false;}, 500);
+    }
+
+    /**Adds a new position to the path and check to make sure the path
+     * has not grown bigger then 120 elements */
+    addToPath(newX:number, newY:number){
+        if (Math.abs(newX - this.path[0].x) > 4 || Math.abs(newY - this.path[0].y) > 4){
+            let newlength = this.path.unshift({x:newX, y:newY});
+            /*to help with performance we wait till it fill to 120 then splice off
+            everyhting back down to 80*/
+            if(newlength > 120){
+                this.path.splice(80);
+            }
+        }
+    }
+
+    updatePartyOnPath(){
+        for(let i = 1; i < this.party.length; i++){
+            if (this.path.length > i * 3){
+                this.party[i].sprite.x = this.path[i*3].x;
+                this.party[i].sprite.y = this.path[i*3].y;
+            }
+        }
     }
 
     /**ran in the update loop of the current scene, checks for all player input and
@@ -103,6 +126,12 @@ export class Player {
         if (this.controls.isDown("walk right")){
             x += this.freeRoamSpeed
         }
-        this.leader.UpdateMovement(x,y);
+        this.party[0].UpdateMovement(x,y);
+        this.addToPath(this.party[0].sprite.x, this.party[0].sprite.y);
+        this.updatePartyOnPath();
+        /**check for input to change the party leader */
+        if (this.controls.isDown("change leader") && !this.leaderChangeTimeOut){
+            this.changeLeader();
+        }
     }
 }

@@ -52,6 +52,10 @@ export class Character {
     /**String */
     /**Used to store the direction the character is facing */
     facingDirection: string;
+    /**The name of the character */
+    name: string;
+    /**Stores the string relating to the sprite */
+    spriteKey;
 
     /**Misc */
     /**The animation manager is global as such we just need a refernce to it
@@ -83,71 +87,74 @@ export class Character {
         this.sprite = scene.physics.add.sprite(x, y, spriteKey, 0);
         this.sprite.setDepth(this.depth);
         this.sprite.ignoreDestroy = true;
+        this.name = spriteKey;
+        this.spriteKey = spriteKey;
         /**generate all the animations associated with this sprite */
+        /**animation for character walking right */
         scene.anims.create({
-            key: 'right',
+            key: spriteKey + 'walk_right',
             frames: scene.anims.generateFrameNumbers(spriteKey, { start: 8, end: 15 }),
             frameRate: 7,
             repeat: -1
         });
-        /**animation for character walking left */
+        /**animation for character walking up */
         scene.anims.create({
-            key: 'up',
+            key: spriteKey + 'walk_up',
             frames: scene.anims.generateFrameNumbers(spriteKey, { start: 16, end: 23 }),
             frameRate: 7,
             repeat: -1
         });
-        /**animation for character walking left */
+        /**animation for character walking down */
         scene.anims.create({
-            key: 'down',
+            key: spriteKey + 'walk_down',
             frames: scene.anims.generateFrameNumbers(spriteKey, { start: 24, end: 31 }),
             frameRate: 7,
             repeat: -1
         });
         /**animation for character walking left */
         scene.anims.create({
-            key: 'left',
+            key: spriteKey + 'walk_left',
             frames: scene.anims.generateFrameNumbers(spriteKey, { start: 32, end: 39 }),
             frameRate: 7,
             repeat: -1
         });
         /**animation used to reset the frame of the character sprite */
         scene.anims.create({
-            key: 'idle',
+            key: spriteKey + 'idle',
             frames: scene.anims.generateFrameNumbers(spriteKey, { end: 0 }),
             frameRate: 10,
             repeat: -1
         });
         /**animation used to reset the frame of the character sprite after walking up */
         scene.anims.create({
-            key: 'idle_up',
+            key: spriteKey + 'idle_up',
             frames: scene.anims.generateFrameNumbers(spriteKey, { start:1, end: 1 }),
             frameRate: 10,
             repeat: -1
         });
         /**animation used to reset the frame of the character sprite after walking down */
         scene.anims.create({
-            key: 'idle_down',
+            key: spriteKey + 'idle_down',
             frames: scene.anims.generateFrameNumbers(spriteKey, { end: 0 }),
             frameRate: 10,
             repeat: -1
         });
         /**animation used to reset the frame of the character sprite after walking left */
         scene.anims.create({
-            key: 'idle_left',
+            key: spriteKey + 'idle_left',
             frames: scene.anims.generateFrameNumbers(spriteKey, { start:3, end: 3 }),
             frameRate: 10,
             repeat: -1
         });
         /**animation used to reset the frame of the character sprite after walking right */
         scene.anims.create({
-            key: 'idle_right',
+            key: spriteKey + 'idle_right',
             frames: scene.anims.generateFrameNumbers(spriteKey, { start:2, end: 2 }),
             frameRate: 10,
             repeat: -1
         });
         /**set players inital animation */
-        scene.anims.play("idle_down", this.sprite);
+        scene.anims.play(spriteKey + "idle_down", this.sprite);
         this.facingDirection = "down";
 
         /**set hitbox to cover lower 16x16 block of character, around it's feet*/
@@ -191,28 +198,28 @@ export class Character {
          * and down if multiple keys are pressed. If not buttons are being pressed
          * then set an idle animation */
         if(y > 0){
-            if(this.sprite.anims.getCurrentKey() != "down"){
-                this.animationManager.play("down", this.sprite);
+            if(this.sprite.anims.getCurrentKey() != this.spriteKey + 'walk_down'){
+                this.animationManager.play(this.spriteKey + 'walk_down', this.sprite);
                 this.facingDirection = "down";
             }
         } else if (y < 0){
-            if(this.sprite.anims.getCurrentKey() != "up"){
-                this.animationManager.play("up", this.sprite);
+            if(this.sprite.anims.getCurrentKey() != this.spriteKey + 'walk_up'){
+                this.animationManager.play(this.spriteKey + 'walk_up', this.sprite);
                 this.facingDirection = "up";
             }
         } else if (x > 0){
-            if(this.sprite.anims.getCurrentKey() != "right"){
-                this.animationManager.play("right", this.sprite);
+            if(this.sprite.anims.getCurrentKey() != this.spriteKey + 'walk_right'){
+                this.animationManager.play(this.spriteKey + 'walk_right', this.sprite);
                 this.facingDirection = "right";
             }
         } else if (x < 0){
-            if(this.sprite.anims.getCurrentKey() != "left"){
-                this.animationManager.play("left", this.sprite);
+            if(this.sprite.anims.getCurrentKey() != this.spriteKey + 'walk_left'){
+                this.animationManager.play(this.spriteKey + 'walk_left', this.sprite);
                 this.facingDirection = "left";
             }
         } else {
-            if (this.sprite.anims.getCurrentKey() != "idle_" + this.facingDirection) {
-                this.animationManager.play("idle_" + this.facingDirection, this.sprite);
+            if (this.sprite.anims.getCurrentKey() != this.spriteKey + "idle_" + this.facingDirection) {
+                this.animationManager.play(this.spriteKey + "idle_" + this.facingDirection, this.sprite);
             }
         }
     }

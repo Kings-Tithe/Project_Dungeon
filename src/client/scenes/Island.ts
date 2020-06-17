@@ -69,12 +69,13 @@ export class Island extends Phaser.Scene {
     create() {
         this.createTileMap();
         this.player = new Player(this, this.tilemapWidthInPixels/2, this.tilemapHeightInPixels/2);
-        this.player.addPartyMemeberByKey(this,"gregTheTestDummy");
-        console.log(this.player.leader);
-        /**adds collision for the player */
-        //this.physics.add.collider(this.main.sprite, this.walkLayer);
+        this.player.addPartyMemeberByKey("dregTheTestDummy");
+        this.player.addPartyMemeberByKey("gregTheTestDummy");
+        this.player.addPartyMemeberByKey("megTheTestDummy");
+        this.player.addPartyMemeberByKey("craigTheTestDummy");
+        this.player.addCollisionByLayer(this.walkLayer);
         /**setup the main camera */
-        this.cameras.main.startFollow(this.player.leader.sprite, true);
+        this.cameras.main.startFollow(this.player.party[0].sprite, true);
 
         // Round physics positions to avoid ugly render artifacts
         hookToMethod(Phaser.Physics.Arcade.Body.prototype, 'update', function() {
