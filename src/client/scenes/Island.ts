@@ -102,8 +102,7 @@ export class Island extends Phaser.Scene {
         });
 
         // Create a game console
-        let con = new Console(this);
-        con.rewireAll();
+        this.scene.launch('Hud');
 
     }
 

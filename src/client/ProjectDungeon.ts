@@ -3,6 +3,7 @@ import * as Phaser from 'phaser';
 import { TestBox } from './scenes/TestBox';
 import { Island } from './scenes/Island';
 import { LoadAssets } from './scenes/LoadAssets';
+import { Hud } from './scenes/overlays/Hud';
 
 /**Dungeon_Project game configuration, including settings such as render type,
  * logical size, anti-aliasing, and more. */
@@ -15,7 +16,8 @@ const config: Phaser.Types.Core.GameConfig = {
     scene: [
         LoadAssets,
         Island,
-        TestBox
+        TestBox,
+        Hud
     ],
 
     /** Title to display on the game */
