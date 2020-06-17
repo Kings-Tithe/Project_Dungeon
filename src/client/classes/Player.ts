@@ -101,8 +101,14 @@ export class Player {
     updatePartyOnPath(){
         for(let i = 1; i < this.party.length; i++){
             if (this.path.length > i * 3){
-                this.party[i].sprite.x = this.path[i*3].x;
-                this.party[i].sprite.y = this.path[i*3].y;
+                let rangeX = Math.abs(this.path[i*3].x - this.party[i].sprite.x);
+                let rangeY = Math.abs(this.path[i*3].y - this.party[i].sprite.y);
+                if (rangeX > 3 || rangeY > 3){
+                    this.currentScene.physics.moveTo(this.party[i].sprite, this.path[i*3].x, this.path[i*3].y, this.freeRoamSpeed);
+                } else {
+                    let body = <Phaser.Physics.Arcade.Body>this.party[i].sprite.body;
+                    body.setVelocity(0,0);
+                }
             }
         }
     }
