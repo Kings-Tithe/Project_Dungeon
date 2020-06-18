@@ -2,6 +2,7 @@ import { hookToMethod } from "../tools/Hook";
 import { Character } from "../classes/Character";
 import { Controls } from "../classes/Controls";
 import { Player } from "../classes/Player";
+import { Console } from "../tools/Console";
 
 /** Island
  * Purpose: Phaser Scene with a basic starting example island for what the final
@@ -11,6 +12,9 @@ import { Player } from "../classes/Player";
 export class Island extends Phaser.Scene {
 
     /**Member Varibles */
+
+    /**Keys */
+    keys: { [key: string]: Phaser.Input.Keyboard.Key; };
 
     /**Numbers */
     /**Used to store the width of the tilemap in pixels */
@@ -50,7 +54,7 @@ export class Island extends Phaser.Scene {
      * of Phaser scenes
      */
     constructor() {
-        super("Island")
+        super("Island");
     }
 
     /** used to instantiate objects and set inital values where they apply
@@ -73,16 +77,20 @@ export class Island extends Phaser.Scene {
         this.player.addPartyMemberByKey("gregTheTestDummy");
         this.player.addPartyMemberByKey("megTheTestDummy");
         this.player.addPartyMemberByKey("craigTheTestDummy");
-        this.player.addCollisionByLayer(this.walkLayer);
+        this.player.addCollisionByLayer(this.walkLayer);;
+
         /**setup the main camera */
         this.cameras.main.startFollow(this.player.party[0].sprite, true);
 
-        // Round physics positions to avoid ugly render artifacts
-        hookToMethod(Phaser.Physics.Arcade.Body.prototype, 'update', function() {
+        // Round physics positions to avoid ugly render artifacts;
+        hookToMethod(Phaser.Physics.Arcade.Body.prototype, 'update', function () {
             this.x = Math.round(this.x);
             this.y = Math.round(this.y);
         });
-        
+
+        // Create a game console
+        this.scene.launch('Hud');
+
     }
 
     /**A overwritten version of the game loop that is called 60 times
@@ -99,9 +107,9 @@ export class Island extends Phaser.Scene {
         this.islandA1 = this.map.addTilesetImage("islandA1");
         this.islandA2 = this.map.addTilesetImage("islandA2");
         this.islandB = this.map.addTilesetImage("islandB");
-        this.backgroundLayer = this.map.createStaticLayer("background",[this.islandA1,this.islandA2],0,0);
-        this.walkLayer = this.map.createStaticLayer("walk",[this.islandA1,this.islandB],0,0);
-        this.overheadLayer= this.map.createStaticLayer("overhead",[this.islandB],0,0);
+        this.backgroundLayer = this.map.createStaticLayer("background", [this.islandA1, this.islandA2], 0, 0);
+        this.walkLayer = this.map.createStaticLayer("walk", [this.islandA1, this.islandB], 0, 0);
+        this.overheadLayer = this.map.createStaticLayer("overhead", [this.islandB], 0, 0);
         /**make sure the layers appear where they are supposed to in relation to the player*/
         this.backgroundLayer.depth = 9;
         this.walkLayer.depth = 9;
@@ -111,6 +119,6 @@ export class Island extends Phaser.Scene {
         /**set veribles values to their proper values based on newly created tilemap */
         this.tilemapHeightInPixels = this.map.heightInPixels;
         this.tilemapWidthInPixels = this.map.widthInPixels;
-        this.cameras.main.setBounds(0,0,this.tilemapWidthInPixels,this.tilemapHeightInPixels);
+        this.cameras.main.setBounds(0, 0, this.tilemapWidthInPixels, this.tilemapHeightInPixels);
     }
 }

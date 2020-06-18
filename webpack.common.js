@@ -7,7 +7,6 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 module.exports = {
     entry: {
         app: './src/client/ProjectDungeon.ts',
-        server: './src/server/PDServer.ts',
         vendors: ['phaser']
     },
 
