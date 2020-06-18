@@ -31,6 +31,7 @@ export class Controls {
         this.keys["walk left"] = this.inputManager.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
         this.keys["walk down"] = this.inputManager.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S);
         this.keys["walk right"] = this.inputManager.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
+        this.keys["change leader"] = this.inputManager.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
     }
 
     /**Used to poll a key and see if it is pressed down */

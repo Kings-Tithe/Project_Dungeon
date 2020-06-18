@@ -1,6 +1,7 @@
 import { hookToMethod } from "../tools/Hook";
 import { Character } from "../classes/Character";
 import { Controls } from "../classes/Controls";
+import { Player } from "../classes/Player";
 
 /** Island
  * Purpose: Phaser Scene with a basic starting example island for what the final
@@ -37,10 +38,9 @@ export class Island extends Phaser.Scene {
     /**A layer of things that sit above the player and adds a sense of depth */
     overheadLayer: Phaser.Tilemaps.StaticTilemapLayer;
 
-    /**Characters */
-    /**Current Main character while I build the character class, 
-     * this will eventually be in the players party */
-    main: Character;
+    /**Player */
+    /**The Player containing our party and other relevent details */
+    player: Player;
 
     /**control handler */
     controls: Controls;
@@ -58,7 +58,7 @@ export class Island extends Phaser.Scene {
      */
     init(){
         this.cameras.main.setZoom(2);
-        this.main = new Character(this);
+        this.player = new Player(this);
         this.controls = new Controls(this);
     }
 
@@ -68,11 +68,14 @@ export class Island extends Phaser.Scene {
     */
     create() {
         this.createTileMap();
-        this.main.addSpriteToScene(this, "gregTheTestDummy", this.tilemapWidthInPixels/2, this.tilemapHeightInPixels/2);
-        /**adds collision for the player */
-        this.physics.add.collider(this.main.sprite, this.walkLayer);
+        this.player = new Player(this, this.tilemapWidthInPixels/2, this.tilemapHeightInPixels/2);
+        this.player.addPartyMemberByKey("dregTheTestDummy");
+        this.player.addPartyMemberByKey("gregTheTestDummy");
+        this.player.addPartyMemberByKey("megTheTestDummy");
+        this.player.addPartyMemberByKey("craigTheTestDummy");
+        this.player.addCollisionByLayer(this.walkLayer);
         /**setup the main camera */
-        this.cameras.main.startFollow(this.main.sprite, true);
+        this.cameras.main.startFollow(this.player.party[0].sprite, true);
 
         // Round physics positions to avoid ugly render artifacts
         hookToMethod(Phaser.Physics.Arcade.Body.prototype, 'update', function() {
@@ -86,7 +89,8 @@ export class Island extends Phaser.Scene {
      * a second by the game.
      */
     update() {
-        this.poleCharactermovement();
+        this.player.updatePlayerInput();
+        this.player.update();
     }
 
     /**Creates and puts together the primary tilemap for this scene*/
@@ -101,35 +105,12 @@ export class Island extends Phaser.Scene {
         /**make sure the layers appear where they are supposed to in relation to the player*/
         this.backgroundLayer.depth = 9;
         this.walkLayer.depth = 9;
-        this.overheadLayer.depth = 11;
+        this.overheadLayer.depth = 15;
         /**set collision for the walk layer */
         this.walkLayer.setCollisionByProperty({ passThru: false });
         /**set veribles values to their proper values based on newly created tilemap */
         this.tilemapHeightInPixels = this.map.heightInPixels;
         this.tilemapWidthInPixels = this.map.widthInPixels;
         this.cameras.main.setBounds(0,0,this.tilemapWidthInPixels,this.tilemapHeightInPixels);
-    }
-
-    /**Runs thru and checks what keys are being pressed making a call to
-     * the character accordingly to move the character
-     */
-    poleCharactermovement(){
-        let playerSpeed = 130;
-        let x = 0;
-        let y = 0;
-        if (this.controls.isDown("walk up")){
-            y -= playerSpeed;
-        }
-        if (this.controls.isDown("walk down")){
-            y += playerSpeed;
-        }
-        if (this.controls.isDown("walk left")){
-            x -= playerSpeed;
-        }
-        if (this.controls.isDown("walk right")){
-            x += playerSpeed;
-        }
-        /**call to the player to move based on key presses */
-        this.main.UpdateMovement(x,y);
     }
 }
