@@ -90,6 +90,7 @@ export class Island extends Phaser.Scene {
      */
     update() {
         this.player.updatePlayerInput();
+        this.player.update();
     }
 
     /**Creates and puts together the primary tilemap for this scene*/
