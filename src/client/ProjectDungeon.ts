@@ -1,6 +1,6 @@
 import * as Phaser from 'phaser';
 import { Island } from './scenes/Island';
-import { LoadAssets } from './scenes/LoadAssets'
+import { LoadAssets } from './scenes/LoadAssets';
 
 /**Dungeon_Project game configuration, including settings such as render type,
  * logical size, anti-aliasing, and more. */
@@ -23,7 +23,7 @@ const config: Phaser.Types.Core.GameConfig = {
         default: 'arcade',
         arcade: {
             gravity: { y: 0 },
-            debug: false
+            debug: true
         }
     },
     /** Black background when nothing else is being displayed over it */
@@ -37,7 +37,7 @@ const config: Phaser.Types.Core.GameConfig = {
         width: 1280,
         height: 720
     }
-}
+};
 
 /** This is the primary Phaser game object. After construction it
  * will automatically transition to the first scene in the scene array.
