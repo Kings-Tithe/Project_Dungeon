@@ -152,7 +152,7 @@ export class Player {
                     this.party[i].moveTo(this.path[i * nodeOffSet].x, this.path[i * nodeOffSet].y);
                 } //if we are atleast more then 3 pixels away from our target but not more then 50 
                 else if (Math.hypot(differenceX, differenceY) > 3) {
-                    this.currentScene.physics.moveTo(this.party[i].sprite, this.path[i * nodeOffSet].x, this.path[i * nodeOffSet].y, this.freeRoamSpeed * 1.15);
+                    this.currentScene.physics.moveTo(this.party[i].sprite, this.path[i * nodeOffSet].x, this.path[i * nodeOffSet].y, this.freeRoamSpeed * 1.1535);
                 } //if we are within 3 pixels of our target then make the character stop moving
                 else {
                     body.setVelocity(0, 0);
