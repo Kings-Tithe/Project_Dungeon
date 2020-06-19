@@ -3,11 +3,6 @@ export interface ICharacterData {
     /**The name of the character */
     name: string;
 
-    /**This is stored to allow for the creation of the character class from this interface
-     * without having to hard-code in every character's class. Allowing only the interface
-     * to need to be hard-coded */
-    spriteKey: string;
-
     /**Base Stats: these are the 4 basic stats most the games calculations
      * for characters is based on */
 
