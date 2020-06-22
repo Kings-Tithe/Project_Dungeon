@@ -16,7 +16,9 @@ export class Controls {
      * so that we can use this class to poll them during the game. */
     inputManager: Phaser.Input.InputPlugin;
 
-
+    /**Constructs an instance of this class 
+     * @param scene The Phaser scene used to construct this
+    */
     constructor(scene: Phaser.Scene){
         this.keys = {};
         this.inputManager = scene.input;
@@ -26,7 +28,7 @@ export class Controls {
     /**Eventually this will be stored in a key_config.json somewhere on the
      * local machine However until the there are default values here*/
     loadKeyBindings(){
-        /**fill this.keys will all the keys we will need to poll in this scene */
+        //fill this.keys will all the keys we will need to poll in this scene
         this.keys["walk up"] = this.inputManager.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W);
         this.keys["walk left"] = this.inputManager.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
         this.keys["walk down"] = this.inputManager.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S);
@@ -34,7 +36,9 @@ export class Controls {
         this.keys["change leader"] = this.inputManager.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E);
     }
 
-    /**Used to poll a key and see if it is pressed down */
+    /**Used to poll a key and see if it is pressed down 
+     * @param key the string key of the action being polled
+    */
     isDown(key: string){
         if (this.keys[key]){
             return this.keys[key].isDown;

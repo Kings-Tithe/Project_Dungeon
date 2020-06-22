@@ -60,7 +60,7 @@ export class Island extends Phaser.Scene {
     /** used to instantiate objects and set inital values where they apply
      * this runs in full before create()
      */
-    init(){
+    init() {
         this.cameras.main.setZoom(2);
         this.player = new Player(this);
         this.controls = new Controls(this);
@@ -72,17 +72,16 @@ export class Island extends Phaser.Scene {
     */
     create() {
         this.createTileMap();
-        this.player = new Player(this, this.tilemapWidthInPixels/2, this.tilemapHeightInPixels/2);
+        this.player = new Player(this, this.tilemapWidthInPixels / 2, this.tilemapHeightInPixels / 2);
         this.player.addPartyMemberByKey("dregTheTestDummy");
         this.player.addPartyMemberByKey("gregTheTestDummy");
         this.player.addPartyMemberByKey("megTheTestDummy");
         this.player.addPartyMemberByKey("craigTheTestDummy");
-        this.player.addCollisionByLayer(this.walkLayer);;
-
-        /**setup the main camera */
+        this.player.addCollisionByLayer(this.walkLayer);
+        //setup the main camera
         this.cameras.main.startFollow(this.player.party[0].sprite, true);
 
-        // Round physics positions to avoid ugly render artifacts;
+        //round physics positions to avoid ugly render artifacts
         hookToMethod(Phaser.Physics.Arcade.Body.prototype, 'update', function () {
             this.x = Math.round(this.x);
             this.y = Math.round(this.y);
@@ -93,9 +92,8 @@ export class Island extends Phaser.Scene {
 
     }
 
-    /**A overwritten version of the game loop that is called 60 times
-     * a second by the game.
-     */
+    /**A overwritten version of the game loop that is called around 60 times
+     * a second by the game */
     update() {
         this.player.updatePlayerInput();
         this.player.update();
@@ -110,13 +108,13 @@ export class Island extends Phaser.Scene {
         this.backgroundLayer = this.map.createStaticLayer("background", [this.islandA1, this.islandA2], 0, 0);
         this.walkLayer = this.map.createStaticLayer("walk", [this.islandA1, this.islandB], 0, 0);
         this.overheadLayer = this.map.createStaticLayer("overhead", [this.islandB], 0, 0);
-        /**make sure the layers appear where they are supposed to in relation to the player*/
+        //make sure the layers appear where they are supposed to in relation to the player
         this.backgroundLayer.depth = 9;
         this.walkLayer.depth = 9;
         this.overheadLayer.depth = 15;
-        /**set collision for the walk layer */
+        //set collision for the walk layer 
         this.walkLayer.setCollisionByProperty({ passThru: false });
-        /**set veribles values to their proper values based on newly created tilemap */
+        //set veribles values to their proper values based on newly created tilemap 
         this.tilemapHeightInPixels = this.map.heightInPixels;
         this.tilemapWidthInPixels = this.map.widthInPixels;
         this.cameras.main.setBounds(0, 0, this.tilemapWidthInPixels, this.tilemapHeightInPixels);
