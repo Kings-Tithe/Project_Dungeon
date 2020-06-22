@@ -14,8 +14,13 @@
  * @param methodNameAsString the name of the method we are hooking onto
  * @param callback the function to run after the method completes
  * 
- * Credit: Eric Seastrand, Stack Overflow User, 2015
+ * Credit:
+ * The original version of this function came from Stack Overflow user Eric
+ * Seastrand. I have modified it to accept "null" functions and to send
+ * arguments to the new function unwrapped, instead of as an argument object.
+ * Linked below is the question on Stack Overflow, and the user's profile.
  * https://stackoverflow.com/questions/10273309/need-to-hook-into-a-javascript-function-call-any-way-to-do-this
+ * https://stackoverflow.com/users/884734/eric-seastrand
  */
 export function hookToMethod(prototype, methodNameAsString, callback) {
     (function (originalFunction) {
