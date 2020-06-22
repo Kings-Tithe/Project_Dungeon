@@ -36,7 +36,7 @@ export class Character {
      * by the player class. 
      * @param animationManager A reference to the global animation manager
      * */
-    constructor(animationManager: Phaser.Animations.AnimationManager){
+    constructor(animationManager: Phaser.Animations.AnimationManager) {
         this.animationManager = animationManager;
         this.depth = 10;
     }
@@ -48,10 +48,10 @@ export class Character {
      * @param x         The x coordinate to create the sprite at if the sprite has not been created
      * @param y         The y coordinate to create the sprite at if the sprite has not been created
      */
-    addSpriteToScene(scene: Phaser.Scene, spriteKey: string = this.spriteKey, x: number = 0, y: number = 0){
+    addSpriteToScene(scene: Phaser.Scene, spriteKey: string = this.spriteKey, x: number = 0, y: number = 0) {
         //Make sure the sprite has been created, if not, create it
-        if (this.sprite == null){
-            this.createSprite(scene, spriteKey,x,y);
+        if (this.sprite == null) {
+            this.createSprite(scene, spriteKey, x, y);
         }
         scene.add.existing(this.sprite);
     }
@@ -108,7 +108,7 @@ export class Character {
         //animation used to reset the frame of the character sprite after walking up
         scene.anims.create({
             key: spriteKey + 'idle_up',
-            frames: scene.anims.generateFrameNumbers(spriteKey, { start:1, end: 1 }),
+            frames: scene.anims.generateFrameNumbers(spriteKey, { start: 1, end: 1 }),
             frameRate: 10,
             repeat: -1
         });
@@ -122,14 +122,14 @@ export class Character {
         //animation used to reset the frame of the character sprite after walking left
         scene.anims.create({
             key: spriteKey + 'idle_left',
-            frames: scene.anims.generateFrameNumbers(spriteKey, { start:3, end: 3 }),
+            frames: scene.anims.generateFrameNumbers(spriteKey, { start: 3, end: 3 }),
             frameRate: 10,
             repeat: -1
         });
         //animation used to reset the frame of the character sprite after walking right 
         scene.anims.create({
             key: spriteKey + 'idle_right',
-            frames: scene.anims.generateFrameNumbers(spriteKey, { start:2, end: 2 }),
+            frames: scene.anims.generateFrameNumbers(spriteKey, { start: 2, end: 2 }),
             frameRate: 10,
             repeat: -1
         });
@@ -139,8 +139,8 @@ export class Character {
 
         //set hitbox to cover lower 16x16 block of character, around it's feet
         let body = <Phaser.Physics.Arcade.Body>this.sprite.body;
-        body.setSize(18,16,false);
-        body.setOffset(7,16);
+        body.setSize(18, 16, false);
+        body.setOffset(7, 16);
     }
 
     /**Used to move the character in small increments, is meant to be used in an update loop
@@ -157,37 +157,37 @@ export class Character {
         body.setVelocity(0);
 
         //Now we are gonna set our speeds
-        if (x != 0){
+        if (x != 0) {
             body.setVelocityX(x);
         }
-        if (y != 0){
+        if (y != 0) {
             body.setVelocityY(y);
         }
         //Now we normalize our speed to make sure we don't go faster on diagonals
-        if (Math.abs(x) == Math.abs(y)){
+        if (Math.abs(x) == Math.abs(y)) {
             body.velocity.normalize().scale(Math.abs(x));
         }
-       
+
         /*now we determine what animation to play with a prefernce towards up
          and down if multiple keys are pressed. If no buttons are being pressed
          then set an idle animation */
-        if(y > 0){
-            if(this.sprite.anims.getCurrentKey() != this.spriteKey + 'walk_down'){
+        if (y > 0) {
+            if (this.sprite.anims.getCurrentKey() != this.spriteKey + 'walk_down') {
                 this.animationManager.play(this.spriteKey + 'walk_down', this.sprite);
                 this.facingDirection = "down";
             }
-        } else if (y < 0){
-            if(this.sprite.anims.getCurrentKey() != this.spriteKey + 'walk_up'){
+        } else if (y < 0) {
+            if (this.sprite.anims.getCurrentKey() != this.spriteKey + 'walk_up') {
                 this.animationManager.play(this.spriteKey + 'walk_up', this.sprite);
                 this.facingDirection = "up";
             }
-        } else if (x > 0){
-            if(this.sprite.anims.getCurrentKey() != this.spriteKey + 'walk_right'){
+        } else if (x > 0) {
+            if (this.sprite.anims.getCurrentKey() != this.spriteKey + 'walk_right') {
                 this.animationManager.play(this.spriteKey + 'walk_right', this.sprite);
                 this.facingDirection = "right";
             }
-        } else if (x < 0){
-            if(this.sprite.anims.getCurrentKey() != this.spriteKey + 'walk_left'){
+        } else if (x < 0) {
+            if (this.sprite.anims.getCurrentKey() != this.spriteKey + 'walk_left') {
                 this.animationManager.play(this.spriteKey + 'walk_left', this.sprite);
                 this.facingDirection = "left";
             }
@@ -202,12 +202,12 @@ export class Character {
      * @param x The x coordinate position in the world to set the character
      * @param y The y coordinate position in the world to set the character
      */
-    moveTo(x:number, y:number){
-        this.sprite.setPosition(x,y);
+    moveTo(x: number, y: number) {
+        this.sprite.setPosition(x, y);
     }
 
     /**Destroys the sprite and then sets it to null for good measure */
-    destroy(){
+    destroy() {
         this.sprite.destroy();
         this.sprite = null;
     }

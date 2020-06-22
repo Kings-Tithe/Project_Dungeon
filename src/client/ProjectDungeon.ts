@@ -1,6 +1,9 @@
 import * as Phaser from 'phaser';
+
+import { TestBox } from './scenes/TestBox';
 import { Island } from './scenes/Island';
 import { LoadAssets } from './scenes/LoadAssets';
+import { Hud } from './scenes/overlays/Hud';
 
 /**Dungeon_Project game configuration, including settings such as render type,
  * logical size, anti-aliasing, and more. */
@@ -8,8 +11,15 @@ const config: Phaser.Types.Core.GameConfig = {
 
     /** Automatically determine how to render */
     type: Phaser.AUTO,
+
     /** Primary scene objects */
-    scene: [LoadAssets, Island],
+    scene: [
+        LoadAssets,
+        Island,
+        TestBox,
+        Hud
+    ],
+
     /** Title to display on the game */
     title: 'ProjectDungeon',
     /** Prevents anti-aliasing */
@@ -36,6 +46,10 @@ const config: Phaser.Types.Core.GameConfig = {
         mode: Phaser.Scale.FIT,
         width: 1280,
         height: 720
+    },
+    /** Allows dom elements to be added to phaser's managers */
+    dom: {
+        createContainer: true
     }
 };
 
