@@ -22,15 +22,16 @@ export class Console {
     dom: Phaser.GameObjects.DOMElement;
 
     // static HTML elements that are created once and re-used
-    // the <pre> output element which will contain console output
-    static outputEl: HTMLPreElement = null;
-    // the <div> which contains the output element, handles scrolling, and
-    // determines the consoles size and stlying in game
-    static containerEl: HTMLDivElement = null;
+    // the <div> container element that holds ALL other console HTML elements
+    static consoleEl: HTMLDivElement = null;
+    // the <pre> output element which will contain actual logged items and text
+    static logsEl: HTMLPreElement = null;
     // the <style> which handles syntax highlighting of the console's output
     static highlightEl: HTMLStyleElement = null;
     // the <style> which handles syntax highlighting of the console's output
     static inputEl: HTMLInputElement = null;
+    // the <div> container element for the logs which also handles scrolling
+    static outputEl: HTMLDivElement = null;
 
     /**
      * Constructs a Console object
@@ -41,26 +42,27 @@ export class Console {
         // Create the HTML elements forming the game console
         this.create();
         // Add the console to it's scene
-        this.dom = this.scene.add.dom(px(100), py(100), Console.containerEl)
-            .setScrollFactor(0).setOrigin(1, 1);
+        this.dom = this.scene.add.dom(0, 0, Console.consoleEl)
+            .setScrollFactor(0).setOrigin(0, 0);
     }
 
     create() {
-        this.createContainerElement();
+        this.createConsoleElement();
         this.createOutputElement();
         this.createInputElement();
+        this.createLogsElement();
         this.createHighlightElement();
     }
 
-    createContainerElement() {
-        // Create the output container if it does not already exist
-        if (!Console.containerEl) {
-            Console.containerEl = document.createElement('div');
-            Console.containerEl.id = 'log-container';
-            Console.containerEl.style.overflow = 'auto';
-            Console.containerEl.style.width = '300px';
-            Console.containerEl.style.height = '150px';
-            Console.containerEl.style.backgroundColor = '#222';
+    createConsoleElement() {
+        // Create the console container if it does not already exist
+        if (!Console.consoleEl) {
+            Console.consoleEl = document.createElement('div');
+            Console.consoleEl.id = 'console-container';
+            Console.consoleEl.style.textAlign = 'center';
+            Console.consoleEl.style.width = '100%';
+            Console.consoleEl.style.height = '30%';
+            Console.consoleEl.style.backgroundColor = '#444';
         }
     }
 
@@ -74,7 +76,7 @@ export class Console {
             .log-info { color: skyblue } \
             .log-log { color: silver } \
             .log-warn, .log-error { font-weight: bold; }";
-            Console.containerEl.appendChild(Console.highlightEl);
+            Console.outputEl.appendChild(Console.highlightEl);
         }
     }
 
@@ -82,8 +84,9 @@ export class Console {
         // Create input element that handles commands if it does not exist
         if (!Console.inputEl) {
             Console.inputEl = document.createElement('input');
+            Console.inputEl.style.width = '96%';
             Console.inputEl.type = 'text';
-            Console.containerEl.appendChild(Console.inputEl);
+            Console.consoleEl.appendChild(Console.inputEl);
             document.onkeypress = (ev: KeyboardEvent) => {
                 if (ev.which == 13) {
                     console.log(Console.inputEl.value);
@@ -93,12 +96,31 @@ export class Console {
         }
     }
 
-    createOutputElement() {
+    createLogsElement() {
         // Create the output text element if it does not already exist
+        if (!Console.logsEl) {
+            Console.logsEl = document.createElement('pre');
+            Console.logsEl.id = 'log';
+            Console.outputEl.appendChild(Console.logsEl);
+        }
+    }
+
+    createOutputElement() {
+        // Create the output container if it does not already exist
         if (!Console.outputEl) {
-            Console.outputEl = document.createElement('pre');
-            Console.outputEl.id = 'log';
-            Console.containerEl.appendChild(Console.outputEl);
+            Console.outputEl = document.createElement('div');
+            Console.outputEl.id = 'log-container';
+            // How this element is displayed inside the parent container
+            Console.outputEl.style.backgroundColor = '#222';
+            Console.outputEl.style.display = 'inline-block';
+            Console.outputEl.style.width = '100%';
+            Console.outputEl.style.height = '80%';
+            // How elements inside this container are displayed
+            Console.outputEl.style.overflow = 'auto';
+            Console.outputEl.style.textAlign = 'left';
+            Console.outputEl.style.paddingLeft = '5px';
+            // Append this element to it's parent
+            Console.consoleEl.appendChild(Console.outputEl);
         }
     }
 
@@ -150,19 +172,19 @@ export class Console {
             // get HTML span tags of the objects
             const output = Console.htmlLog(consoleFuncName, args);
             // add the html <span> texts to the <pre> output element
-            Console.outputEl.innerHTML += output + "<br>";
+            Console.logsEl.innerHTML += output + "<br>";
 
             // determine if game console is currently scrolled to the bottom
             const bottomed =
-                Console.containerEl.scrollHeight
-                - Console.containerEl.clientHeight
-                <= Console.containerEl.scrollTop + 1;
+                Console.outputEl.scrollHeight
+                - Console.outputEl.clientHeight
+                <= Console.outputEl.scrollTop + 1;
             // automatically scroll to the bottom when new console output
             // is created
             if (!bottomed) {
-                Console.containerEl.scrollTop =
-                    Console.containerEl.scrollHeight
-                    - Console.containerEl.clientHeight;
+                Console.outputEl.scrollTop =
+                    Console.outputEl.scrollHeight
+                    - Console.outputEl.clientHeight;
             }
 
             // run the old function too, to print to the console
