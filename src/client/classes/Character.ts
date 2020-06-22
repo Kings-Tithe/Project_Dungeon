@@ -14,6 +14,9 @@ export class Character {
     /**The visual representation of this character, comes in the form of a
      * sprite that uses our basic character sprite sheet. */
     sprite: Phaser.GameObjects.Sprite;
+    /**Sprite of the characters portrait that display when they are the leader
+     * and on their character sheet */
+    portrait: Phaser.GameObjects.Sprite;
 
     /**Numbers */
     /**Stores the characters set depth, only meant to change when changing party 
@@ -70,10 +73,10 @@ export class Character {
         this.depth = 10;
     }
 
-    addSpriteToScene(scene: Phaser.Scene, spriteKey: string, x: number = 0, y: number = 0){
+    addSpriteToScene(scene: Phaser.Scene, spriteKey: string, portraitKey: string, x: number = 0, y: number = 0){
         /**Make sure the sprite has been created, if not, create it */
         if (this.sprite == null){
-            this.createSprite(scene, spriteKey,x,y);
+            this.createSprite(scene, spriteKey,portraitKey, x,y);
         }
         scene.add.existing(this.sprite);
     }
@@ -82,13 +85,15 @@ export class Character {
      * and run some testing. Eventually when we have actaully characters made this
      * will construct the sprite for a character based on a player/characters interface
      */
-    createSprite(scene: Phaser.Scene, spriteKey: string, x: number = 0, y: number = 0) {
+    createSprite(scene: Phaser.Scene, spriteKey: string, portraitKey: string, x: number = 0, y: number = 0) {
         /**generate the inital sprite */
         this.sprite = scene.physics.add.sprite(x, y, spriteKey, 0);
         this.sprite.setDepth(this.depth);
         this.sprite.ignoreDestroy = true;
         this.name = spriteKey;
         this.spriteKey = spriteKey;
+        //generate the portrait sprite
+        //this.portrait = scene.add.sprite()
         /**generate all the animations associated with this sprite */
         /**animation for character walking right */
         scene.anims.create({

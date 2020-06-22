@@ -69,10 +69,10 @@ export class Player {
     /**Adds a party member to the list by a passed in spritekey, this
      * constructs a new character object to add a new member by the character
      * object use addPartyMemberByObject() */
-    addPartyMemberByKey(key: string) {
+    addPartyMemberByKey(key: string, portrait) {
         //construct our new party member and add them to the party
         let newPartyMember = new Character(this.currentScene.anims);
-        newPartyMember.createSprite(this.currentScene, key, this.x, this.y);
+        newPartyMember.createSprite(this.currentScene, key, portrait, this.x, this.y);
         this.party.push(newPartyMember);
     }
 

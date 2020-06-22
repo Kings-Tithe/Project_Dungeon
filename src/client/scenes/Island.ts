@@ -73,10 +73,10 @@ export class Island extends Phaser.Scene {
     create() {
         this.createTileMap();
         this.player = new Player(this, this.tilemapWidthInPixels/2, this.tilemapHeightInPixels/2);
-        this.player.addPartyMemberByKey("dregTheTestDummy");
-        this.player.addPartyMemberByKey("gregTheTestDummy");
-        this.player.addPartyMemberByKey("megTheTestDummy");
-        this.player.addPartyMemberByKey("craigTheTestDummy");
+        this.player.addPartyMemberByKey("dregTheTestDummy","dregThePortrait");
+        this.player.addPartyMemberByKey("gregTheTestDummy","gregThePortrait");
+        this.player.addPartyMemberByKey("megTheTestDummy","megThePortrait");
+        this.player.addPartyMemberByKey("craigTheTestDummy","craigThePortrait");
         this.player.addCollisionByLayer(this.walkLayer);;
 
         /**setup the main camera */
