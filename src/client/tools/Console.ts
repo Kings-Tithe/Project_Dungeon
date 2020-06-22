@@ -1,4 +1,5 @@
 import { px, py } from "./PercentCoords";
+import { hookToMethod } from "./Hook";
 
 /**
  * In game console with output of error messages, feedback, and command inputs
@@ -28,6 +29,8 @@ export class Console {
     static containerEl: HTMLDivElement = null;
     // the <style> which handles syntax highlighting of the console's output
     static highlightEl: HTMLStyleElement = null;
+    // the <style> which handles syntax highlighting of the console's output
+    static inputEl: HTMLInputElement = null;
 
     /**
      * Constructs a Console object
@@ -42,15 +45,14 @@ export class Console {
             .setScrollFactor(0).setOrigin(1, 1);
     }
 
-    setPosition(x: number, y: number) {
-        this.dom.setPosition(x, y);
-    }
-
-    setScale(scale: number) {
-        this.dom.setScale(scale);
-    }
-
     create() {
+        this.createContainerElement();
+        this.createOutputElement();
+        this.createInputElement();
+        this.createHighlightElement();
+    }
+
+    createContainerElement() {
         // Create the output container if it does not already exist
         if (!Console.containerEl) {
             Console.containerEl = document.createElement('div');
@@ -60,14 +62,9 @@ export class Console {
             Console.containerEl.style.height = '150px';
             Console.containerEl.style.backgroundColor = '#222';
         }
+    }
 
-        // Create the output text element if it does not already exist
-        if (!Console.outputEl) {
-            Console.outputEl = document.createElement('pre');
-            Console.outputEl.id = 'log';
-            Console.containerEl.appendChild(Console.outputEl);
-        }
-
+    createHighlightElement() {
         // Create style element that handles highlighting if it does not exist
         if (!Console.highlightEl) {
             Console.highlightEl = document.createElement('style');
@@ -79,6 +76,47 @@ export class Console {
             .log-warn, .log-error { font-weight: bold; }";
             Console.containerEl.appendChild(Console.highlightEl);
         }
+    }
+
+    createInputElement() {
+        // Create input element that handles commands if it does not exist
+        if (!Console.inputEl) {
+            Console.inputEl = document.createElement('input');
+            Console.inputEl.type = 'text';
+            Console.containerEl.appendChild(Console.inputEl);
+            document.onkeypress = (ev: KeyboardEvent) => {
+                if (ev.which == 13) {
+                    console.log(Console.inputEl.value);
+                    Console.inputEl.value = '';
+                }
+            };
+        }
+    }
+
+    createOutputElement() {
+        // Create the output text element if it does not already exist
+        if (!Console.outputEl) {
+            Console.outputEl = document.createElement('pre');
+            Console.outputEl.id = 'log';
+            Console.containerEl.appendChild(Console.outputEl);
+        }
+    }
+
+    /**
+     * Sets the origin point of the DOM elements
+     * @param x coordinate
+     * @param y coordinate
+     */
+    setPosition(x: number, y: number) {
+        this.dom.setPosition(x, y);
+    }
+
+    /**
+     * Scales the DOM elements by a given factor
+     * @param scale the factor to scale by
+     */
+    setScale(scale: number) {
+        this.dom.setScale(scale);
     }
 
     /**
