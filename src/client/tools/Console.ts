@@ -44,6 +44,8 @@ export class Console {
         // Add the console to it's scene
         this.dom = this.scene.add.dom(0, 0, Console.consoleEl)
             .setScrollFactor(0).setOrigin(0, 0);
+        // Starts off invisible
+        this.dom.setVisible(false);
     }
 
     create() {
