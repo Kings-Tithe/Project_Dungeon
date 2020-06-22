@@ -118,13 +118,6 @@ export class Character {
             frameRate: 7,
             repeat: -1
         });
-        /**animation used to reset the frame of the character sprite */
-        scene.anims.create({
-            key: spriteKey + 'idle',
-            frames: scene.anims.generateFrameNumbers(spriteKey, { end: 0 }),
-            frameRate: 10,
-            repeat: -1
-        });
         /**animation used to reset the frame of the character sprite after walking up */
         scene.anims.create({
             key: spriteKey + 'idle_up',
