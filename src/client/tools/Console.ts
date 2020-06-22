@@ -62,7 +62,8 @@ export class Console {
             Console.consoleEl.style.textAlign = 'center';
             Console.consoleEl.style.width = '100%';
             Console.consoleEl.style.height = '30%';
-            Console.consoleEl.style.backgroundColor = '#444';
+            Console.consoleEl.style.borderRadius = '5px';
+            Console.consoleEl.style.backgroundColor = '#343434';
         }
     }
 
@@ -84,7 +85,7 @@ export class Console {
         // Create input element that handles commands if it does not exist
         if (!Console.inputEl) {
             Console.inputEl = document.createElement('input');
-            Console.inputEl.style.width = '96%';
+            Console.inputEl.style.width = '99%';
             Console.inputEl.type = 'text';
             Console.consoleEl.appendChild(Console.inputEl);
             document.onkeypress = (ev: KeyboardEvent) => {
@@ -114,7 +115,7 @@ export class Console {
             Console.outputEl.style.backgroundColor = '#222';
             Console.outputEl.style.display = 'inline-block';
             Console.outputEl.style.width = '100%';
-            Console.outputEl.style.height = '80%';
+            Console.outputEl.style.height = '86%';
             // How elements inside this container are displayed
             Console.outputEl.style.overflow = 'auto';
             Console.outputEl.style.textAlign = 'left';
