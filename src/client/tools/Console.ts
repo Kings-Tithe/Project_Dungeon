@@ -88,7 +88,7 @@ export class Console {
             Console.inputEl.style.width = '99%';
             Console.inputEl.type = 'text';
             Console.consoleEl.appendChild(Console.inputEl);
-            document.onkeypress = (ev: KeyboardEvent) => {
+            Console.inputEl.onkeypress = (ev: KeyboardEvent) => {
                 if (ev.which == 13) {
                     console.log(Console.inputEl.value);
                     Console.inputEl.value = '';
