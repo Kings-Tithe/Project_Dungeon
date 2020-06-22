@@ -142,8 +142,28 @@ export class Console {
         this.dom.setScale(scale);
     }
 
-    toggleDisplay() {
-        this.dom.setVisible(this.dom.visible ? false : true);
+    toggleDisplay(gameInput: { enabled: Boolean }) {
+        // If the dom elements are visible, we're closing the console
+        if (this.dom.visible) {
+            // Unfocus and clear the text from the input
+            Console.inputEl.value = '';
+            Console.inputEl.blur();
+            // Hide the dom elements
+            this.dom.setVisible(false);
+            // Enable game input so that it can capture keys for control
+            gameInput.enabled = true;
+        }
+        // If the dom elements are not visible, we're opening the console
+        else {
+            // Show the dom elements
+            this.dom.setVisible(true);
+            // Disable the game input so that it doesn't capture keys
+            gameInput.enabled = false;
+            // Focus on the input box so the player types in it without having
+            // to click on it first. Has to be on a timer b/c it takes a moment
+            // to ready the HTML
+            setTimeout(() => { Console.inputEl.focus() }, 30);
+        }
     }
 
     /**

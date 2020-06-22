@@ -22,8 +22,8 @@ export class Hud extends Phaser.Scene {
         // Listen for the backtick key to toggle the console
         hookToMethod(document, 'onkeypress', (ret, ev) => {
             if (ev.which == '96'){
-                console.log('backtiiiiiiiick');
-                con.toggleDisplay();
+                // Toggle the display of the console and phaser controls
+                con.toggleDisplay(this.game.input.keyboard);
             }
         });
     }
