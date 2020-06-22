@@ -142,6 +142,10 @@ export class Console {
         this.dom.setScale(scale);
     }
 
+    toggleDisplay() {
+        this.dom.setVisible(this.dom.visible ? false : true);
+    }
+
     /**
      * Redirects the output of all major console output functions to
      * HTML game console as well as browser debug console.

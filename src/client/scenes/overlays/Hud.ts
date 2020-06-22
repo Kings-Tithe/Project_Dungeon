@@ -19,9 +19,12 @@ export class Hud extends Phaser.Scene {
         // Create a game console
         let con = new Console(this);
         con.rewireAll();
-        console.log(document.onkeypress);
-        hookToMethod(document, 'onkeypress', function() {
-            console.log('backtiiiiiiiick');
+        // Listen for the backtick key to toggle the console
+        hookToMethod(document, 'onkeypress', (ret, ev) => {
+            if (ev.which == '96'){
+                console.log('backtiiiiiiiick');
+                con.toggleDisplay();
+            }
         });
     }
 
