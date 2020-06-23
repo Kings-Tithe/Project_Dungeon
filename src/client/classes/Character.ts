@@ -58,7 +58,9 @@ export class Character {
     /**The name of the character */
     name: string;
     /**Stores the string relating to the sprite */
-    spriteKey;
+    spriteKey: string;
+    /**Stores the string relating to the portraits's sprite */
+    portraitKey: string;
 
     /**Misc */
     /**The animation manager is global as such we just need a refernce to it
@@ -92,8 +94,7 @@ export class Character {
         this.sprite.ignoreDestroy = true;
         this.name = spriteKey;
         this.spriteKey = spriteKey;
-        //generate the portrait sprite
-        //this.portrait = scene.add.sprite()
+        this.portraitKey = portraitKey;
         /**generate all the animations associated with this sprite */
         /**animation for character walking right */
         scene.anims.create({

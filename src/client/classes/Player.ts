@@ -1,5 +1,6 @@
 import { Character } from "./Character";
 import { Controls } from "./Controls";
+import { EventGlobals } from "../tools/EventGlobals";
 
 /**Player
  * Holds all the information and functionality of the player themselves
@@ -44,6 +45,10 @@ export class Player {
     /**Stores a refernce to the current scene */
     currentScene: Phaser.Scene;
 
+    //GlobalEmitter
+    /**Stores a refernce to the global event emitter */
+    globalEmitter: EventGlobals;
+
     /**Instantiates an instance of this class, this is also where alot of our default
      * values are setup and stuff like arrays are first instantiated.
      */
@@ -60,6 +65,7 @@ export class Player {
         this.money = 0;
         this.freeRoamSpeed = 130;
         this.startDepth = 10;
+        this.globalEmitter = EventGlobals.getInstance();
         /* priming varibles for logic, these should not be changed unless 
         the logic involving them is */
         this.leaderChangeTimeOut = false;
@@ -69,10 +75,11 @@ export class Player {
     /**Adds a party member to the list by a passed in spritekey, this
      * constructs a new character object to add a new member by the character
      * object use addPartyMemberByObject() */
-    addPartyMemberByKey(key: string, portrait) {
+    addPartyMemberByKey(key: string, portrait: string) {
         //construct our new party member and add them to the party
         let newPartyMember = new Character(this.currentScene.anims);
         newPartyMember.createSprite(this.currentScene, key, portrait, this.x, this.y);
+        this.globalEmitter.emit("addPortrait", portrait);
         this.party.push(newPartyMember);
     }
 
@@ -104,6 +111,8 @@ export class Player {
         //set the new leader and make sure their facing the same direction as the old one
         this.party[0].moveTo(this.x, this.y);
         this.party[0].facingDirection = direction;
+        //change the hud's portrait to refelct the new leader
+        this.globalEmitter.emit("changePortrait",this.party[0].portraitKey);
         //fix the current scenes main camera to follow the new leader
         this.currentScene.cameras.main.startFollow(this.party[0].sprite, true);
         //set timeout to allow for leader changing again
