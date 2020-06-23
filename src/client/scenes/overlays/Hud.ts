@@ -29,10 +29,17 @@ export class Hud extends Phaser.Scene {
 
     constructor() {
         super('Hud');
+
         //needs to be instantiated before use
         this.portraitSprites = {};
 
+        //events to listen for
         this.globalEmitter = EventGlobals.getInstance();
+        this.globalEmitter.on("addPortrait", (portrait) => {
+            console.log(portrait, 'sprite being added!');
+            this.addPortraitSprite(portrait)
+        });
+        this.globalEmitter.on("changePortrait", this.changePortraitSprite, this);
     }
 
     create() {
@@ -44,10 +51,6 @@ export class Hud extends Phaser.Scene {
         this.characterFrame = this.add.sprite(0, 0, "characterFrame").setOrigin(0, 0);
         this.characterFrame.setScale(2);
         this.characterFrame.setDepth(1);
-
-        //events to listen for
-        this.globalEmitter.on("addPortrait", (portrait) => { console.log("Portrait Data: ", portrait) });
-        this.globalEmitter.on("changePortrait", this.changePortraitSprite, this);
     }
 
     /**Used to add to the list of character portrait sprites we have in portraitSprites */
