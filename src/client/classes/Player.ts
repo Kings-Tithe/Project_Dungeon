@@ -1,5 +1,5 @@
 import { Character } from "./Character";
-import { Controls } from "./Controls";
+import { Controls } from "../tools/Controls";
 import { EventGlobals } from "../tools/EventGlobals";
 
 /**Player
@@ -60,7 +60,7 @@ export class Player {
         //things that need to be instantiated before use.
         this.path = [];
         this.party = [];
-        this.controls = new Controls(scene);
+        this.controls = Controls.getInstance(scene);
         //default values
         this.money = 0;
         this.freeRoamSpeed = 130;

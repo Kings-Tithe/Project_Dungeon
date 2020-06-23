@@ -1,7 +1,7 @@
 /**This is a global emitter used for communication between scenes and classes */
 export class EventGlobals extends Phaser.Events.EventEmitter {
 
-    constructor(){
+    private constructor(){
         super();
     }
 

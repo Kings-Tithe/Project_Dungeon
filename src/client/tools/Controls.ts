@@ -4,7 +4,6 @@
  * coded controls but it is set up so that there can eventually be a menu for
  * adjusting keyboard controls.
  */
-
 export class Controls {
 
     /**member functions */
@@ -17,10 +16,19 @@ export class Controls {
     inputManager: Phaser.Input.InputPlugin;
 
 
-    constructor(scene: Phaser.Scene){
+    private constructor(scene: Phaser.Scene){
         this.keys = {};
         this.inputManager = scene.input;
         this.loadKeyBindings();
+    }
+
+    static getInstance(scene: Phaser.Scene){
+        //if an instance has not been made yet, create one
+        if (instance == null){
+            instance = new Controls(scene);
+        }
+        //as long as we have an instance, return it
+        return instance;
     }
 
     /**Eventually this will be stored in a key_config.json somewhere on the
@@ -43,3 +51,7 @@ export class Controls {
         }
     }
 }
+
+/**This is the varible used to store our one instance of our singlton class, this
+ * is a module level variable and cannot be seen by other scripts */
+let instance: Controls;
