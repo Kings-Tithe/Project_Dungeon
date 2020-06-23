@@ -35,10 +35,7 @@ export class Hud extends Phaser.Scene {
 
         //events to listen for
         this.globalEmitter = EventGlobals.getInstance();
-        this.globalEmitter.on("addPortrait", (portrait) => {
-            console.log(portrait, 'sprite being added!');
-            this.addPortraitSprite(portrait)
-        });
+        this.globalEmitter.on("addPortrait",this.addPortraitSprite, this)
         this.globalEmitter.on("changePortrait", this.changePortraitSprite, this);
     }
 
@@ -59,7 +56,7 @@ export class Hud extends Phaser.Scene {
         if (this.portraitSprites[spritekey] == null) {
             //create the new sprite if it is not already in the list
             let newPortrait = this.add.sprite(10, 12, spritekey).setOrigin(0, 0);
-            newPortrait.setScale(1.3);
+            newPortrait.setScale(0);
             newPortrait.setDepth(0);
             //add to list
             this.portraitSprites[spritekey] = newPortrait;
@@ -68,7 +65,7 @@ export class Hud extends Phaser.Scene {
         }
 
         //if there is no sprite currently in use, use the new one
-        if (typeof this.currentPortrait !== 'undefined') {
+        if (!this.currentPortrait) {
             this.currentPortrait = spritekey;
             this.portraitSprites[this.currentPortrait].setScale(1.3);
         }
@@ -81,6 +78,7 @@ export class Hud extends Phaser.Scene {
         if (this.portraitSprites[spritekey] != null) {
             this.portraitSprites[this.currentPortrait].setScale(0);
             this.portraitSprites[spritekey].setScale(1.3);
+            this.currentPortrait = spritekey;
         } else {
             console.log(spritekey + " does not exist in the spritePortrait list");
         }
