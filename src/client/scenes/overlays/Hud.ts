@@ -47,7 +47,7 @@ export class Hud extends Phaser.Scene {
 
         //events to listen for
         this.globalEmitter.on("addPortrait", console.log);
-        this.globalEmitter.on("changePortrait", this.changePortraitSprite);
+        this.globalEmitter.on("changePortrait", this.changePortraitSprite, this);
     }
 
     /**Used to add to the list of character portrait sprites we have in portraitSprites */

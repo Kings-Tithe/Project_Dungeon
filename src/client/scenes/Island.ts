@@ -82,7 +82,7 @@ export class Island extends Phaser.Scene {
         /**setup the main camera */
         this.cameras.main.startFollow(this.player.party[0].sprite, true);
 
-        // Round physics positions to avoid ugly render artifacts;
+        // Round physics positions to avoid ugly render artifacts
         hookToMethod(Phaser.Physics.Arcade.Body.prototype, 'update', function () {
             this.x = Math.round(this.x);
             this.y = Math.round(this.y);
