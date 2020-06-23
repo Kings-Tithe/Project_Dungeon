@@ -18,6 +18,8 @@ export class Hud extends Phaser.Scene {
     /**Sprite frame at the top of the screen that other ui elements hit ontop of it
      * sets a depth of 5. The character portrait sits under it */
     characterFrame: Phaser.GameObjects.Sprite;
+    /**Button used to toggle the character sheet */
+    characterSheetButton: Phaser.GameObjects.Sprite;
 
     //strings
     /**Stores the spritekey of the currently in use character portrait */
@@ -48,11 +50,24 @@ export class Hud extends Phaser.Scene {
         this.characterFrame = this.add.sprite(0, 0, "characterFrame").setOrigin(0, 0);
         this.characterFrame.setScale(2);
         this.characterFrame.setDepth(1);
+
+        this.createCharacterSheetButton();
+    }
+
+    createCharacterSheetButton(){
+        this.characterSheetButton = this.add.sprite(95,52,"bookIcon");
+        this.characterSheetButton.setDepth(2);
+        this.characterSheetButton.setScale(.8);
+        this.characterSheetButton.setInteractive();
+        this.characterSheetButton.on("pointerdown", this.toggleCharacterSheet, this);
+    }
+
+    toggleCharacterSheet(){
+        console.log('yay, I clicked a thing');
     }
 
     /**Used to add to the list of character portrait sprites we have in portraitSprites */
     addPortraitSprite(spritekey: string) {
-        setTimeout(() => { console.log('test01'); }, 2000);
         if (this.portraitSprites[spritekey] == null) {
             //create the new sprite if it is not already in the list
             let newPortrait = this.add.sprite(10, 12, spritekey).setOrigin(0, 0);
