@@ -73,7 +73,6 @@ export class Hud extends Phaser.Scene {
 
     /**Used to add to the list of character portrait sprites we have in portraitSprites */
     addPortraitSprite(spritekey: string) {
-        setTimeout(() => { console.log('test01'); }, 2000);
         if (this.portraitSprites[spritekey] == null) {
             //create the new sprite if it is not already in the list
             let newPortrait = this.add.sprite(10, 12, spritekey).setOrigin(0, 0);
