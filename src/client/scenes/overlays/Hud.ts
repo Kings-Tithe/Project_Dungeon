@@ -1,6 +1,6 @@
 import { Console } from "../../tools/Console";
 import { hookToMethod } from "../../tools/Hook";
-import { EventGlobals } from "../../tools/EventGlobals";
+import { SignalManager } from "../../tools/SignalManager";
 
 /**
  * Hud scene that should display over the main game screen. Contains various
@@ -26,7 +26,7 @@ export class Hud extends Phaser.Scene {
 
     //GlobalEmitter
     /**Stores a refernce to the global event emitter */
-    globalEmitter: EventGlobals;
+    signals: SignalManager;
 
     /**
      * Constructor for Hud class.
@@ -38,9 +38,9 @@ export class Hud extends Phaser.Scene {
         this.portraitSprites = {};
 
         //events to listen for
-        this.globalEmitter = EventGlobals.getInstance();
-        this.globalEmitter.on("addPortrait", this.addPortraitSprite, this)
-        this.globalEmitter.on("changePortrait", this.changePortraitSprite, this);
+        this.signals = SignalManager.get();
+        this.signals.on("addPortrait", this.addPortraitSprite, this)
+        this.signals.on("changePortrait", this.changePortraitSprite, this);
     }
 
     /**

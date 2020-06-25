@@ -1,6 +1,6 @@
 import { Character } from "./Character";
 import { Controls } from "./Controls";
-import { EventGlobals } from "../tools/EventGlobals";
+import { SignalManager } from "../tools/SignalManager";
 
 /**Player
  * Holds all the information and functionality of the player themselves
@@ -51,7 +51,7 @@ export class Player {
 
     //GlobalEmitter
     /**Stores a refernce to the global event emitter */
-    globalEmitter: EventGlobals;
+    globalEmitter: SignalManager;
 
     /**Instantiates an instance of this class, this is also where alot of our default
      * values are setup and stuff like arrays are first instantiated.
@@ -74,7 +74,7 @@ export class Player {
         this.startDepth = 10;
         this.nodeOffSet = 5;
         this.idleZone = 3;
-        this.globalEmitter = EventGlobals.getInstance();
+        this.globalEmitter = SignalManager.get();
         /* priming varibles for logic, these should not be changed unless 
         the logic involving them is */
         this.leaderChangeTimeOut = false;

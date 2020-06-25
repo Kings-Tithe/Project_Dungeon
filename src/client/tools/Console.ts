@@ -1,5 +1,6 @@
 import { px, py } from "./PercentCoords";
 import { hookToMethod } from "./Hook";
+import { SignalManager } from "./SignalManager";
 
 /**
  * In game console with output of error messages, feedback, and command inputs
@@ -32,6 +33,9 @@ export class Console {
     static inputEl: HTMLInputElement = null;
     // the <div> container element for the logs which also handles scrolling
     static outputEl: HTMLDivElement = null;
+
+    // Emitter to communicate commands to scenes
+    signals: SignalManager;
 
     /**
      * Constructs a Console object
