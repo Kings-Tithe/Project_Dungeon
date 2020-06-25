@@ -122,13 +122,20 @@ export class Console {
             this.inputEl.style.width = '99%';
             this.inputEl.type = 'text';
             this.consoleEl.appendChild(this.inputEl);
+
             // When the ENTER/RETURN key is pressed, this event fires.
             this.inputEl.onkeypress = (ev: KeyboardEvent) => {
+                // If key is ENTER/RETURN
                 if (ev.which == 13) {
+                    // Log the command entered
                     console.log(this.inputEl.value);
+                    // Handle any command behavior
+                    this.onCommand(this.inputEl.value);
+                    // Clear the input text
                     this.inputEl.value = '';
                 }
             };
+
         }
     }
 
@@ -164,6 +171,10 @@ export class Console {
             // Append this element to it's parent
             this.consoleEl.appendChild(this.outputEl);
         }
+    }
+
+    private onCommand(commandLine: String) {
+        this.signals.emit('command', commandLine.split(' '));
     }
 
     /**
