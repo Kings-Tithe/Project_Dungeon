@@ -1,6 +1,6 @@
-import { px, py } from "./PercentCoords";
 import { hookToMethod } from "./Hook";
 import { SignalManager } from "./SignalManager";
+import { Hud } from "../scenes/overlays/Hud";
 
 /**
  * In game console with output of error messages, feedback, and command inputs
@@ -18,38 +18,50 @@ import { SignalManager } from "./SignalManager";
 export class Console {
 
     // the scene this console object should be attached to
-    scene: Phaser.Scene;
+    private hud: Hud;
     // the phaser dom object that references the html elements
-    dom: Phaser.GameObjects.DOMElement;
+    private dom: Phaser.GameObjects.DOMElement;
 
-    // static HTML elements that are created once and re-used
     // the <div> container element that holds ALL other console HTML elements
-    static consoleEl: HTMLDivElement = null;
+    private consoleEl: HTMLDivElement = null;
     // the <pre> output element which will contain actual logged items and text
-    static logsEl: HTMLPreElement = null;
+    private logsEl: HTMLPreElement = null;
     // the <style> which handles syntax highlighting of the console's output
-    static highlightEl: HTMLStyleElement = null;
+    private highlightEl: HTMLStyleElement = null;
     // the <style> which handles syntax highlighting of the console's output
-    static inputEl: HTMLInputElement = null;
+    private inputEl: HTMLInputElement = null;
     // the <div> container element for the logs which also handles scrolling
-    static outputEl: HTMLDivElement = null;
+    private outputEl: HTMLDivElement = null;
 
     // Emitter to communicate commands to scenes
-    signals: SignalManager;
+    private signals: SignalManager;
 
     /**
      * Constructs a Console object
      * @param scene the scene this console object should be attached to
      */
-    constructor(scene: Phaser.Scene) {
-        this.scene = scene;
+    private constructor(hud: Hud) {
+        this.hud = hud;
         // Create the HTML elements forming the game console
         this.create();
         // Add the console to it's scene
-        this.dom = this.scene.add.dom(0, 0, Console.consoleEl)
+        this.dom = this.hud.add.dom(0, 0, this.consoleEl)
             .setScrollFactor(0).setOrigin(0, 0);
         // Starts off invisible
         this.dom.setVisible(false);
+        // Rewire the console logging functions
+        this.hookToAll();
+        // Get an emitter to send commands through
+        this.signals = SignalManager.get();
+    }
+
+    static get(hud: Hud) {
+        //if an instance has not been made yet, create one
+        if (instance == null) {
+            instance = new Console(hud);
+        }
+        //as long as we have an instance, return it
+        return instance;
     }
 
     /**
@@ -59,7 +71,7 @@ export class Console {
      * Creation is broken up into several individual create methods, this
      * method should just call those.
      */
-    create() {
+    private create() {
         this.createConsoleElement();
         this.createOutputElement();
         this.createInputElement();
@@ -70,51 +82,51 @@ export class Console {
     /**
      * Creates container div element which the rest of the HTML is appended to.
      */
-    createConsoleElement() {
+    private createConsoleElement() {
         // Create the console container if it does not already exist
-        if (!Console.consoleEl) {
-            Console.consoleEl = document.createElement('div');
-            Console.consoleEl.id = 'console-container';
-            Console.consoleEl.style.textAlign = 'center';
-            Console.consoleEl.style.width = '100%';
-            Console.consoleEl.style.height = '30%';
-            Console.consoleEl.style.borderRadius = '5px';
-            Console.consoleEl.style.backgroundColor = '#343434';
+        if (!this.consoleEl) {
+            this.consoleEl = document.createElement('div');
+            this.consoleEl.id = 'console-container';
+            this.consoleEl.style.textAlign = 'center';
+            this.consoleEl.style.width = '100%';
+            this.consoleEl.style.height = '30%';
+            this.consoleEl.style.borderRadius = '5px';
+            this.consoleEl.style.backgroundColor = '#343434';
         }
     }
 
     /**
      * Creates a style element to handle syntax highlighting in the console.
      */
-    createHighlightElement() {
+    private createHighlightElement() {
         // Create style element that handles highlighting if it does not exist
-        if (!Console.highlightEl) {
-            Console.highlightEl = document.createElement('style');
-            Console.highlightEl.type = 'text/css';
-            Console.highlightEl.innerHTML = ".log-warn { color: orange } \
+        if (!this.highlightEl) {
+            this.highlightEl = document.createElement('style');
+            this.highlightEl.type = 'text/css';
+            this.highlightEl.innerHTML = ".log-warn { color: orange } \
             .log-error { color: red } \
             .log-info { color: skyblue } \
             .log-log { color: silver } \
             .log-warn, .log-error { font-weight: bold; }";
-            Console.outputEl.appendChild(Console.highlightEl);
+            this.outputEl.appendChild(this.highlightEl);
         }
     }
 
     /**
      * Creates an input elements to let the users type into.
      */
-    createInputElement() {
+    private createInputElement() {
         // Create input element that handles commands if it does not exist
-        if (!Console.inputEl) {
-            Console.inputEl = document.createElement('input');
-            Console.inputEl.style.width = '99%';
-            Console.inputEl.type = 'text';
-            Console.consoleEl.appendChild(Console.inputEl);
+        if (!this.inputEl) {
+            this.inputEl = document.createElement('input');
+            this.inputEl.style.width = '99%';
+            this.inputEl.type = 'text';
+            this.consoleEl.appendChild(this.inputEl);
             // When the ENTER/RETURN key is pressed, this event fires.
-            Console.inputEl.onkeypress = (ev: KeyboardEvent) => {
+            this.inputEl.onkeypress = (ev: KeyboardEvent) => {
                 if (ev.which == 13) {
-                    console.log(Console.inputEl.value);
-                    Console.inputEl.value = '';
+                    console.log(this.inputEl.value);
+                    this.inputEl.value = '';
                 }
             };
         }
@@ -123,34 +135,34 @@ export class Console {
     /**
      * Creates an elements which actually displays the text of logged items.
      */
-    createLogsElement() {
+    private createLogsElement() {
         // Create the output text element if it does not already exist
-        if (!Console.logsEl) {
-            Console.logsEl = document.createElement('pre');
-            Console.logsEl.id = 'log';
-            Console.outputEl.appendChild(Console.logsEl);
+        if (!this.logsEl) {
+            this.logsEl = document.createElement('pre');
+            this.logsEl.id = 'log';
+            this.outputEl.appendChild(this.logsEl);
         }
     }
 
     /**
      * Creates the container for output logs.
      */
-    createOutputElement() {
+    private createOutputElement() {
         // Create the output container if it does not already exist
-        if (!Console.outputEl) {
-            Console.outputEl = document.createElement('div');
-            Console.outputEl.id = 'log-container';
+        if (!this.outputEl) {
+            this.outputEl = document.createElement('div');
+            this.outputEl.id = 'log-container';
             // How this element is displayed inside the parent container
-            Console.outputEl.style.backgroundColor = '#222';
-            Console.outputEl.style.display = 'inline-block';
-            Console.outputEl.style.width = '100%';
-            Console.outputEl.style.height = '86%';
+            this.outputEl.style.backgroundColor = '#222';
+            this.outputEl.style.display = 'inline-block';
+            this.outputEl.style.width = '100%';
+            this.outputEl.style.height = '86%';
             // How elements inside this container are displayed
-            Console.outputEl.style.overflow = 'auto';
-            Console.outputEl.style.textAlign = 'left';
-            Console.outputEl.style.paddingLeft = '5px';
+            this.outputEl.style.overflow = 'auto';
+            this.outputEl.style.textAlign = 'left';
+            this.outputEl.style.paddingLeft = '5px';
             // Append this element to it's parent
-            Console.consoleEl.appendChild(Console.outputEl);
+            this.consoleEl.appendChild(this.outputEl);
         }
     }
 
@@ -182,8 +194,8 @@ export class Console {
         // If the dom elements are visible, we're closing the console
         if (this.dom.visible) {
             // Unfocus and clear the text from the input
-            Console.inputEl.value = '';
-            Console.inputEl.blur();
+            this.inputEl.value = '';
+            this.inputEl.blur();
             // Hide the dom elements
             this.dom.setVisible(false);
             // Enable game input so that it can capture keys for control
@@ -198,7 +210,7 @@ export class Console {
             // Focus on the input box so the player types in it without having
             // to click on it first. Has to be on a timer b/c it takes a moment
             // to ready the HTML
-            setTimeout(() => { Console.inputEl.focus() }, 30);
+            setTimeout(() => { this.inputEl.focus() }, 30);
         }
     }
 
@@ -206,12 +218,12 @@ export class Console {
      * Redirects the output of all major console output functions to
      * HTML game console as well as browser debug console.
      */
-    rewireAll() {
-        this.rewireConsoleFunc('log');
-        this.rewireConsoleFunc('debug');
-        this.rewireConsoleFunc('warn');
-        this.rewireConsoleFunc('error');
-        this.rewireConsoleFunc('info');
+    private hookToAll() {
+        this.hookToConsoleFunc('log');
+        this.hookToConsoleFunc('debug');
+        this.hookToConsoleFunc('warn');
+        this.hookToConsoleFunc('error');
+        this.hookToConsoleFunc('info');
     }
 
     /**
@@ -220,37 +232,37 @@ export class Console {
      * @param consoleFuncName the name of the console function to redirect to
      * HTML output
      */
-    rewireConsoleFunc(consoleFuncName: string) {
-        // store the old version of the console function
-        console['_old_' + consoleFuncName] = console[consoleFuncName];
+    private hookToConsoleFunc(consoleFuncName: string) {
 
-        /**
-         * The new console function which outputs to both the browser console
-         * and to the game console (in HTML)
-         * @param args the objects to output as log, error, etc...
-         */
-        console[consoleFuncName] = function (...args: any[]) {
-            // get HTML span tags of the objects
-            const output = Console.htmlLog(consoleFuncName, args);
-            // add the html <span> texts to the <pre> output element
-            Console.logsEl.innerHTML += output + "<br>";
+        // We hook onto the console function with new HTML logging function
+        hookToMethod(console, consoleFuncName,
+            /**
+             * The new console function which outputs to the HTML-elements
+             * which form the game console.
+             * @param ret the value returned from the original function, this
+             * is sent to any hooked functions in case they need it for their
+             * additional behavior.
+             * @param args the objects to output as log, error, etc...
+             */
+            (ret: any, ...args: any[]) => {
+                // get HTML span tags of the objects
+                const output = this.htmlLog(consoleFuncName, args);
+                // add the html <span> texts to the <pre> output element
+                this.logsEl.innerHTML += output + "<br>";
 
-            // determine if game console is currently scrolled to the bottom
-            const bottomed =
-                Console.outputEl.scrollHeight
-                - Console.outputEl.clientHeight
-                <= Console.outputEl.scrollTop + 1;
-            // automatically scroll to the bottom when new console output
-            // is created
-            if (!bottomed) {
-                Console.outputEl.scrollTop =
-                    Console.outputEl.scrollHeight
-                    - Console.outputEl.clientHeight;
-            }
-
-            // run the old function too, to print to the console
-            console['_old_' + consoleFuncName].apply(undefined, args);
-        };
+                // determine if game console is currently scrolled to the bottom
+                const bottomed =
+                    this.outputEl.scrollHeight
+                    - this.outputEl.clientHeight
+                    <= this.outputEl.scrollTop + 1;
+                // automatically scroll to the bottom when new console output
+                // is created
+                if (!bottomed) {
+                    this.outputEl.scrollTop =
+                        this.outputEl.scrollHeight
+                        - this.outputEl.clientHeight;
+                }
+            });
 
     };
 
@@ -261,7 +273,7 @@ export class Console {
      * @param args a list of any loggable objects or values
      * @return an HTML formatted string of <span> tags
      */
-    static htmlLog(consoleFuncName: string, args: any[]): String {
+    htmlLog(consoleFuncName: string, args: any[]): String {
         // reduce runs a provided function on each element of an array, with
         // the intention that that function should return a merge of each of
         // the two.
@@ -288,3 +300,8 @@ export class Console {
         return combinedOutput;
     }
 }
+
+/**This is the varible used to store our one instance of our singlton class, this
+ * is a module level variable and cannot be seen by other scripts.
+ */
+let instance: Console = null;
