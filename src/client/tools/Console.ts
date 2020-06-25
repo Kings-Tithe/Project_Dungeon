@@ -48,6 +48,13 @@ export class Console {
         this.dom.setVisible(false);
     }
 
+    /**
+     * Handles creation of the Console HTML elements. These elements are added
+     * to the Phaser Game in the constructor, so this shouldn't be confused 
+     * with the create method on Phaser.Scene objects.
+     * Creation is broken up into several individual create methods, this
+     * method should just call those.
+     */
     create() {
         this.createConsoleElement();
         this.createOutputElement();
@@ -56,6 +63,9 @@ export class Console {
         this.createHighlightElement();
     }
 
+    /**
+     * Creates container div element which the rest of the HTML is appended to.
+     */
     createConsoleElement() {
         // Create the console container if it does not already exist
         if (!Console.consoleEl) {
@@ -69,6 +79,9 @@ export class Console {
         }
     }
 
+    /**
+     * Creates a style element to handle syntax highlighting in the console.
+     */
     createHighlightElement() {
         // Create style element that handles highlighting if it does not exist
         if (!Console.highlightEl) {
@@ -83,6 +96,9 @@ export class Console {
         }
     }
 
+    /**
+     * Creates an input elements to let the users type into.
+     */
     createInputElement() {
         // Create input element that handles commands if it does not exist
         if (!Console.inputEl) {
@@ -90,6 +106,7 @@ export class Console {
             Console.inputEl.style.width = '99%';
             Console.inputEl.type = 'text';
             Console.consoleEl.appendChild(Console.inputEl);
+            // When the ENTER/RETURN key is pressed, this event fires.
             Console.inputEl.onkeypress = (ev: KeyboardEvent) => {
                 if (ev.which == 13) {
                     console.log(Console.inputEl.value);
@@ -99,6 +116,9 @@ export class Console {
         }
     }
 
+    /**
+     * Creates an elements which actually displays the text of logged items.
+     */
     createLogsElement() {
         // Create the output text element if it does not already exist
         if (!Console.logsEl) {
@@ -108,6 +128,9 @@ export class Console {
         }
     }
 
+    /**
+     * Creates the container for output logs.
+     */
     createOutputElement() {
         // Create the output container if it does not already exist
         if (!Console.outputEl) {
@@ -144,6 +167,13 @@ export class Console {
         this.dom.setScale(scale);
     }
 
+    /**
+     * Toggles whether or not the console is visible and interactable.
+     * @param gameInput An object containing a boolean which can be disabled to
+     * disable game inputs. Should stop the character from being moved while
+     * typing in the console. This method will eventually be deprecated with
+     * better control management schemes.
+     */
     toggleDisplay(gameInput: { enabled: Boolean }) {
         // If the dom elements are visible, we're closing the console
         if (this.dom.visible) {

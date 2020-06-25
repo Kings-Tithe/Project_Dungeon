@@ -1,6 +1,5 @@
 import * as Phaser from 'phaser';
 
-import { TestBox } from './scenes/TestBox';
 import { Island } from './scenes/Island';
 import { LoadAssets } from './scenes/LoadAssets';
 import { Hud } from './scenes/overlays/Hud';
@@ -16,7 +15,6 @@ const config: Phaser.Types.Core.GameConfig = {
     scene: [
         LoadAssets,
         Island,
-        TestBox,
         Hud
     ],
 

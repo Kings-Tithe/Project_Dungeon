@@ -7,14 +7,23 @@ import { hookToMethod } from "../../tools/Hook";
  */
 export class Hud extends Phaser.Scene {
 
+    /**
+     * Constructor for Hud class.
+     */
     constructor() {
         super('Hud');
     }
 
+    /**
+     * Phaser.Scene method that handles the creation when scene starts.
+     */
     create() {
         this.createConsole();
     }
 
+    /**
+     * Instantiates and runs setup methods for the console object in the hud.
+     */
     createConsole() {
         // Create a game console
         let con = new Console(this);
