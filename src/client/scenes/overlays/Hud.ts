@@ -1,6 +1,7 @@
 import { Console } from "../../tools/Console";
 import { EventGlobals } from "../../tools/EventGlobals";
 import { CENTER } from "../../tools/Globals";
+import { CharacterSheet } from "../../classes/CharacterSheet";
 
 /**
  * Hud scene that should display over the main game screen. Contains various
@@ -19,8 +20,6 @@ export class Hud extends Phaser.Scene {
     /**Sprite frame at the top of the screen that other ui elements hit ontop of it
      * sets a depth of 5. The character portrait sits under it */
     characterFrame: Phaser.GameObjects.Sprite;
-    /**Button used to toggle the character sheet */
-    characterSheetButton: Phaser.GameObjects.Sprite;
 
     //strings
     /**Stores the spritekey of the currently in use character portrait */
@@ -29,6 +28,10 @@ export class Hud extends Phaser.Scene {
     //GlobalEmitter
     /**Stores a refernce to the global event emitter */
     globalEmitter: EventGlobals;
+
+    //character sheet
+    /**The instance of our character sheet part of the hud */
+    characterSheet: CharacterSheet;
 
     constructor() {
         super('Hud');
@@ -50,18 +53,10 @@ export class Hud extends Phaser.Scene {
         //create character frame
         this.characterFrame = this.add.sprite(0, 0, "characterFrame").setOrigin(0, 0);
         this.characterFrame.setScale(2);
-        this.characterFrame.setDepth(1); 
-
-        this.createCharacterSheetButton();
-        this.createCharacterSheet();
-    }
-
-    createCharacterSheetButton(){
-        this.characterSheetButton = this.add.sprite(95,52,"bookIcon");
-        this.characterSheetButton.setDepth(2);
-        this.characterSheetButton.setScale(.8);
-        this.characterSheetButton.setInteractive();
-        this.characterSheetButton.on("pointerdown", this.toggleCharacterSheet, this);
+        this.characterFrame.setDepth(1);
+        
+        //create our character sheet
+        this.characterSheet = new CharacterSheet(this,95,52);
     }
 
     /**Used to add to the list of character portrait sprites we have in portraitSprites */

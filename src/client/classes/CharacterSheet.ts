@@ -10,41 +10,90 @@ export class CharacterSheet {
     /**This keep track of if the character sheet is currently visible */
     ToggleVisible: boolean;
 
+    //numbers
+    /**The x of the point used to position all of the elements of character graghics */
+    startPointx: number;
+    /**The y of the point used to position all of the elements of character graghics */
+    startPointy: number;
+    /**The x where the mouse was when dragging began*/
+    mouseStartPointx: number;
+    /**The y where the mouse was when dragging began*/
+    mouseStartPointy: number;
+
     //sprites
     /**The portrait used in the character sheet */
     Portrait: Phaser.GameObjects.Sprite;
     /**The outline of a man used in the character sheet */
     outlineOfMan: Phaser.GameObjects.Sprite;
+    /**Button used to toggle the character sheet */
+    characterSheetButton: Phaser.GameObjects.Sprite;
+    /**Sprite used as a drag zone for the character sheet window */
+    dragZoneSprite: Phaser.GameObjects.Sprite;
 
     //graphics
     /**This is the backdrop for the character sheet */
     Background: Phaser.GameObjects.Graphics;
+    /**Block used as a backdrop for the number representing Focus */
     FocusBlock: Phaser.GameObjects.Graphics;
+    /**Block used as a backdrop for the number representing Endurance */
     EnduranceBlock: Phaser.GameObjects.Graphics;
+    /**Block used as a backdrop for the number representing Speed */
     SpeedBlock: Phaser.GameObjects.Graphics;
+    /**Block used as a backdrop for the number representing Might */
     MightBlock: Phaser.GameObjects.Graphics;
+    /**This is the area where you can click and drag the character sheet window */
+    dragZone: Phaser.GameObjects.Graphics;
     
 
     //text
+    /**Text representing the character's Name */
     Name: Phaser.GameObjects.Text;
+    /**Text representing the character's Level */
     Level: Phaser.GameObjects.Text;
+    /**Text representing the character's amount of EXP */
     EXP: Phaser.GameObjects.Text;
+    /**Labeling Text put above the text for the character's Focus*/
     FocusLabel: Phaser.GameObjects.Text;
+    /**Labeling Text put above the text for the character's Endurance*/
     EnduranceLabel: Phaser.GameObjects.Text;
+    /**Labeling Text put above the text for the character's Speed*/
     SpeedLabel: Phaser.GameObjects.Text;
+    /**Labeling Text put above the text for the character's Might*/
     MightLebel: Phaser.GameObjects.Text;
+    /**Text representing the character's Level Focus*/
     FocusText: Phaser.GameObjects.Text;
+    /**Text representing the character's Level Endurance*/
     EnduranceText: Phaser.GameObjects.Text;
+    /**Text representing the character's Level Speed*/
     SpeedText: Phaser.GameObjects.Text;
+    /**Text representing the character's Level Might*/
     MightText: Phaser.GameObjects.Text;
+    /**Text representing the character's Level Life*/
     LifeText: Phaser.GameObjects.Text;
+    /**Text representing the character's Level Energy*/
     EnergyText: Phaser.GameObjects.Text;
+    /**Text representing the character's Level BattleSpeed*/
     BattleSpeedText: Phaser.GameObjects.Text;
 
-    constructor(scene: Phaser.Scene){
+    /**Constructs an instance of this class and creates all the internal sprites
+     * and graghics.
+     * @param scene The Phaser scene to construct the character sheet within
+     * @param x where to place the toggle button on the x coordinate place
+     * @param y where to place the toggle button on the y coordinate place
+     */
+    constructor(scene: Phaser.Scene, x: number, y: number){
         //inital values
         this.ToggleVisible = false;
+        this.createToggleButton(scene,x,y);
         this.createCharacterSheet(scene);
+    }
+
+    createToggleButton(scene: Phaser.Scene, x: number, y: number){
+        this.characterSheetButton = scene.add.sprite(x,y,"bookIcon");
+        this.characterSheetButton.setDepth(2);
+        this.characterSheetButton.setScale(.8);
+        this.characterSheetButton.setInteractive();
+        this.characterSheetButton.on("pointerdown", this.toggle, this);
     }
 
     /**Allows the linking of all the sprites and graghics to
@@ -53,6 +102,7 @@ export class CharacterSheet {
      * in case.
      */
     link(scene: Phaser.Scene){
+        scene.add.existing(this.characterSheetButton)
         scene.add.existing(this.Background);
         scene.add.existing(this.Portrait);
         scene.add.existing(this.Name);
@@ -84,6 +134,18 @@ export class CharacterSheet {
         this.Background.strokeRoundedRect(CENTER.x - 200, CENTER.y - 300, 400, 600,20)
         this.Background.fillRoundedRect(CENTER.x - 200, CENTER.y - 300, 400, 600,20);
         this.Background.setScale(0);
+        /*create drag zone, we use the graghic to generate a sprite that can then be draggable
+        and run a function when it is. This function will reposition everything as it moves */
+        this.dragZone = scene.add.graphics();
+        this.dragZone.fillStyle(0xa80000,.5);
+        this.dragZone.setScale(1);
+        this.dragZone.fillRoundedRect(CENTER.x - 200, CENTER.y - 310, 400, 30,20);
+        scene.add.rectangle(CENTER.x - 200, CENTER.y - 310, 400, 30,20);
+        // this.dragZone.generateTexture("CharacterSheetDragZoneTexture",400,50);
+        // scene.add.image(CENTER.x - 200, CENTER.y - 310,"CharacterSheetDragZoneTexture");
+        // this.dragZone.destroy();
+        //this.dragZoneSprite.setInteractive();
+        //this.dragZoneSprite.on("drag",console.log);
         //create portrait
         this.Portrait = scene.add.sprite(CENTER.x - 180, CENTER.y - 280,"gregThePortrait");
         this.Portrait.setOrigin(0);
@@ -234,6 +296,10 @@ export class CharacterSheet {
             this.outlineOfMan.setScale(1);
             this.ToggleVisible = true;
         }
+    }
+
+    startDarg(){
+        //this.mouseStartPointx = 
     }
 
 }
