@@ -72,23 +72,24 @@ export class Island extends Phaser.Scene {
     */
     create() {
         this.createTileMap();
-        this.player = new Player(this, this.tilemapWidthInPixels / 2, this.tilemapHeightInPixels / 2);
-        this.player.addPartyMemberByKey("dregTheTestDummy");
-        this.player.addPartyMemberByKey("gregTheTestDummy");
-        this.player.addPartyMemberByKey("megTheTestDummy");
-        this.player.addPartyMemberByKey("craigTheTestDummy");
-        this.player.addCollisionByLayer(this.walkLayer);
-        //setup the main camera
+        this.player = new Player(this, this.tilemapWidthInPixels/2, this.tilemapHeightInPixels/2);
+        this.player.addPartyMemberByKey("dregTheTestDummy","dregThePortrait");
+        this.player.addPartyMemberByKey("gregTheTestDummy","gregThePortrait");
+        this.player.addPartyMemberByKey("megTheTestDummy","megThePortrait");
+        this.player.addPartyMemberByKey("craigTheTestDummy","craigThePortrait");
+        this.player.addCollisionByLayer(this.walkLayer);;
+
+        /**setup the main camera */
         this.cameras.main.startFollow(this.player.party[0].sprite, true);
 
-        //round physics positions to avoid ugly render artifacts
+        // Create a game console
+        this.scene.launch('Hud');
+
+        // Round physics positions to avoid ugly render artifacts
         hookToMethod(Phaser.Physics.Arcade.Body.prototype, 'update', function () {
             this.x = Math.round(this.x);
             this.y = Math.round(this.y);
         });
-
-        // Create a game console
-        this.scene.launch('Hud');
 
     }
 
