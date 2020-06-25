@@ -24,16 +24,19 @@ export class LoadAssets extends Scene {
          * T = Tilemap
          */
         this.files = {
-            /** Images */
+            //mages
             "islandA1": "I/images/tilesets/islandA1.png",
             "islandA2": "I/images/tilesets/islandA2.png",
             "islandB": "I/images/tilesets/islandB.png",
             "islandC": "I/images/tilesets/islandC.png",
 
-            /** Spritesheet */
-            "character_template": "S/images/gregTheTestDummy.png",
+            //Spritesheet
+            "gregTheTestDummy": "S/images/gregTheTestDummy.png",
+            "dregTheTestDummy": "S/images/dregTheTestDummy.png",
+            "megTheTestDummy": "S/images/megTheTestDummy.png",
+            "craigTheTestDummy": "S/images/craigTheTestDummy.png",
 
-            /** Tilemaps */
+            //Tilemaps
             "islandUpleft": "T/tilemaps/islandUpleft.json",
         }
 
@@ -45,7 +48,7 @@ export class LoadAssets extends Scene {
      */
     preload() {
 
-        // Loop through every key in the file list
+        //loop through every key in the file list
         for (let key of Object.keys(this.files)) {
             /**Check the type of asset, then load the asset. When loading, take
              * a slice that doesn't include the first character. That first
@@ -67,7 +70,7 @@ export class LoadAssets extends Scene {
      * It runs after init() and preload() have completed
      */
     create() {
-        // Start the next scene
+        //start the next scene
         this.scene.start('Island');
     }
 
