@@ -22,6 +22,10 @@ export class Character {
     /**Stores the characters set depth, only meant to change when changing party 
      * order, property depthOffSet uses this as a base by which to offset */
     depth: number;
+    /**Keeps track of the players level */
+    level: number;
+    /**Keeps track of the players EXP */
+    exp: number;
 
     /**Numbers - Base Stats: these are the 4 basic stats most the games calculations
      * for characters is based on */

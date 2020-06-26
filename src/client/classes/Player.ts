@@ -70,6 +70,15 @@ export class Player {
         the logic involving them is */
         this.leaderChangeTimeOut = false;
         this.path[0] = { x: this.x, y: this.y, facing: "down" };
+
+        //global flags
+        this.globalEmitter.on("checkPartyConsistancy", this.sendParty.bind(this));
+    }
+
+    //will make a cleaner solution later
+    sendParty(){
+        console.log(this.party[0]);
+        this.globalEmitter.emit("partyData", this.party);
     }
 
     /**Adds a party member to the list by a passed in spritekey, this
@@ -207,6 +216,7 @@ export class Player {
      * Meant to be called after updatePlayerInput.
      */
     update() {
+        console.log(this.party);
         this.addToPath(this.party[0].sprite.x, this.party[0].sprite.y, this.party[0].facingDirection);
         this.updatePartyOnPath();
         this.updateDepth();
