@@ -47,8 +47,8 @@ export class Hud extends Phaser.Scene {
 
     create() {
         // Create a game console
-        let con = new Console(this);
-        con.rewireAll();
+        //let con = new Console(this);
+        //con.rewireAll();
 
         //create character frame
         this.characterFrame = this.add.sprite(0, 0, "characterFrame").setOrigin(0, 0);

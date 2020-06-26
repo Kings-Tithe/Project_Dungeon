@@ -10,16 +10,6 @@ export class CharacterSheet {
     /**This keep track of if the character sheet is currently visible */
     ToggleVisible: boolean;
 
-    //numbers
-    /**The x of the point used to position all of the elements of character graghics */
-    startPointx: number;
-    /**The y of the point used to position all of the elements of character graghics */
-    startPointy: number;
-    /**The x where the mouse was when dragging began*/
-    mouseStartPointx: number;
-    /**The y where the mouse was when dragging began*/
-    mouseStartPointy: number;
-
     //sprites
     /**The portrait used in the character sheet */
     Portrait: Phaser.GameObjects.Sprite;
@@ -27,8 +17,6 @@ export class CharacterSheet {
     outlineOfMan: Phaser.GameObjects.Sprite;
     /**Button used to toggle the character sheet */
     characterSheetButton: Phaser.GameObjects.Sprite;
-    /**Sprite used as a drag zone for the character sheet window */
-    dragZoneSprite: Phaser.GameObjects.Sprite;
 
     //graphics
     /**This is the backdrop for the character sheet */
@@ -131,23 +119,19 @@ export class CharacterSheet {
         this.Background = scene.add.graphics();
         this.Background.fillStyle(0xb06e27,1);
         this.Background.lineStyle(20,0x915b20,1)
-        this.Background.strokeRoundedRect(CENTER.x - 200, CENTER.y - 300, 400, 600,20)
-        this.Background.fillRoundedRect(CENTER.x - 200, CENTER.y - 300, 400, 600,20);
+        this.Background.strokeRoundedRect(440, 60, 400, 600,20)
+        this.Background.fillRoundedRect(440, 60, 400, 600,20);
         this.Background.setScale(0);
         /*create drag zone, we use the graghic to generate a sprite that can then be draggable
         and run a function when it is. This function will reposition everything as it moves */
         this.dragZone = scene.add.graphics();
-        this.dragZone.fillStyle(0xa80000,.5);
+        this.dragZone.fillStyle(0xa80000,0);
         this.dragZone.setScale(1);
-        this.dragZone.fillRoundedRect(CENTER.x - 200, CENTER.y - 310, 400, 30,20);
-        scene.add.rectangle(CENTER.x - 200, CENTER.y - 310, 400, 30,20);
-        // this.dragZone.generateTexture("CharacterSheetDragZoneTexture",400,50);
-        // scene.add.image(CENTER.x - 200, CENTER.y - 310,"CharacterSheetDragZoneTexture");
-        // this.dragZone.destroy();
-        //this.dragZoneSprite.setInteractive();
-        //this.dragZoneSprite.on("drag",console.log);
-        //create portrait
-        this.Portrait = scene.add.sprite(CENTER.x - 180, CENTER.y - 280,"gregThePortrait");
+        this.dragZone.fillRoundedRect(440, 50, 400, 30,20);
+        this.dragZone.setInteractive(new Phaser.Geom.Rectangle(440, 50, 400, 30), Phaser.Geom.Rectangle.Contains);
+        scene.input.setDraggable(this.dragZone,true);
+        this.dragZone.on("drag", this.startDrag, this);
+        this.Portrait = scene.add.sprite(460, 80,"gregThePortrait");
         this.Portrait.setOrigin(0);
         this.Portrait.setScale(0);
         //create text config
@@ -298,8 +282,54 @@ export class CharacterSheet {
         }
     }
 
-    startDarg(){
-        //this.mouseStartPointx = 
+    startDrag(garbage: object, dragX: number, dragY: number){
+        /*do to how graghics are renders they start at 0,0 position wise 
+        not matter where they are are drawn, this is a happy feature */
+        this.dragZone.x = dragX;
+        this.dragZone.y = dragY;
+        this.Background.x = dragX;
+        this.Background.y = dragY;
+        this.FocusBlock.x = dragX;
+        this.FocusBlock.y = dragY;
+        this.EnduranceBlock.x = dragX;
+        this.EnduranceBlock.y = dragY;
+        this.SpeedBlock.x = dragX;
+        this.SpeedBlock.y = dragY;
+        this.MightBlock.x = dragX;
+        this.MightBlock.y = dragY;
+        //all not graghics objects must be done by offset
+        this.Portrait.x = this.dragZone.x + 460;
+        this.Portrait.y = this.dragZone.y + 80;
+        this.Name.x = this.dragZone.x + 570;
+        this.Name.y = this.dragZone.y + 100;
+        this.Level.x = this.dragZone.x + 570;
+        this.Level.y = this.dragZone.y + 125;
+        this.EXP.x = this.dragZone.x + 570;
+        this.EXP.y = this.dragZone.y + 150;
+        this.FocusLabel.x = this.dragZone.x + 490;
+        this.FocusLabel.y = this.dragZone.y + 215;
+        this.EnduranceLabel.x = this.dragZone.x + 590;
+        this.EnduranceLabel.y = this.dragZone.y + 215;
+        this.SpeedLabel.x = this.dragZone.x + 690;
+        this.SpeedLabel.y = this.dragZone.y + 215;
+        this.MightLebel.x = this.dragZone.x + 790;
+        this.MightLebel.y = this.dragZone.y + 215;
+        this.FocusText.x = this.dragZone.x + 490;
+        this.FocusText.y = this.dragZone.y + 265;
+        this.EnduranceText.x = this.dragZone.x + 590;
+        this.EnduranceText.y = this.dragZone.y + 265;
+        this.SpeedText.x = this.dragZone.x + 690;
+        this.SpeedText.y = this.dragZone.y + 265;
+        this.MightText.x = this.dragZone.x + 790;
+        this.MightText.y = this.dragZone.y + 265;
+        this.LifeText.x = this.dragZone.x + 460;
+        this.LifeText.y = this.dragZone.y + 330;
+        this.EnergyText.x = this.dragZone.x + 460;
+        this.EnergyText.y = this.dragZone.y + 355;
+        this.BattleSpeedText.x = this.dragZone.x + 460;
+        this.BattleSpeedText.y = this.dragZone.y + 380;
+        this.outlineOfMan.x = this.dragZone.x + 640;
+        this.outlineOfMan.y = this.dragZone.y + 535;
     }
 
 }
