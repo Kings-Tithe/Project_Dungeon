@@ -79,10 +79,9 @@ export class Player {
         //construct our new party member and add them to the party
         let newPartyMember = new Character(this.currentScene.anims);
         newPartyMember.createSprite(this.currentScene, key, portrait, this.x, this.y);
-        console.log("sent the thing");
+        this.party.push(newPartyMember);
         this.globalEmitter.emit("partyChange", this.party);
         this.globalEmitter.emit("addPortrait", portrait);
-        this.party.push(newPartyMember);
     }
 
     /**Adds a party member to the list by a passed in character object,

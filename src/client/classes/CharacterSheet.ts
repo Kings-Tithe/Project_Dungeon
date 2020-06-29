@@ -16,7 +16,7 @@ export class CharacterSheet {
      * so in the form of an array of objects where the objects hold the spritekey
      * and the sprite it's self, the spritekey is stored so we can refrence that
      * sprite more easily */
-    portraitIcons: { [index: number]: Phaser.GameObjects.Sprite };
+    portraitIcons: Phaser.GameObjects.Sprite[];
     /**The outline of a man used in the character sheet */
     outlineOfMan: Phaser.GameObjects.Sprite;
     /**Button used to toggle the character sheet */
@@ -91,6 +91,7 @@ export class CharacterSheet {
         this.ToggleVisible = false;
         this.eventEmitter = EventGlobals.getInstance();
         this.party = [];
+        this.portraitIcons = [];
         this.eventEmitter.on("partyChange", this.partyChange, this);
     }
 
@@ -131,6 +132,10 @@ export class CharacterSheet {
         this.currentScene.add.existing(this.EnergyText);
         this.currentScene.add.existing(this.BattleSpeedText);
         this.currentScene.add.existing(this.outlineOfMan);
+        this.currentScene.add.existing(this.dragZone);
+        for(let i = 0; i < this.party.length; i++){
+            this.currentScene.add.existing(this.portraitIcons[i]);
+        }
     }
 
     createCharacterSheet(){
@@ -145,7 +150,7 @@ export class CharacterSheet {
         and run a function when it is. This function will reposition everything as it moves */
         this.dragZone = this.currentScene.add.graphics();
         this.dragZone.fillStyle(0xa80000,0);
-        this.dragZone.setScale(1);
+        this.dragZone.setScale(0);
         this.dragZone.fillRoundedRect(440, 50, 400, 30,20);
         this.dragZone.setInteractive(new Phaser.Geom.Rectangle(440, 50, 400, 30), Phaser.Geom.Rectangle.Contains);
         this.currentScene.input.setDraggable(this.dragZone,true);
@@ -249,6 +254,11 @@ export class CharacterSheet {
         this.outlineOfMan = this.currentScene.add.sprite(CENTER.x, 535,"outlineOfMan");
         this.outlineOfMan.setOrigin(.5,.5);
         this.outlineOfMan.setScale(0);
+
+        //default the above values to the party leader if we have set a party
+        if (this.party.length > 0){
+            this.updateSheet(this.party[0]);
+        }
     }
 
     toggle(){
@@ -274,6 +284,11 @@ export class CharacterSheet {
             this.EnergyText.setScale(0);
             this.BattleSpeedText.setScale(0);
             this.outlineOfMan.setScale(0);
+            this.dragZone.setScale(0);
+            //portrait icons
+            for(let i = 0; i < this.portraitIcons.length; i++){
+                this.portraitIcons[i].setScale(0);
+            }
             this.ToggleVisible = false;
         } else {
             this.Background.setScale(1);
@@ -297,11 +312,20 @@ export class CharacterSheet {
             this.EnergyText.setScale(1);
             this.BattleSpeedText.setScale(1);
             this.outlineOfMan.setScale(1);
+            this.dragZone.setScale(1);
+            //portrait icons
+            for(let i = 0; i < this.portraitIcons.length; i++){
+                this.portraitIcons[i].setScale(.75);
+            }
             this.ToggleVisible = true;
         }
     }
 
     startDrag(garbage: object, dragX: number, dragY: number){
+        //round our dragx numbers it tends to make things less blurry
+        dragX = Math.round(dragX);
+        dragY = Math.round(dragY);
+        console.log(dragX, dragY);
         /*do to how graghics are renders they start at 0,0 position wise 
         not matter where they are are drawn, this is a happy feature */
         this.dragZone.x = dragX;
@@ -349,34 +373,64 @@ export class CharacterSheet {
         this.BattleSpeedText.y = this.dragZone.y + 380;
         this.outlineOfMan.x = this.dragZone.x + 640;
         this.outlineOfMan.y = this.dragZone.y + 535;
+        //drag portrait icons
+        for(let i = 0; i < this.party.length; i++){
+            this.portraitIcons[i].x = this.dragZone.x + 860;
+            this.portraitIcons[i].y = this.dragZone.y + ((55 * i) + 90);
+        }
     }
 
     updateSheet(character: Character){
         //update all the test elements
         this.Name.setText(character.name);
-        this.Level.setText(character.level.toString());
-        this.EXP.setText(character.exp.toString());
+        this.Level.setText("Level: " + character.level.toString());
+        this.EXP.setText("EXP: " + character.exp.toString());
         this.FocusText.setText(character.focus.toString());
         this.EnduranceText.setText(character.endurance.toString());
         this.SpeedText.setText(character.speed.toString());
         this.MightText.setText(character.might.toString());
-        this.LifeText.setText(character.life.toString());
-        this.EnergyText.setText(character.energy.toString());
-        this.BattleSpeedText.setText(character.battleSpeed.toString());
+        this.LifeText.setText("Life: " + character.life.toString());
+        this.EnergyText.setText("Energy: " + character.energy.toString());
+        this.BattleSpeedText.setText("Battle Speed: " + character.battleSpeed.toString());
         //update the portrait
-        this.sheetPortrait = new Phaser.GameObjects.Sprite(this.currentScene,this.dragZone.x + 460,this.dragZone.y + 80,character.portraitKey);
+        this.sheetPortrait.setTexture(character.portraitKey);
     }
 
     partyChange(newParty){
-        if(true){
-            this.party = newParty;
-            this.portraitIcons = {};
-            //run thru and create new icon for character sheets
-            console.log(this.party,this.party.length);
-            for (let i = 0; i < this.party.length; i++){
-                let newIcon = this.currentScene.add.sprite(this.dragZone.x + 460,this.dragZone.y + 80 * i,this.party[i].portraitKey);
-                newIcon.setDepth(200);
+        this.party = newParty;
+        //first we set what we already have to have the correct values
+        for(let i = 0; i < this.party.length && i < this.portraitIcons.length; i++){
+            this.portraitIcons[i].setTexture(this.party[i].portraitKey);
+        }
+        //now if needed we create more
+        for(let i = this.portraitIcons.length; i < this.party.length; i++){
+            let newIcon: Phaser.GameObjects.Sprite;
+            //check if dragzone exists and either create to it or to 0,0 where it will be created
+            if(this.dragZone){
+                newIcon = this.currentScene.add.sprite(this.dragZone.x + 460,this.dragZone.y + 80 * i,this.party[i].portraitKey);
+            } else {
+                newIcon = this.currentScene.add.sprite(860,(55 * i) + 90,this.party[i].portraitKey);
             }
+            newIcon.setScale(0)
+            newIcon.setDepth(200);
+            newIcon.setInteractive();
+            newIcon.on("pointerdown", () => {this.updateSheet(this.party[i])});
+            this.portraitIcons[i] = newIcon;
+        }
+        /*lastly we delete and that we no longer need, this removes them off screen and
+            deletes and data linked to it */
+        for (let i = this.party.length; i < this.portraitIcons.length; i++){
+            this.portraitIcons[i].destroy();
+        }
+        /*this removes the now empty elements in the array leaving no ties to the previous
+            Icons allowing them to go to garbage collection */
+        this.portraitIcons.slice(this.party.length);
+
+        /*use the new party leader as the default until a character icon is clicked, dragzone
+        is used here as a way of checking the all the assets changed in updatesheet have been
+        created */
+        if(this.party.length > 0 && this.dragZone){
+        this.updateSheet(this.party[0]);
         }
     }
 
