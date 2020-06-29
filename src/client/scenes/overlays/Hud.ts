@@ -43,6 +43,8 @@ export class Hud extends Phaser.Scene {
         this.globalEmitter = EventGlobals.getInstance();
         this.globalEmitter.on("addPortrait",this.addPortraitSprite, this)
         this.globalEmitter.on("changePortrait", this.changePortraitSprite, this);
+
+        this.characterSheet = new CharacterSheet(this);
     }
 
     create() {
@@ -56,7 +58,8 @@ export class Hud extends Phaser.Scene {
         this.characterFrame.setDepth(1);
         
         //create our character sheet
-        this.characterSheet = new CharacterSheet(this,95,52);
+        this.characterSheet.createToggleButton(95,52);
+        this.characterSheet.createCharacterSheet();
     }
 
     /**Used to add to the list of character portrait sprites we have in portraitSprites */

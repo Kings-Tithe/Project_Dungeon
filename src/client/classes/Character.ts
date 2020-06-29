@@ -78,6 +78,16 @@ export class Character {
     constructor(animationManager: Phaser.Animations.AnimationManager){
         this.animationManager = animationManager;
         this.depth = 10;
+        this.level = 0;
+        this.exp =0;
+        this.focus = 0;
+        this.endurance = 0;
+        this.speed = 0;
+        this.might = 0;
+        this.energy = 0;
+        this.life = 0;
+        this.battleSpeed = 0;
+        this.criticalChance = 0;
     }
 
     addSpriteToScene(scene: Phaser.Scene, spriteKey: string, portraitKey: string, x: number = 0, y: number = 0){

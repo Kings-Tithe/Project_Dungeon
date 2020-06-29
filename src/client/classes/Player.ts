@@ -70,15 +70,6 @@ export class Player {
         the logic involving them is */
         this.leaderChangeTimeOut = false;
         this.path[0] = { x: this.x, y: this.y, facing: "down" };
-
-        //global flags
-        this.globalEmitter.on("checkPartyConsistancy", this.sendParty.bind(this));
-    }
-
-    //will make a cleaner solution later
-    sendParty(){
-        console.log(this.party[0]);
-        this.globalEmitter.emit("partyData", this.party);
     }
 
     /**Adds a party member to the list by a passed in spritekey, this
@@ -88,6 +79,8 @@ export class Player {
         //construct our new party member and add them to the party
         let newPartyMember = new Character(this.currentScene.anims);
         newPartyMember.createSprite(this.currentScene, key, portrait, this.x, this.y);
+        console.log("sent the thing");
+        this.globalEmitter.emit("partyChange", this.party);
         this.globalEmitter.emit("addPortrait", portrait);
         this.party.push(newPartyMember);
     }
@@ -95,6 +88,7 @@ export class Player {
     /**Adds a party member to the list by a passed in character object,
      * to add a new member using a spritekey use addPartyMemberByKey() */
     addPartyMemberByObject(newPartyMember: Character) {
+        this.globalEmitter.emit("partyChange", newPartyMember);
         this.party.push(newPartyMember);
     }
 
@@ -216,7 +210,6 @@ export class Player {
      * Meant to be called after updatePlayerInput.
      */
     update() {
-        console.log(this.party);
         this.addToPath(this.party[0].sprite.x, this.party[0].sprite.y, this.party[0].facingDirection);
         this.updatePartyOnPath();
         this.updateDepth();

@@ -85,16 +85,13 @@ export class CharacterSheet {
      * @param x where to place the toggle button on the x coordinate place
      * @param y where to place the toggle button on the y coordinate place
      */
-    constructor(scene: Phaser.Scene, x: number, y: number){
+    constructor(scene: Phaser.Scene){
         //inital values
         this.currentScene = scene;
         this.ToggleVisible = false;
-        this.createToggleButton(x,y);
-        this.createCharacterSheet(this.currentScene);
         this.eventEmitter = EventGlobals.getInstance();
         this.party = [];
-        this.party[0] = new Character(this.currentScene.anims);
-        this.eventEmitter.on("partyData", this.checkPartyConsistancy, this);
+        this.eventEmitter.on("partyChange", this.partyChange, this);
     }
 
     createToggleButton(x: number, y: number){
@@ -136,7 +133,7 @@ export class CharacterSheet {
         this.currentScene.add.existing(this.outlineOfMan);
     }
 
-    createCharacterSheet(scene: Phaser.Scene){
+    createCharacterSheet(){
         //create background
         this.Background = this.currentScene.add.graphics();
         this.Background.fillStyle(0xb06e27,1);
@@ -300,7 +297,6 @@ export class CharacterSheet {
             this.EnergyText.setScale(1);
             this.BattleSpeedText.setScale(1);
             this.outlineOfMan.setScale(1);
-            this.eventEmitter.emit("checkPartyConsistancy");
             this.ToggleVisible = true;
         }
     }
@@ -371,19 +367,16 @@ export class CharacterSheet {
         this.sheetPortrait = new Phaser.GameObjects.Sprite(this.currentScene,this.dragZone.x + 460,this.dragZone.y + 80,character.portraitKey);
     }
 
-    checkPartyConsistancy(checkParty: Character[]){
+    partyChange(newParty){
         if(true){
-            console.log(checkParty);
-            this.party = checkParty;
+            this.party = newParty;
             this.portraitIcons = {};
+            //run thru and create new icon for character sheets
+            console.log(this.party,this.party.length);
             for (let i = 0; i < this.party.length; i++){
-                //create the new sprite
-                let newPortrait = this.currentScene.add.sprite(10, 12, this.party[i].portraitKey).setOrigin(0, 0);
-                newPortrait.setDepth(2);
-                //add to list
-                this.portraitIcons[i] = newPortrait;
+                let newIcon = this.currentScene.add.sprite(this.dragZone.x + 460,this.dragZone.y + 80 * i,this.party[i].portraitKey);
+                newIcon.setDepth(200);
             }
-            //this.updateSheet(this.party[0]);
         }
     }
 
