@@ -55,6 +55,7 @@ export class Character {
     /**determines your changes of an attack being critical, greatly affected 
      * by focus and speed */
     criticalChance: number;
+
     /**String */
     /**Used to store the direction the character is facing */
     facingDirection: string;
@@ -62,12 +63,15 @@ export class Character {
     spriteKey: string;
     /**Stores the string relating to the portraits's sprite */
     portraitKey: string;
+    /**Stores the name of this character */
+    name: string;
 
     /**Misc */
     /**The animation manager is global as such we just need a refernce to it
      * this makes it so we don't need to store a scene to play an animation
      * on our sprite */
     animationManager: Phaser.Animations.AnimationManager;
+
 
     /**Creates an instance of our character, this is passed an animation handler
      * by the player class. 
@@ -89,26 +93,26 @@ export class Character {
     }
 
     /**Adds the character sprite to any given scene
-     * @param scene     The Phaser scene to add the sprite to
+     * @param scene The Phaser scene to add the sprite to
      * @param spriteKey The sprite key of the given character, this only needs to be added if the sprite
      * has not be created yet.
-     * @param x         The x coordinate to create the sprite at if the sprite has not been created
-     * @param y         The y coordinate to create the sprite at if the sprite has not been created
+     * @param x The x coordinate to create the sprite at if the sprite has not been created
+     * @param y The y coordinate to create the sprite at if the sprite has not been created
      */
-    addSpriteToScene(scene: Phaser.Scene, spriteKey: string = this.spriteKey, x: number = 0, y: number = 0) {
+    addSpriteToScene(scene: Phaser.Scene, spriteKey: string = this.spriteKey, portraitKey: string, x: number = 0, y: number = 0) {
         //Make sure the sprite has been created, if not, create it
         if (this.sprite == null) {
-            this.createSprite(scene, spriteKey, x, y);
+            this.createSprite(scene, spriteKey, portraitKey, x, y);
         }
         scene.add.existing(this.sprite);
     }
 
     /**Constructs the sprite for the character based on a spriteKey
-     * @param scene     The Phaser scene to initially add the sprite to
+     * @param scene The Phaser scene to initially add the sprite to
      * @param spriteKey The sprite key to create the sprite from, this will then be stored as part
      * of the class
-     * @param x         The x coordinate to create the sprite at
-     * @param y         The y coordinate to create the sprite at
+     * @param x The x coordinate to create the sprite at
+     * @param y The y coordinate to create the sprite at
      */
     createSprite(scene: Phaser.Scene, spriteKey: string, portraitKey: string, x: number = 0, y: number = 0) {
         /**generate the inital sprite */
@@ -117,6 +121,7 @@ export class Character {
         this.sprite.ignoreDestroy = true;
         this.spriteKey = spriteKey;
         this.portraitKey = portraitKey;
+        this.name = spriteKey;
         /**generate all the animations associated with this sprite */
         /**animation for character walking right */
         scene.anims.create({

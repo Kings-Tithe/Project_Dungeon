@@ -68,6 +68,7 @@ export class Console {
             Console.outputEl.id = 'log';
             Console.containerEl.appendChild(Console.outputEl);
         }
+    }
 
     /**
      * Creates a style element to handle syntax highlighting in the console.

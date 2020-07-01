@@ -275,14 +275,10 @@ export class CharacterSheet {
 
     /**Either scales the elements to their regular size or down to be non-visible and
      * non clickable (hit areas scale to the sprite so this makes it so they can't still
-     * be clicked on). This is by default based on this.toggleVisible member but a value
-     * can be passed in
-     * @param toggle a passed boolean of weather to toggle the sheet on or off, by default
-     * this matches internal value this.toggleVisible simply flipping the varibles from it's
-     * current state
+     * be clicked on). This is based on this.toggleVisible member
      */
-    toggle(toggle: boolean = this.toggleVisible){
-        if(toggle){
+    toggle(){
+        if(this.toggleVisible){
             this.Background.setScale(0);
             this.sheetPortrait.setScale(0);
             this.Name.setScale(0);
@@ -309,7 +305,7 @@ export class CharacterSheet {
             for(let i = 0; i < this.portraitIcons.length; i++){
                 this.portraitIcons[i].setScale(0);
             }
-            this.toggleVisible = !toggle;
+            this.toggleVisible = false;
         } else {
             this.Background.setScale(1);
             this.sheetPortrait.setScale(2);
@@ -337,7 +333,7 @@ export class CharacterSheet {
             for(let i = 0; i < this.portraitIcons.length; i++){
                 this.portraitIcons[i].setScale(.75);
             }
-            this.toggleVisible = !toggle;
+            this.toggleVisible = true;
         }
     }
 
