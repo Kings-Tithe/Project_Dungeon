@@ -88,9 +88,8 @@ export class Island extends Phaser.Scene {
         this.cameras.main.startFollow(this.player.party[0].sprite, true);
     }
 
-    /**A overwritten version of the game loop that is called 60 times
-     * a second by the game.
-     */
+    /**A overwritten version of the game loop that is called around 60 times
+     * a second by the game */
     update() {
         this.player.updatePlayerInput();
         this.player.update();
@@ -109,9 +108,9 @@ export class Island extends Phaser.Scene {
         this.backgroundLayer.depth = 9;
         this.walkLayer.depth = 9;
         this.overheadLayer.depth = 15;
-        /**set collision for the walk layer */
+        //set collision for the walk layer 
         this.walkLayer.setCollisionByProperty({ passThru: false });
-        /**set veribles values to their proper values based on newly created tilemap */
+        //set veribles values to their proper values based on newly created tilemap 
         this.tilemapHeightInPixels = this.map.heightInPixels;
         this.tilemapWidthInPixels = this.map.widthInPixels;
         this.cameras.main.setBounds(0, 0, this.tilemapWidthInPixels, this.tilemapHeightInPixels);

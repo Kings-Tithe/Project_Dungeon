@@ -51,6 +51,9 @@ export class Player {
 
     /**Instantiates an instance of this class, this is also where alot of our default
      * values are setup and stuff like arrays are first instantiated.
+     * @param scene The phaser scene to construct this in
+     * @param x     The x coordinate for the party to start at
+     * @param y     The y coordinate for the party to start at
      */
     constructor(scene: Phaser.Scene, x: number = 0, y: number = 0) {
         //storing passed in values
@@ -74,7 +77,8 @@ export class Player {
 
     /**Adds a party member to the list by a passed in spritekey, this
      * constructs a new character object to add a new member by the character
-     * object use addPartyMemberByObject() */
+     * object use addPartyMemberByObject()
+     * @param key The sprite key for this party members sprite */
     addPartyMemberByKey(key: string, portrait: string) {
         //construct our new party member and add them to the party
         let newPartyMember = new Character(this.currentScene.anims);
@@ -85,13 +89,18 @@ export class Player {
     }
 
     /**Adds a party member to the list by a passed in character object,
-     * to add a new member using a spritekey use addPartyMemberByKey() */
+     * to add a new member using a spritekey use addPartyMemberByKey()
+     * @param newPartyMember The Character object of the party member to be added
+     */
     addPartyMemberByObject(newPartyMember: Character) {
         this.globalEmitter.emit("partyChange", newPartyMember);
         this.party.push(newPartyMember);
     }
 
-    /**Adds collision for all party members for a passed in layer within the current scene */
+    /**Adds collision for all party members for a passed in layer within the current scene 
+     * @param layer The layer to add collison to, collison is added between all party 
+     * members and this layer
+    */
     addCollisionByLayer(layer: Phaser.Tilemaps.StaticTilemapLayer | Phaser.Tilemaps.DynamicTilemapLayer) {
         for (let i = 0; i < this.party.length; i++) {
             this.currentScene.physics.add.collider(this.party[i].sprite, layer);
@@ -122,7 +131,11 @@ export class Player {
     }
 
     /**Adds a new point/node to the path and checks to make sure the path
-     * has not grown bigger then 120 elements */
+     * has not grown bigger then 120 elements 
+     * @param newX      The x coordinate of the point trying to be added
+     * @param newY      The x coordinate of the point trying to be added
+     * @param newFacing The direction the leader is facing at this point
+     */
     addToPath(newX: number, newY: number, newFacing: string) {
         /* We only add to the path if the passed in position varies by atleast 3 pixels from
         the last recorded point/node */
