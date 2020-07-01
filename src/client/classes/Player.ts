@@ -28,6 +28,10 @@ export class Player {
     /**the depth at which we start when setting the depth for characters it goes from here to
      * +4 of here assuming 4 party members */
     startDepth: number;
+    /**The area non-leader chracters must be within of the target area on the path to idle */
+    idleZone: number;
+    /**The number of nodes down the path each character stays back from one another */
+    nodeOffSet: number;
 
     /**Boolean */
     /**Used to tell if the party change is in timeout */
@@ -69,6 +73,8 @@ export class Player {
         this.freeRoamSpeed = 130;
         this.startDepth = 10;
         this.globalEmitter = EventGlobals.getInstance();
+        this.nodeOffSet = 5;
+        this.idleZone = 3;
         /* priming varibles for logic, these should not be changed unless 
         the logic involving them is */
         this.leaderChangeTimeOut = false;
@@ -142,9 +148,9 @@ export class Player {
         if (Math.abs(newX - this.path[0].x) > 3 || Math.abs(newY - this.path[0].y) > 3) {
             //unshift adds an element to the front of the array and returns the new length of the array
             let newlength = this.path.unshift({ x: newX, y: newY, facing: newFacing });
-            /*to help with performance we wait till it fill to 120 then splice off
+            /*to help with performance we wait till it fill to 200 then splice off
             everyhting back down to 80 */
-            if (newlength > 120) {
+            if (newlength > 200) {
                 this.path.splice(80);
             }
         }
@@ -155,28 +161,24 @@ export class Player {
      * number of nodes behind the leader on the path, with a threshold of 2 pixels both ways for
      * when to stop and allow the party member to idle. */
     updatePartyOnPath() {
-        /**The area the chracter must be within of the target area to idle */
-        let idleZone: number = 3;
-        /**The number of nodes down the path each character stays back from one another */
-        let nodeOffSet: number = 5;
         //run for each non-leader member of the party
         for (let i = 1; i < this.party.length; i++) {
             //make sure there is enough nodes on the path to follow to
-            if (this.path.length > i * nodeOffSet) {
+            if (this.path.length > i * this.nodeOffSet) {
                 /**The pysics body of the party members sprite */
                 let body = <Phaser.Physics.Arcade.Body>this.party[i].sprite.body;
                 /**the distance on the x-axis between our current position and desired position */
-                let differenceX = Math.abs(this.path[i * nodeOffSet].x - this.party[i].sprite.x);
+                let differenceX = Math.abs(this.path[i * this.nodeOffSet].x - this.party[i].sprite.x);
                 /**the distance on the y-axis between our current position and desired position */
-                let differenceY = Math.abs(this.path[i * nodeOffSet].y - this.party[i].sprite.y);
+                let differenceY = Math.abs(this.path[i * this.nodeOffSet].y - this.party[i].sprite.y);
 
                 /*if we have for some reason gotten more then 50 pixels from our target, this is kinda as a
                 last resort catch if anything get in their way or stops them for some reason */
                 if (Math.hypot(differenceX, differenceY) > 30) {
-                    this.party[i].moveTo(this.path[i * nodeOffSet].x, this.path[i * nodeOffSet].y);
+                    this.party[i].moveTo(this.path[i * this.nodeOffSet].x, this.path[i * this.nodeOffSet].y);
                 } //if we are atleast more then 3 pixels away from our target but not more then 50 
-                else if (Math.hypot(differenceX, differenceY) > 3) {
-                    this.currentScene.physics.moveTo(this.party[i].sprite, this.path[i * nodeOffSet].x, this.path[i * nodeOffSet].y, this.freeRoamSpeed * 1.1535);
+                else if (Math.hypot(differenceX, differenceY) > this.idleZone) {
+                    this.currentScene.physics.moveTo(this.party[i].sprite, this.path[i * this.nodeOffSet].x, this.path[i * this.nodeOffSet].y, this.freeRoamSpeed * 1.1535);
                 } //if we are within 3 pixels of our target then make the character stop moving
                 else {
                     body.setVelocity(0, 0);
@@ -186,14 +188,14 @@ export class Player {
                 if (body.velocity.x || body.velocity.y) {
                     /* check if the animation is already playing, otherwise it will restart it repeatadle making it 
                     look like only the first frame of the animation */
-                    if (this.party[i].sprite.anims.getCurrentKey() != this.party[i].spriteKey + "walk_" + this.path[i * nodeOffSet].facing) {
-                        this.currentScene.anims.play(this.party[i].spriteKey + "walk_" + this.path[i * nodeOffSet].facing, this.party[i].sprite);
+                    if (this.party[i].sprite.anims.getCurrentKey() != this.party[i].spriteKey + "walk_" + this.path[i * this.nodeOffSet].facing) {
+                        this.currentScene.anims.play(this.party[i].spriteKey + "walk_" + this.path[i * this.nodeOffSet].facing, this.party[i].sprite);
                     }
                 } else {
                     /* check if the animation is already playing, otherwise it will restart it repeatadle making it 
                     look like only the first frame of the animation */
-                    if (this.party[i].sprite.anims.getCurrentKey() != this.party[i].spriteKey + "idle_" + this.path[i * nodeOffSet].facing) {
-                        this.currentScene.anims.play(this.party[i].spriteKey + "idle_" + this.path[i * nodeOffSet].facing, this.party[i].sprite);
+                    if (this.party[i].sprite.anims.getCurrentKey() != this.party[i].spriteKey + "idle_" + this.path[i * this.nodeOffSet].facing) {
+                        this.currentScene.anims.play(this.party[i].spriteKey + "idle_" + this.path[i * this.nodeOffSet].facing, this.party[i].sprite);
                     }
                 }
             }
@@ -222,9 +224,15 @@ export class Player {
      * Meant to be called after updatePlayerInput.
      */
     update() {
+        //these should be ran no matter what
         this.addToPath(this.party[0].sprite.x, this.party[0].sprite.y, this.party[0].facingDirection);
         this.updatePartyOnPath();
-        this.updateDepth();
+        //this should only be ran if the y coordinate of our leader has changed
+        if (this.party[0].sprite.y != this.y){
+            this.updateDepth();
+        }
+        //store our current y to check if we changed y next update
+        this.y = this.party[0].sprite.y;
     }
 
     /**ran in the update loop of the current scene, checks for all player input and

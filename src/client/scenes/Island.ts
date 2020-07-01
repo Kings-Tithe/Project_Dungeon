@@ -57,7 +57,7 @@ export class Island extends Phaser.Scene {
     /** used to instantiate objects and set inital values where they apply
      * this runs in full before create()
      */
-    init(){
+    init() {
         this.cameras.main.setZoom(2);
         this.player = new Player(this);
     }
@@ -67,7 +67,7 @@ export class Island extends Phaser.Scene {
      * a particular part of the scene unless creating that thing takes a single command.
     */
     create() {
-        // Create a game console
+        // Create the games hud scene
         this.scene.launch('Hud');
 
         // Round physics positions to avoid ugly render artifacts
@@ -104,7 +104,7 @@ export class Island extends Phaser.Scene {
         this.backgroundLayer = this.map.createStaticLayer("background", [this.islandA1, this.islandA2], 0, 0);
         this.walkLayer = this.map.createStaticLayer("walk", [this.islandA1, this.islandB], 0, 0);
         this.overheadLayer = this.map.createStaticLayer("overhead", [this.islandB], 0, 0);
-        /**make sure the layers appear where they are supposed to in relation to the player*/
+        //make sure the layers appear where they are supposed to in relation to the player
         this.backgroundLayer.depth = 9;
         this.walkLayer.depth = 9;
         this.overheadLayer.depth = 15;

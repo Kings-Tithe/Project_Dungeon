@@ -1,4 +1,5 @@
 import { px, py } from "./PercentCoords";
+import { hookToMethod } from "./Hook";
 
 /**
  * In game console with output of error messages, feedback, and command inputs
@@ -68,6 +69,10 @@ export class Console {
             Console.containerEl.appendChild(Console.outputEl);
         }
 
+    /**
+     * Creates a style element to handle syntax highlighting in the console.
+     */
+    createHighlightElement() {
         // Create style element that handles highlighting if it does not exist
         if (!Console.highlightEl) {
             Console.highlightEl = document.createElement('style');

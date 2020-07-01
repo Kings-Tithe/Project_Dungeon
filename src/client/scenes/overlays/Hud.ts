@@ -2,6 +2,7 @@ import { Console } from "../../tools/Console";
 import { EventGlobals } from "../../tools/EventGlobals";
 import { CENTER } from "../../tools/Globals";
 import { CharacterSheet } from "../../classes/CharacterSheet";
+import { hookToMethod } from "../../tools/Hook";
 
 /**
  * Hud scene that should display over the main game screen. Contains various
@@ -49,8 +50,8 @@ export class Hud extends Phaser.Scene {
 
     create() {
         // Create a game console
-        //let con = new Console(this);
-        //con.rewireAll();
+        let con = new Console(this);
+        con.rewireAll();
 
         //create character frame
         this.characterFrame = this.add.sprite(0, 0, "characterFrame").setOrigin(0, 0);
@@ -94,4 +95,5 @@ export class Hud extends Phaser.Scene {
             console.log(spritekey + " does not exist in the spritePortrait list");
         }
     }
+
 }
