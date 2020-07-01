@@ -1,6 +1,6 @@
 import { Console } from "../tools/Console";
 import { EventGlobals } from "../tools/EventGlobals";
-import { CENTER } from "../tools/Globals";
+import { CENTER, GAME_WIDTH } from "../tools/Globals";
 import { Character } from "./Character";
 
 export class CharacterSheet {
@@ -9,7 +9,7 @@ export class CharacterSheet {
 
     //boolean
     /**This keep track of if the character sheet is currently visible */
-    ToggleVisible: boolean;
+    toggleVisible: boolean;
 
     //sprites
     /**This stores all the potrait sprites for the characters in a party, it does
@@ -79,22 +79,26 @@ export class CharacterSheet {
     //scene
     currentScene: Phaser.Scene;
 
-    /**Constructs an instance of this class and creates all the internal sprites
-     * and graghics.
+    /**Constructs an instance of this class and initializes all the data, 
+     * graphics are initially created in the createToggleButton and
+     * createCharacterSheet functions
      * @param scene The Phaser scene to construct the character sheet within
-     * @param x where to place the toggle button on the x coordinate place
-     * @param y where to place the toggle button on the y coordinate place
      */
     constructor(scene: Phaser.Scene){
         //inital values
         this.currentScene = scene;
-        this.ToggleVisible = false;
+        this.toggleVisible = false;
         this.eventEmitter = EventGlobals.getInstance();
         this.party = [];
         this.portraitIcons = [];
         this.eventEmitter.on("partyChange", this.partyChange, this);
     }
 
+    /**Constructs an instance of this class and creates all the internal sprites
+     * and graghics.
+     * @param x where to place the toggle button on the x coordinate place
+     * @param y where to place the toggle button on the y coordinate place
+     */
     createToggleButton(x: number, y: number){
         this.characterSheetButton = this.currentScene.add.sprite(x,y,"bookIcon");
         this.characterSheetButton.setDepth(2);
@@ -107,6 +111,7 @@ export class CharacterSheet {
      * a given scene, this class will most likely only ever be
      * used in the main hud scene so I doubt I'l need it but just
      * in case.
+     * @param scene The Phaser scene to link all the pre-existing elements to
      */
     link(scene: Phaser.Scene){
         this.currentScene = scene;
@@ -138,16 +143,22 @@ export class CharacterSheet {
         }
     }
 
+    /**Initially creates all the visual elements for the class, this is done
+    after the constructor so that the class can still listen for global events
+    before it's visual elements are constructed, it is first created with all
+    place holder values and keep these until a party is created for the player */
     createCharacterSheet(){
-        //create background
+        //create the sheet background
         this.Background = this.currentScene.add.graphics();
         this.Background.fillStyle(0xb06e27,1);
         this.Background.lineStyle(20,0x915b20,1)
         this.Background.strokeRoundedRect(440, 60, 400, 600,20)
         this.Background.fillRoundedRect(440, 60, 400, 600,20);
         this.Background.setScale(0);
-        /*create drag zone, we use the graghic to generate a sprite that can then be draggable
-        and run a function when it is. This function will reposition everything as it moves */
+        /*create drag zone, we use the graghic as an invisible, clickable zone.
+        we attach a function that will reposition everything as it moves based on
+        dragging done on this zone, this zone is also often used to see if the graphics
+        have been created yet */
         this.dragZone = this.currentScene.add.graphics();
         this.dragZone.fillStyle(0xa80000,0);
         this.dragZone.setScale(0);
@@ -155,6 +166,7 @@ export class CharacterSheet {
         this.dragZone.setInteractive(new Phaser.Geom.Rectangle(440, 50, 400, 30), Phaser.Geom.Rectangle.Contains);
         this.currentScene.input.setDraggable(this.dragZone,true);
         this.dragZone.on("drag", this.startDrag, this);
+        //create the sheet portrait, this will have it's texture changed as need be
         this.sheetPortrait = this.currentScene.add.sprite(460, 80,"gregThePortrait");
         this.sheetPortrait.setOrigin(0);
         this.sheetPortrait.setScale(0);
@@ -261,8 +273,16 @@ export class CharacterSheet {
         }
     }
 
-    toggle(){
-        if(this.ToggleVisible){
+    /**Either scales the elements to their regular size or down to be non-visible and
+     * non clickable (hit areas scale to the sprite so this makes it so they can't still
+     * be clicked on). This is by default based on this.toggleVisible member but a value
+     * can be passed in
+     * @param toggle a passed boolean of weather to toggle the sheet on or off, by default
+     * this matches internal value this.toggleVisible simply flipping the varibles from it's
+     * current state
+     */
+    toggle(toggle: boolean = this.toggleVisible){
+        if(toggle){
             this.Background.setScale(0);
             this.sheetPortrait.setScale(0);
             this.Name.setScale(0);
@@ -289,7 +309,7 @@ export class CharacterSheet {
             for(let i = 0; i < this.portraitIcons.length; i++){
                 this.portraitIcons[i].setScale(0);
             }
-            this.ToggleVisible = false;
+            this.toggleVisible = !toggle;
         } else {
             this.Background.setScale(1);
             this.sheetPortrait.setScale(2);
@@ -317,15 +337,24 @@ export class CharacterSheet {
             for(let i = 0; i < this.portraitIcons.length; i++){
                 this.portraitIcons[i].setScale(.75);
             }
-            this.ToggleVisible = true;
+            this.toggleVisible = !toggle;
         }
     }
 
+    /**This takes all the objects and moves the as an offset from the position of the
+     * drag zone, by default graghics are created with the x and y at 0,0 and just constructed
+     * as an offset, as such everything is moved from an offset of the dragzone that is an offset
+     * from where is is first drawn. This allows the entire windows to be drug around and placed
+     * where every a player may want to move it to.
+     * @param garbage garbage pointer data we don't use but needs to be passed in to access other data
+     * @param dragX the amount dragzone has been drug from it's original point on the x axis
+     * @param dragY the amount dragzone has been drug from it's original point on the y axis
+     * 
+     */
     startDrag(garbage: object, dragX: number, dragY: number){
         //round our dragx numbers it tends to make things less blurry
         dragX = Math.round(dragX);
         dragY = Math.round(dragY);
-        console.log(dragX, dragY);
         /*do to how graghics are renders they start at 0,0 position wise 
         not matter where they are are drawn, this is a happy feature */
         this.dragZone.x = dragX;
@@ -380,6 +409,11 @@ export class CharacterSheet {
         }
     }
 
+    /**This changes all the text and portrait of the sheet to match the values
+     * of a passed in character
+     * @param character The character which the sprite sheet's data should currently
+     * reflect
+     */
     updateSheet(character: Character){
         //update all the test elements
         this.Name.setText(character.name);
@@ -396,6 +430,12 @@ export class CharacterSheet {
         this.sheetPortrait.setTexture(character.portraitKey);
     }
 
+    /**A function ran when ever the global event "partyChange" is heard. This denotes that
+     * the party has changed members in some way (and not just member order). As such we make
+     * sure to relist the characters along the side of the character sheet to reflect the new
+     * party members
+     * @param newParty A copy of the new party after what ever member changes were just made
+     */
     partyChange(newParty){
         this.party = newParty;
         //first we set what we already have to have the correct values
@@ -433,5 +473,4 @@ export class CharacterSheet {
         this.updateSheet(this.party[0]);
         }
     }
-
 }
