@@ -1,6 +1,6 @@
 import { hookToMethod } from "../tools/Hook";
 import { Character } from "../classes/Character";
-import { Controls } from "../classes/Controls";
+import { Controls } from "../tools/Controls";
 import { Player } from "../classes/Player";
 import { Console } from "../tools/Console";
 
@@ -46,9 +46,6 @@ export class Island extends Phaser.Scene {
     /**The Player containing our party and other relevent details */
     player: Player;
 
-    /**control handler */
-    controls: Controls;
-
     /**Calls to the parent constructor to construct the scene. Parents adds
      * the key of the scene that is passed in below to the game objects list
      * of Phaser scenes
@@ -63,7 +60,6 @@ export class Island extends Phaser.Scene {
     init() {
         this.cameras.main.setZoom(2);
         this.player = new Player(this);
-        this.controls = new Controls(this);
     }
 
     /**Used to initally create all of our assets and set up the games scene/stage the
@@ -71,25 +67,25 @@ export class Island extends Phaser.Scene {
      * a particular part of the scene unless creating that thing takes a single command.
     */
     create() {
-        this.createTileMap();
-        this.player = new Player(this, this.tilemapWidthInPixels / 2, this.tilemapHeightInPixels / 2);
-        this.player.addPartyMemberByKey("dregTheTestDummy");
-        this.player.addPartyMemberByKey("gregTheTestDummy");
-        this.player.addPartyMemberByKey("megTheTestDummy");
-        this.player.addPartyMemberByKey("craigTheTestDummy");
-        this.player.addCollisionByLayer(this.walkLayer);
-        //setup the main camera
-        this.cameras.main.startFollow(this.player.party[0].sprite, true);
+        // Create the games hud scene
+        this.scene.launch('Hud');
 
-        //round physics positions to avoid ugly render artifacts
+        // Round physics positions to avoid ugly render artifacts
         hookToMethod(Phaser.Physics.Arcade.Body.prototype, 'update', function () {
             this.x = Math.round(this.x);
             this.y = Math.round(this.y);
         });
 
-        // Create a game console
-        this.scene.launch('Hud');
+        this.createTileMap();
+        this.player = new Player(this, this.tilemapWidthInPixels/2, this.tilemapHeightInPixels/2);
+        this.player.addPartyMemberByKey("dregTheTestDummy","dregThePortrait");
+        this.player.addPartyMemberByKey("gregTheTestDummy","gregThePortrait");
+        this.player.addPartyMemberByKey("megTheTestDummy","megThePortrait");
+        this.player.addPartyMemberByKey("craigTheTestDummy","craigThePortrait");
+        this.player.addCollisionByLayer(this.walkLayer);;
 
+        /**setup the main camera */
+        this.cameras.main.startFollow(this.player.party[0].sprite, true);
     }
 
     /**A overwritten version of the game loop that is called around 60 times
