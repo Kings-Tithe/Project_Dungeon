@@ -1,8 +1,7 @@
 import { Console } from "../../tools/Console";
-import { EventGlobals } from "../../tools/EventGlobals";
-import { CENTER } from "../../tools/Globals";
-import { CharacterSheet } from "../../classes/CharacterSheet";
 import { hookToMethod } from "../../tools/Hook";
+import { SignalManager } from "../../tools/SignalManager";
+import { CharacterSheet } from "../../classes/CharacterSheet";
 
 /**
  * Hud scene that should display over the main game screen. Contains various
@@ -30,7 +29,7 @@ export class Hud extends Phaser.Scene {
 
     //GlobalEmitter
     /**Stores a refernce to the global event emitter */
-    globalEmitter: EventGlobals;
+    signals: SignalManager;
 
     //character sheet
     /**The instance of our character sheet part of the hud */
@@ -48,17 +47,25 @@ export class Hud extends Phaser.Scene {
         this.inBuildingMode = false;
 
         //events to listen for
-        this.globalEmitter = EventGlobals.getInstance();
-        this.globalEmitter.on("addPortrait",this.addPortraitSprite, this)
-        this.globalEmitter.on("changePortrait", this.changePortraitSprite, this);
+        this.signals = SignalManager.get();
+        this.signals.on("addPortrait", this.addPortraitSprite, this)
+        this.signals.on("changePortrait", this.changePortraitSprite, this);
+    
 
         this.characterSheet = new CharacterSheet(this);
     }
 
     create() {
         // Create a game console
-        let con = new Console(this);
-        con.rewireAll();
+        let con = Console.get(this);
+
+        // Listen for the backtick key to toggle the console
+        hookToMethod(document, 'onkeypress', (ret, ev) => {
+            if (ev.which == '96') {
+                // Toggle the display of the console and phaser controls
+                con.toggleDisplay(this.game.input.keyboard);
+            }
+        });
 
         //create character frame
         this.characterFrame = this.add.sprite(0, 0, "characterFrame").setOrigin(0, 0);

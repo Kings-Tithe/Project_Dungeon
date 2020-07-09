@@ -1,6 +1,6 @@
 import { Character } from "./Character";
 import { Controls } from "../tools/Controls";
-import { EventGlobals } from "../tools/EventGlobals";
+import { SignalManager } from "../tools/SignalManager";
 
 /**Player
  * Holds all the information and functionality of the player themselves
@@ -51,7 +51,10 @@ export class Player {
 
     //GlobalEmitter
     /**Stores a refernce to the global event emitter */
-    globalEmitter: EventGlobals;
+    globalEmitter: SignalManager;
+
+    // Tile layers that the party should collide with
+    collisionLayers: (Phaser.Tilemaps.StaticTilemapLayer | Phaser.Tilemaps.DynamicTilemapLayer)[];
 
     /**Instantiates an instance of this class, this is also where alot of our default
      * values are setup and stuff like arrays are first instantiated.
@@ -65,6 +68,7 @@ export class Player {
         this.x = x;
         this.y = y;
         //things that need to be instantiated before use.
+        this.collisionLayers = [];
         this.path = [];
         this.party = [];
         this.controls = Controls.getInstance(scene);
@@ -72,9 +76,9 @@ export class Player {
         this.money = 0;
         this.freeRoamSpeed = 130;
         this.startDepth = 10;
-        this.globalEmitter = EventGlobals.getInstance();
         this.nodeOffSet = 5;
         this.idleZone = 3;
+        this.globalEmitter = SignalManager.get();
         /* priming varibles for logic, these should not be changed unless 
         the logic involving them is */
         this.leaderChangeTimeOut = false;
@@ -90,6 +94,10 @@ export class Player {
         let newPartyMember = new Character(this.currentScene.anims);
         newPartyMember.createSprite(this.currentScene, key, portrait, this.x, this.y);
         this.party.push(newPartyMember);
+        // Add colliders between this party member and all collision layers
+        this.collisionLayers.forEach((layer) => {
+            this.currentScene.physics.add.collider(newPartyMember.sprite, layer);
+        }, this);
         this.globalEmitter.emit("partyChange", this.party);
         this.globalEmitter.emit("addPortrait", portrait);
     }
@@ -108,9 +116,12 @@ export class Player {
      * members and this layer
     */
     addCollisionByLayer(layer: Phaser.Tilemaps.StaticTilemapLayer | Phaser.Tilemaps.DynamicTilemapLayer) {
-        for (let i = 0; i < this.party.length; i++) {
-            this.currentScene.physics.add.collider(this.party[i].sprite, layer);
-        }
+        // Add the layer to list of collision layers
+        this.collisionLayers.push(layer);
+        // Add a collider for each party member to this layer
+        this.party.forEach((member) => {
+            this.currentScene.physics.add.collider(member.sprite, layer);
+        }, this);
     }
 
     /**Pulls the current leader to the back of the party and moves up the party member
@@ -129,7 +140,7 @@ export class Player {
         this.party[0].moveTo(this.x, this.y);
         this.party[0].facingDirection = direction;
         //change the hud's portrait to refelct the new leader
-        this.globalEmitter.emit("changePortrait",this.party[0].portraitKey);
+        this.globalEmitter.emit("changePortrait", this.party[0].portraitKey);
         //fix the current scenes main camera to follow the new leader
         this.currentScene.cameras.main.startFollow(this.party[0].sprite, true);
         //set timeout to allow for leader changing again
@@ -150,9 +161,9 @@ export class Player {
             let newlength = this.path.unshift({ x: newX, y: newY, facing: newFacing });
             /*to help with performance we wait till it fill to 200 then splice off
             everyhting back down to 80 */
-            if (newlength > 200) {
-                this.path.splice(80);
-            }
+            // if (newlength > 200) {
+            //     this.path.splice(80);
+            // }
         }
     }
 
@@ -228,7 +239,7 @@ export class Player {
         this.addToPath(this.party[0].sprite.x, this.party[0].sprite.y, this.party[0].facingDirection);
         this.updatePartyOnPath();
         //this should only be ran if the y coordinate of our leader has changed
-        if (this.party[0].sprite.y != this.y){
+        if (this.party[0].sprite.y != this.y) {
             this.updateDepth();
         }
         //store our current y to check if we changed y next update
