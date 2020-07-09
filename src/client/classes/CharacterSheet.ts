@@ -433,6 +433,7 @@ export class CharacterSheet {
      * @param newParty A copy of the new party after what ever member changes were just made
      */
     partyChange(newParty){
+        console.log("running party change");
         this.party = newParty;
         //first we set what we already have to have the correct values
         for(let i = 0; i < this.party.length && i < this.portraitIcons.length; i++){
@@ -443,11 +444,16 @@ export class CharacterSheet {
             let newIcon: Phaser.GameObjects.Sprite;
             //check if dragzone exists and either create to it or to 0,0 where it will be created
             if(this.dragZone){
-                newIcon = this.currentScene.add.sprite(this.dragZone.x + 460,this.dragZone.y + 80 * i,this.party[i].portraitKey);
+                newIcon = this.currentScene.add.sprite(this.dragZone.x + 860,this.dragZone.y + ((55 * i) + 90),this.party[i].portraitKey);
             } else {
                 newIcon = this.currentScene.add.sprite(860,(55 * i) + 90,this.party[i].portraitKey);
             }
-            newIcon.setScale(0)
+            //check if the character sheet is currently open, set scale accordingly
+            if(this.toggleVisible){
+                newIcon.setScale(.75)
+            } else {
+                newIcon.setScale(0)
+            }
             newIcon.setDepth(200);
             newIcon.setInteractive();
             newIcon.on("pointerdown", () => {this.updateSheet(this.party[i])});
