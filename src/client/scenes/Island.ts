@@ -1,8 +1,9 @@
 import { hookToMethod } from "../tools/Hook";
 import { Character } from "../classes/Character";
-import { Controls } from "../classes/Controls";
+import { Controls } from "../tools/Controls";
 import { Player } from "../classes/Player";
 import { Console } from "../tools/Console";
+import { SignalManager } from "../tools/SignalManager";
 
 /** Island
  * Purpose: Phaser Scene with a basic starting example island for what the final
@@ -49,6 +50,9 @@ export class Island extends Phaser.Scene {
     /**control handler */
     controls: Controls;
 
+    // Handles signals from other scenes/classes
+    signals: SignalManager;
+
     /**Calls to the parent constructor to construct the scene. Parents adds
      * the key of the scene that is passed in below to the game objects list
      * of Phaser scenes
@@ -63,7 +67,6 @@ export class Island extends Phaser.Scene {
     init() {
         this.cameras.main.setZoom(2);
         this.player = new Player(this);
-        this.controls = new Controls(this);
     }
 
     /**Used to initally create all of our assets and set up the games scene/stage the
@@ -72,23 +75,22 @@ export class Island extends Phaser.Scene {
     */
     create() {
         this.createTileMap();
+        this.createListeners();
         this.player = new Player(this, this.tilemapWidthInPixels / 2, this.tilemapHeightInPixels / 2);
-        this.player.addPartyMemberByKey("dregTheTestDummy");
-        this.player.addPartyMemberByKey("gregTheTestDummy");
-        this.player.addPartyMemberByKey("megTheTestDummy");
-        this.player.addPartyMemberByKey("craigTheTestDummy");
+        this.player.addPartyMemberByKey("craigTheTestDummy", "craigThePortrait");
         this.player.addCollisionByLayer(this.walkLayer);
-        //setup the main camera
+
+        /**setup the main camera */
         this.cameras.main.startFollow(this.player.party[0].sprite, true);
 
-        //round physics positions to avoid ugly render artifacts
+        // Create the games hud scene
+        this.scene.launch('Hud');
+
+        // Round physics positions to avoid ugly render artifacts
         hookToMethod(Phaser.Physics.Arcade.Body.prototype, 'update', function () {
             this.x = Math.round(this.x);
             this.y = Math.round(this.y);
         });
-
-        // Create a game console
-        this.scene.launch('Hud');
 
     }
 
@@ -97,6 +99,29 @@ export class Island extends Phaser.Scene {
     update() {
         this.player.updatePlayerInput();
         this.player.update();
+    }
+
+    /**
+     * Creates several listeners for various signals that may be important.
+     */
+    createListeners() {
+        this.signals = SignalManager.get();
+
+        // Listens for commands from the console
+        this.signals.on("command", (command: string[]) => {
+
+            // This command adds a new party member on the island to follow you
+            if (command[0] == 'addtoparty') {
+                // Remove the actual command from the list of arguments
+                command.shift();
+                // For each party member name passed in, add them to the party
+                command.forEach((member: string) => {
+                    this.player.addPartyMemberByKey(member + "TheTestDummy", member + "ThePortrait");
+                }, this);
+            }
+
+        }, this);
+
     }
 
     /**Creates and puts together the primary tilemap for this scene*/
