@@ -3,6 +3,7 @@ import { Character } from "../classes/Character";
 import { Controls } from "../tools/Controls";
 import { Player } from "../classes/Player";
 import { Console } from "../tools/Console";
+import { SignalManager } from "../tools/SignalManager";
 
 /** Island
  * Purpose: Phaser Scene with a basic starting example island for what the final
@@ -46,6 +47,12 @@ export class Island extends Phaser.Scene {
     /**The Player containing our party and other relevent details */
     player: Player;
 
+    /**control handler */
+    controls: Controls;
+
+    // Handles signals from other scenes/classes
+    signals: SignalManager;
+
     /**Calls to the parent constructor to construct the scene. Parents adds
      * the key of the scene that is passed in below to the game objects list
      * of Phaser scenes
@@ -67,6 +74,15 @@ export class Island extends Phaser.Scene {
      * a particular part of the scene unless creating that thing takes a single command.
     */
     create() {
+        this.createTileMap();
+        this.createListeners();
+        this.player = new Player(this, this.tilemapWidthInPixels / 2, this.tilemapHeightInPixels / 2);
+        this.player.addPartyMemberByKey("craigTheTestDummy", "craigThePortrait");
+        this.player.addCollisionByLayer(this.walkLayer);
+
+        /**setup the main camera */
+        this.cameras.main.startFollow(this.player.party[0].sprite, true);
+
         // Create the games hud scene
         this.scene.launch('Hud');
 
@@ -76,16 +92,6 @@ export class Island extends Phaser.Scene {
             this.y = Math.round(this.y);
         });
 
-        this.createTileMap();
-        this.player = new Player(this, this.tilemapWidthInPixels/2, this.tilemapHeightInPixels/2);
-        this.player.addPartyMemberByKey("dregTheTestDummy","dregThePortrait");
-        this.player.addPartyMemberByKey("gregTheTestDummy","gregThePortrait");
-        this.player.addPartyMemberByKey("megTheTestDummy","megThePortrait");
-        this.player.addPartyMemberByKey("craigTheTestDummy","craigThePortrait");
-        this.player.addCollisionByLayer(this.walkLayer);;
-
-        /**setup the main camera */
-        this.cameras.main.startFollow(this.player.party[0].sprite, true);
     }
 
     /**A overwritten version of the game loop that is called around 60 times
@@ -93,6 +99,29 @@ export class Island extends Phaser.Scene {
     update() {
         this.player.updatePlayerInput();
         this.player.update();
+    }
+
+    /**
+     * Creates several listeners for various signals that may be important.
+     */
+    createListeners() {
+        this.signals = SignalManager.get();
+
+        // Listens for commands from the console
+        this.signals.on("command", (command: string[]) => {
+
+            // This command adds a new party member on the island to follow you
+            if (command[0] == 'addtoparty') {
+                // Remove the actual command from the list of arguments
+                command.shift();
+                // For each party member name passed in, add them to the party
+                command.forEach((member: string) => {
+                    this.player.addPartyMemberByKey(member + "TheTestDummy", member + "ThePortrait");
+                }, this);
+            }
+
+        }, this);
+
     }
 
     /**Creates and puts together the primary tilemap for this scene*/

@@ -1,5 +1,5 @@
 import { Console } from "../tools/Console";
-import { EventGlobals } from "../tools/EventGlobals";
+import { SignalManager } from "../tools/SignalManager";
 import { CENTER, GAME_WIDTH } from "../tools/Globals";
 import { Character } from "./Character";
 
@@ -70,7 +70,7 @@ export class CharacterSheet {
     BattleSpeedText: Phaser.GameObjects.Text;
 
     //global events emitter
-    eventEmitter: EventGlobals;
+    eventEmitter: SignalManager;
 
     //characters
     /**A refernce to the players's array of characters that make up their party */
@@ -88,7 +88,7 @@ export class CharacterSheet {
         //inital values
         this.currentScene = scene;
         this.toggleVisible = false;
-        this.eventEmitter = EventGlobals.getInstance();
+        this.eventEmitter = SignalManager.get();
         this.party = [];
         this.portraitIcons = [];
         this.eventEmitter.on("partyChange", this.partyChange, this);

@@ -66,7 +66,7 @@ export class Character {
     /**Stores the name of this character */
     name: string;
 
-    /**Misc */
+    // Misc
     /**The animation manager is global as such we just need a refernce to it
      * this makes it so we don't need to store a scene to play an animation
      * on our sprite */
@@ -76,7 +76,7 @@ export class Character {
     /**Creates an instance of our character, this is passed an animation handler
      * by the player class. 
      * @param animationManager A reference to the global animation manager
-     * */
+     */
     constructor(animationManager: Phaser.Animations.AnimationManager) {
         this.animationManager = animationManager;
         this.depth = 10;
