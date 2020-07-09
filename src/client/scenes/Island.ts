@@ -1,6 +1,6 @@
 import { hookToMethod } from "../tools/Hook";
 import { Character } from "../classes/Character";
-import { Controls } from "../classes/Controls";
+import { Controls } from "../tools/Controls";
 import { Player } from "../classes/Player";
 import { Console } from "../tools/Console";
 import { SignalManager } from "../tools/SignalManager";
@@ -67,7 +67,6 @@ export class Island extends Phaser.Scene {
     init() {
         this.cameras.main.setZoom(2);
         this.player = new Player(this);
-        this.controls = new Controls(this);
     }
 
     /**Used to initally create all of our assets and set up the games scene/stage the
@@ -84,7 +83,7 @@ export class Island extends Phaser.Scene {
         /**setup the main camera */
         this.cameras.main.startFollow(this.player.party[0].sprite, true);
 
-        // Create a game console
+        // Create the games hud scene
         this.scene.launch('Hud');
 
         // Round physics positions to avoid ugly render artifacts

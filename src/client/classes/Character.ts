@@ -22,6 +22,39 @@ export class Character {
     /**Stores the characters set depth, only meant to change when changing party 
      * order, property depthOffSet uses this as a base by which to offset */
     depth: number;
+    /**Keeps track of the players level */
+    level: number;
+    /**Keeps track of the players EXP */
+    exp: number;
+
+    /**Numbers - Base Stats: these are the 4 basic stats most the games calculations
+     * for characters is based on */
+    /**Represents mental & focus based abilities, a character's wit, smarts
+     *  steady hand and rationale. */
+    focus: number;
+    /**Represents a characters survivability, their pain thresholds, poison
+     *  resistance, metabolism and strength of spirit. */
+    endurance: number;
+    /**Represents a character's momentum and mental pacing, their reflexes,
+     *  rate of action and defensive capability. */
+    speed: number;
+    /**Represents Physical power, a character's ability to crush, grapple, 
+     * slash, and generally exert force */
+    might: number;
+
+    /**Numbers - Indirect Stats: these are useful stats that are stored instead
+     * of constantly recalculate that are based on the above base stats */
+    /**used as a cost for abilities and skills, increases with endurance, minor cost
+     * reduction with focus */
+    energy: number;
+    /**A measure of how healthy or close to death depending a character is. slightly
+     * affected by might and focus, greatly affected by endurance. */
+    life: number;
+    /**The number of spaces this character can move in battle, based on speed stat */
+    battleSpeed: number;
+    /**determines your changes of an attack being critical, greatly affected 
+     * by focus and speed */
+    criticalChance: number;
 
     /**String */
     /**Used to store the direction the character is facing */
@@ -30,12 +63,15 @@ export class Character {
     spriteKey: string;
     /**Stores the string relating to the portraits's sprite */
     portraitKey: string;
+    /**Stores the name of this character */
+    name: string;
 
     // Misc
     /**The animation manager is global as such we just need a refernce to it
      * this makes it so we don't need to store a scene to play an animation
      * on our sprite */
     animationManager: Phaser.Animations.AnimationManager;
+
 
     /**Creates an instance of our character, this is passed an animation handler
      * by the player class. 
@@ -44,29 +80,39 @@ export class Character {
     constructor(animationManager: Phaser.Animations.AnimationManager) {
         this.animationManager = animationManager;
         this.depth = 10;
+        this.level = 0;
+        this.exp =0;
+        this.focus = 0;
+        this.endurance = 0;
+        this.speed = 0;
+        this.might = 0;
+        this.energy = 0;
+        this.life = 0;
+        this.battleSpeed = 0;
+        this.criticalChance = 0;
     }
 
     /**Adds the character sprite to any given scene
-     * @param scene     The Phaser scene to add the sprite to
+     * @param scene The Phaser scene to add the sprite to
      * @param spriteKey The sprite key of the given character, this only needs to be added if the sprite
      * has not be created yet.
-     * @param x         The x coordinate to create the sprite at if the sprite has not been created
-     * @param y         The y coordinate to create the sprite at if the sprite has not been created
+     * @param x The x coordinate to create the sprite at if the sprite has not been created
+     * @param y The y coordinate to create the sprite at if the sprite has not been created
      */
-    addSpriteToScene(scene: Phaser.Scene, spriteKey: string, portraitKey: string, x: number = 0, y: number = 0){
-        // Make sure the sprite has been created, if not, create it
-        if (this.sprite == null){
-            this.createSprite(scene, spriteKey,portraitKey, x,y);
+    addSpriteToScene(scene: Phaser.Scene, spriteKey: string = this.spriteKey, portraitKey: string, x: number = 0, y: number = 0) {
+        //Make sure the sprite has been created, if not, create it
+        if (this.sprite == null) {
+            this.createSprite(scene, spriteKey, portraitKey, x, y);
         }
         scene.add.existing(this.sprite);
     }
 
     /**Constructs the sprite for the character based on a spriteKey
-     * @param scene     The Phaser scene to initially add the sprite to
+     * @param scene The Phaser scene to initially add the sprite to
      * @param spriteKey The sprite key to create the sprite from, this will then be stored as part
      * of the class
-     * @param x         The x coordinate to create the sprite at
-     * @param y         The y coordinate to create the sprite at
+     * @param x The x coordinate to create the sprite at
+     * @param y The y coordinate to create the sprite at
      */
     createSprite(scene: Phaser.Scene, spriteKey: string, portraitKey: string, x: number = 0, y: number = 0) {
         /**generate the inital sprite */
@@ -74,9 +120,10 @@ export class Character {
         this.sprite.setDepth(this.depth);
         this.sprite.ignoreDestroy = true;
         this.spriteKey = spriteKey;
-        //generate all the animations associated with this sprite
-        //animation for character walking right
         this.portraitKey = portraitKey;
+        this.name = spriteKey;
+        /**generate all the animations associated with this sprite */
+        /**animation for character walking right */
         scene.anims.create({
             key: spriteKey + 'walk_right',
             frames: scene.anims.generateFrameNumbers(spriteKey, { start: 8, end: 15 }),

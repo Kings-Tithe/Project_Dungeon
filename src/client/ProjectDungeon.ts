@@ -1,5 +1,4 @@
 import * as Phaser from 'phaser';
-
 import { Island } from './scenes/Island';
 import { LoadAssets } from './scenes/LoadAssets';
 import { Hud } from './scenes/overlays/Hud';

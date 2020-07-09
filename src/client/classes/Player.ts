@@ -1,5 +1,5 @@
 import { Character } from "./Character";
-import { Controls } from "./Controls";
+import { Controls } from "../tools/Controls";
 import { SignalManager } from "../tools/SignalManager";
 
 /**Player
@@ -71,7 +71,7 @@ export class Player {
         this.collisionLayers = [];
         this.path = [];
         this.party = [];
-        this.controls = new Controls(scene);
+        this.controls = Controls.getInstance(scene);
         //default values
         this.money = 0;
         this.freeRoamSpeed = 130;
@@ -93,12 +93,13 @@ export class Player {
         //construct our new party member and add them to the party
         let newPartyMember = new Character(this.currentScene.anims);
         newPartyMember.createSprite(this.currentScene, key, portrait, this.x, this.y);
-        this.globalEmitter.emit("addPortrait", portrait);
         this.party.push(newPartyMember);
         // Add colliders between this party member and all collision layers
         this.collisionLayers.forEach((layer) => {
             this.currentScene.physics.add.collider(newPartyMember.sprite, layer);
         }, this);
+        this.globalEmitter.emit("partyChange", this.party);
+        this.globalEmitter.emit("addPortrait", portrait);
     }
 
     /**Adds a party member to the list by a passed in character object,
@@ -106,6 +107,7 @@ export class Player {
      * @param newPartyMember The Character object of the party member to be added
      */
     addPartyMemberByObject(newPartyMember: Character) {
+        this.globalEmitter.emit("partyChange", newPartyMember);
         this.party.push(newPartyMember);
     }
 

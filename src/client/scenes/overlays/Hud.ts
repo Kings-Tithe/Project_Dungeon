@@ -1,6 +1,7 @@
 import { Console } from "../../tools/Console";
 import { hookToMethod } from "../../tools/Hook";
 import { SignalManager } from "../../tools/SignalManager";
+import { CharacterSheet } from "../../classes/CharacterSheet";
 
 /**
  * Hud scene that should display over the main game screen. Contains various
@@ -28,9 +29,10 @@ export class Hud extends Phaser.Scene {
     /**Stores a refernce to the global event emitter */
     signals: SignalManager;
 
-    /**
-     * Constructor for Hud class.
-     */
+    //character sheet
+    /**The instance of our character sheet part of the hud */
+    characterSheet: CharacterSheet;
+
     constructor() {
         super('Hud');
 
@@ -41,19 +43,12 @@ export class Hud extends Phaser.Scene {
         this.signals = SignalManager.get();
         this.signals.on("addPortrait", this.addPortraitSprite, this)
         this.signals.on("changePortrait", this.changePortraitSprite, this);
+    
+
+        this.characterSheet = new CharacterSheet(this);
     }
 
-    /**
-     * Phaser.Scene method that handles the creation when scene starts.
-     */
     create() {
-        this.createConsole();
-    }
-
-    /**
-     * Instantiates and runs setup methods for the console object in the hud.
-     */
-    createConsole() {
         // Create a game console
         let con = Console.get(this);
 
@@ -69,6 +64,10 @@ export class Hud extends Phaser.Scene {
         this.characterFrame = this.add.sprite(0, 0, "characterFrame").setOrigin(0, 0);
         this.characterFrame.setScale(2);
         this.characterFrame.setDepth(1);
+        
+        //create our character sheet
+        this.characterSheet.createToggleButton(95,52);
+        this.characterSheet.createCharacterSheet();
     }
 
     /**Used to add to the list of character portrait sprites we have in portraitSprites */

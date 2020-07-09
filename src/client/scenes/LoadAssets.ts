@@ -34,6 +34,8 @@ export class LoadAssets extends Scene {
             "megThePortrait": "I/images/megThePortrait.png",
             "craigThePortrait": "I/images/craigThePortrait.png",
             "characterFrame": "I/images/character_frame.png",
+            "bookIcon": "I/images/book.png",
+            "outlineOfMan": "I/images/free-use/outlineOfManBrown.png",
 
             //Spritesheet
             "gregTheTestDummy": "S/images/gregTheTestDummy.png",
