@@ -29,6 +29,7 @@ export class LoadAssets extends Scene {
             "islandA2": "I/images/tilesets/islandA2.png",
             "islandB": "I/images/tilesets/islandB.png",
             "islandC": "I/images/tilesets/islandC.png",
+            "buildingSet": "I/images/tilesets/testBuildSpriteSheet.png",
             "gregThePortrait": "I/images/gregThePortrait.png",
             "dregThePortrait": "I/images/dregThePortrait.png",
             "megThePortrait": "I/images/megThePortrait.png",
@@ -36,6 +37,8 @@ export class LoadAssets extends Scene {
             "characterFrame": "I/images/character_frame.png",
             "bookIcon": "I/images/book.png",
             "outlineOfMan": "I/images/free-use/outlineOfManBrown.png",
+            "hammerIcon": "I/images/hammerIcon.png",
+
 
             //Spritesheet
             "gregTheTestDummy": "S/images/gregTheTestDummy.png",

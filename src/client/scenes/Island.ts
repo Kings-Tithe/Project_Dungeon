@@ -34,6 +34,8 @@ export class Island extends Phaser.Scene {
     islandA2: Phaser.Tilemaps.Tileset;
     /**Tileset used to construct this.map */
     islandB: Phaser.Tilemaps.Tileset;
+    /**Tileset used to for the testing of the building mode */
+    buildingSet: Phaser.Tilemaps.Tileset;
 
     /**Static Layers */
     /**Is the basic background layer that everything else is placed over */
@@ -42,6 +44,10 @@ export class Island extends Phaser.Scene {
     walkLayer: Phaser.Tilemaps.StaticTilemapLayer;
     /**A layer of things that sit above the player and adds a sense of depth */
     overheadLayer: Phaser.Tilemaps.StaticTilemapLayer;
+
+    //dynamic layers
+    /**This is a layer used to test the building mechanics */
+    buildLayer: Phaser.Tilemaps.DynamicTilemapLayer;
 
     /**Player */
     /**The Player containing our party and other relevent details */
@@ -130,9 +136,11 @@ export class Island extends Phaser.Scene {
         this.islandA1 = this.map.addTilesetImage("islandA1");
         this.islandA2 = this.map.addTilesetImage("islandA2");
         this.islandB = this.map.addTilesetImage("islandB");
+        this.buildingSet = this.map.addTilesetImage("buildingSet");
         this.backgroundLayer = this.map.createStaticLayer("background", [this.islandA1, this.islandA2], 0, 0);
         this.walkLayer = this.map.createStaticLayer("walk", [this.islandA1, this.islandB], 0, 0);
         this.overheadLayer = this.map.createStaticLayer("overhead", [this.islandB], 0, 0);
+        this.buildLayer = this.map.createBlankDynamicLayer("buildingLayer", [this.buildingSet],0,0);
         //make sure the layers appear where they are supposed to in relation to the player
         this.backgroundLayer.depth = 9;
         this.walkLayer.depth = 9;
