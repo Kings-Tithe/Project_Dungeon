@@ -35,7 +35,7 @@ export class Island extends Phaser.Scene {
     /**Tileset used to construct this.map */
     islandB: Phaser.Tilemaps.Tileset;
     /**Tileset used to for the testing of the building mode */
-    buildingSet: Phaser.Tilemaps.Tileset;
+    testBuildSpriteSheet: Phaser.Tilemaps.Tileset;
 
     /**Static Layers */
     /**Is the basic background layer that everything else is placed over */
@@ -103,8 +103,14 @@ export class Island extends Phaser.Scene {
     /**A overwritten version of the game loop that is called around 60 times
      * a second by the game */
     update() {
+        //console.log(this.buildLayer);
         this.player.updatePlayerInput();
         this.player.update();
+        if (this.input.manager.activePointer.isDown) {
+            let worldPoint = <Phaser.Math.Vector2>this.input.activePointer.positionToCamera(this.cameras.main);
+            console.log(this.testBuildSpriteSheet.firstgid);
+            this.buildLayer.putTileAtWorldXY(605, worldPoint.x, worldPoint.y);
+          }
     }
 
     /**
@@ -136,14 +142,17 @@ export class Island extends Phaser.Scene {
         this.islandA1 = this.map.addTilesetImage("islandA1");
         this.islandA2 = this.map.addTilesetImage("islandA2");
         this.islandB = this.map.addTilesetImage("islandB");
-        this.buildingSet = this.map.addTilesetImage("buildingSet");
+        this.testBuildSpriteSheet = this.map.addTilesetImage("testBuildSpriteSheet");
         this.backgroundLayer = this.map.createStaticLayer("background", [this.islandA1, this.islandA2], 0, 0);
         this.walkLayer = this.map.createStaticLayer("walk", [this.islandA1, this.islandB], 0, 0);
         this.overheadLayer = this.map.createStaticLayer("overhead", [this.islandB], 0, 0);
-        this.buildLayer = this.map.createBlankDynamicLayer("buildingLayer", [this.buildingSet],0,0);
+        this.buildLayer = this.map.createDynamicLayer("build", [this.testBuildSpriteSheet, this.islandA1]);
+        console.log("Here:");
+        console.log(this.map.layers);
         //make sure the layers appear where they are supposed to in relation to the player
         this.backgroundLayer.depth = 9;
         this.walkLayer.depth = 9;
+        this.buildLayer.depth = 10;
         this.overheadLayer.depth = 15;
         //set collision for the walk layer 
         this.walkLayer.setCollisionByProperty({ passThru: false });
