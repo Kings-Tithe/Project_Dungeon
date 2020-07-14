@@ -59,6 +59,10 @@ export class Island extends Phaser.Scene {
     // Handles signals from other scenes/classes
     signals: SignalManager;
 
+    //sprites
+    /**Used to show players where they are about to build */
+    cursorTile: Phaser.GameObjects.Sprite;
+
     /**Calls to the parent constructor to construct the scene. Parents adds
      * the key of the scene that is passed in below to the game objects list
      * of Phaser scenes
@@ -85,6 +89,7 @@ export class Island extends Phaser.Scene {
         this.player = new Player(this, this.tilemapWidthInPixels / 2, this.tilemapHeightInPixels / 2);
         this.player.addPartyMemberByKey("craigTheTestDummy", "craigThePortrait");
         this.player.addCollisionByLayer(this.walkLayer);
+        this.player.addCollisionByLayer(this.buildLayer);
 
         /**setup the main camera */
         this.cameras.main.startFollow(this.player.party[0].sprite, true);
@@ -98,6 +103,18 @@ export class Island extends Phaser.Scene {
             this.y = Math.round(this.y);
         });
 
+        //create build modes cursor tile
+        this.cursorTile = this.add.sprite(800,800,"testBuildSpriteSheetTable",6);
+        this.cursorTile.setOrigin(0,0);
+        this.cursorTile.setAlpha(.65);
+        this.cursorTile.setDepth(100);
+        var cursorTween = this.tweens.add({
+            targets: this.cursorTile,
+            alpha: .2,
+            duration: 1000,
+            repeat: -1,
+            yoyo: true
+        });
     }
 
     /**A overwritten version of the game loop that is called around 60 times
@@ -106,10 +123,21 @@ export class Island extends Phaser.Scene {
         //console.log(this.buildLayer);
         this.player.updatePlayerInput();
         this.player.update();
+        this.buildUpdate();
+    }
+
+    buildUpdate(){
+        //grab the cursor's current point in the world taking into account the camera
+        let worldPoint = <Phaser.Math.Vector2>this.input.activePointer.positionToCamera(this.cameras.main);
+        let testTile: Phaser.Math.Vector2 = this.buildLayer.worldToTileXY(worldPoint.x, worldPoint.y,true);
+        let tilecoord = this.buildLayer.tileToWorldXY(testTile.x, testTile.y);
+        this.cursorTile.x = tilecoord.x;
+        this.cursorTile.y = tilecoord.y;
         if (this.input.manager.activePointer.isDown) {
-            let worldPoint = <Phaser.Math.Vector2>this.input.activePointer.positionToCamera(this.cameras.main);
-            console.log(this.testBuildSpriteSheet.firstgid);
-            this.buildLayer.putTileAtWorldXY(605, worldPoint.x, worldPoint.y);
+            let testTile: Phaser.Math.Vector2 = this.buildLayer.worldToTileXY(worldPoint.x, worldPoint.y,true);
+            console.log(this.buildLayer.tileToWorldXY(testTile.x, testTile.y));
+            let tile = this.buildLayer.putTileAtWorldXY(611, worldPoint.x, worldPoint.y);
+            tile.setCollision(true);
           }
     }
 
@@ -147,8 +175,6 @@ export class Island extends Phaser.Scene {
         this.walkLayer = this.map.createStaticLayer("walk", [this.islandA1, this.islandB], 0, 0);
         this.overheadLayer = this.map.createStaticLayer("overhead", [this.islandB], 0, 0);
         this.buildLayer = this.map.createDynamicLayer("build", [this.testBuildSpriteSheet, this.islandA1]);
-        console.log("Here:");
-        console.log(this.map.layers);
         //make sure the layers appear where they are supposed to in relation to the player
         this.backgroundLayer.depth = 9;
         this.walkLayer.depth = 9;

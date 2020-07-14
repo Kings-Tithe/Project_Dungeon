@@ -73,6 +73,7 @@ export class LoadAssets extends Scene {
                 this.load.tilemapTiledJSON(key, this.assetsFolder + this.files[key].slice(1))
             }
         }
+        this.load.spritesheet("testBuildSpriteSheetTable", this.assetsFolder + "/images/tilesets/testBuildSpriteSheet.png",{ frameWidth: 16, frameHeight: 16 })
     }
 
     /**
