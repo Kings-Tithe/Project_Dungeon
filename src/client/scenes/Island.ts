@@ -62,6 +62,13 @@ export class Island extends Phaser.Scene {
     //sprites
     /**Used to show players where they are about to build */
     cursorTile: Phaser.GameObjects.Sprite;
+    /**Used as a build mode icon of the hammer, does a hammering motion when placing a tile */
+    hammerCursor: Phaser.GameObjects.Sprite;
+
+    //tweens
+    /**Those tween is played when clicking in build mode and make the hammer cursor
+     * looking like it is hammering the block in place */
+    hammeringTween: Phaser.Tweens.Tween;
 
     /**Calls to the parent constructor to construct the scene. Parents adds
      * the key of the scene that is passed in below to the game objects list
@@ -104,7 +111,7 @@ export class Island extends Phaser.Scene {
         });
 
         //create build modes cursor tile
-        this.cursorTile = this.add.sprite(800,800,"testBuildSpriteSheetTable",6);
+        this.cursorTile = this.add.sprite(0,0,"testBuildSpriteSheetTable",6);
         this.cursorTile.setOrigin(0,0);
         this.cursorTile.setAlpha(.65);
         this.cursorTile.setDepth(100);
@@ -113,6 +120,17 @@ export class Island extends Phaser.Scene {
             alpha: .2,
             duration: 1000,
             repeat: -1,
+            yoyo: true
+        });
+        this.hammerCursor = this.add.sprite(0,0,"hammerIcon");
+        this.hammerCursor.setScale(1);
+        this.hammerCursor.setDepth(100);
+        this.hammeringTween = this.tweens.add({
+            targets: this.hammerCursor,
+            angle: 90,
+            duration: 150,
+            paused: true,
+            repeat: 0,
             yoyo: true
         });
     }
@@ -131,9 +149,15 @@ export class Island extends Phaser.Scene {
         let worldPoint = <Phaser.Math.Vector2>this.input.activePointer.positionToCamera(this.cameras.main);
         let testTile: Phaser.Math.Vector2 = this.buildLayer.worldToTileXY(worldPoint.x, worldPoint.y,true);
         let tilecoord = this.buildLayer.tileToWorldXY(testTile.x, testTile.y);
+        //move cursor tile
         this.cursorTile.x = tilecoord.x;
         this.cursorTile.y = tilecoord.y;
+        //move cursor hammer
+        this.hammerCursor.x = worldPoint.x - 10;
+        this.hammerCursor.y = worldPoint.y - 10;
+        //define what to do when clicking in build mode
         if (this.input.manager.activePointer.isDown) {
+            this.hammeringTween.play();
             let testTile: Phaser.Math.Vector2 = this.buildLayer.worldToTileXY(worldPoint.x, worldPoint.y,true);
             console.log(this.buildLayer.tileToWorldXY(testTile.x, testTile.y));
             let tile = this.buildLayer.putTileAtWorldXY(611, worldPoint.x, worldPoint.y);
