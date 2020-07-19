@@ -74,6 +74,7 @@ export class LoadAssets extends Scene {
             }
         }
         this.load.spritesheet("testBuildSpriteSheetTable", this.assetsFolder + "/images/tilesets/testBuildSpriteSheet.png",{ frameWidth: 16, frameHeight: 16 })
+        this.load.spritesheet("woodenBackground", this.assetsFolder + "/images/wooden_Background.png",{ frameWidth: 256, frameHeight: 72 })
     }
 
     /**

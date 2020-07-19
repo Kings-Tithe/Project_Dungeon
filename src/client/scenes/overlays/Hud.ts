@@ -1,4 +1,5 @@
 import { Console } from "../../tools/Console";
+import { BuildMenu } from "../../classes/ui/BuildMenu";
 import { hookToMethod } from "../../tools/Hook";
 import { SignalManager } from "../../tools/SignalManager";
 import { CharacterSheet } from "../../classes/CharacterSheet";
@@ -38,6 +39,7 @@ export class Hud extends Phaser.Scene {
     //boolean
     /**Tells weather or not we are currently in building mode */
     inBuildingMode: boolean;
+    buildMenu: BuildMenu;
 
     constructor() {
         super('Hud');
@@ -50,7 +52,7 @@ export class Hud extends Phaser.Scene {
         this.signals = SignalManager.get();
         this.signals.on("addPortrait", this.addPortraitSprite, this)
         this.signals.on("changePortrait", this.changePortraitSprite, this);
-    
+
 
         this.characterSheet = new CharacterSheet(this);
     }
@@ -58,9 +60,12 @@ export class Hud extends Phaser.Scene {
     create() {
         // Create a game console
         let con = Console.get(this);
+        // Create a buidling menu ui element
+        this.buildMenu = BuildMenu.get(this);
 
-        // Listen for the backtick key to toggle the console
+        // Listen for keypress and handle hud events
         hookToMethod(document, 'onkeypress', (ret, ev) => {
+            // Backtick (or tilde) key (`, ~) even opens/closes the console
             if (ev.which == '96') {
                 // Toggle the display of the console and phaser controls
                 con.toggleDisplay(this.game.input.keyboard);
@@ -70,19 +75,19 @@ export class Hud extends Phaser.Scene {
         //create character frame
         this.characterFrame = this.add.sprite(0, 0, "characterFrame").setOrigin(0, 0);
         this.characterFrame.setScale(2);
-        this.characterFrame.setDepth(1);
-        
+        this.characterFrame.setDepth(1)
+;
         //create our character sheet
-        this.characterSheet.createToggleButton(95,52);
+        this.characterSheet.createToggleButton(95, 52);
         this.characterSheet.createCharacterSheet();
 
         //create the building menu and toggle button
-        this.buildingToggleButton = this.add.sprite(130,52,"hammerIcon");
+        this.buildingToggleButton = this.add.sprite(130, 52, "hammerIcon");
         this.buildingToggleButton.setScale(2);
         this.buildingToggleButton.setDepth(2);
         this.buildingToggleButton.setInteractive();
         this.buildingToggleButton.on("pointerdown", () => {
-            if(this.inBuildingMode){
+            if (this.inBuildingMode) {
                 this.exitBuildMode();
             } else {
                 this.enterBuildMode();
@@ -92,15 +97,17 @@ export class Hud extends Phaser.Scene {
     }
 
     /**Makes any changes that need to be made when entering building mode */
-    enterBuildMode(){
+    enterBuildMode() {
         //set that we are now in building mode
         this.inBuildingMode = true;
+        this.buildMenu.toggle(true);
     }
 
     /**Makes any changes that need to be made when entering building mode */
-    exitBuildMode(){
+    exitBuildMode() {
         //set that we are no longer in building mode
         this.inBuildingMode = false;
+        this.buildMenu.toggle(false);
     }
 
     /**Used to add to the list of character portrait sprites we have in portraitSprites */
