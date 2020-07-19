@@ -1,4 +1,4 @@
-eimport { Hud } from "../../scenes/overlays/Hud";
+import { Hud } from "../../scenes/overlays/Hud";
 import { GAME_WIDTH } from "../../tools/Globals";
 
 export class BuildMenu {
