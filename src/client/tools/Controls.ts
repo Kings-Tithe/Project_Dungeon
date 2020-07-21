@@ -210,6 +210,31 @@ export class Controls {
     downDuration(actionKey: string): number{
         return this.actions[actionKey].key.getDuration();
     }
+
+    /**Tells you what key is attached to an action
+     * @param actionKey the action to check the key for
+     */
+    whatKey(actionKey: string): Phaser.Input.Keyboard.Key{
+        return this.actions[actionKey].key;
+    }
+
+    /**Tells you what action(s) are attached to a key
+     * @param key the key to check the actions for
+     */
+    whatActions(checkKey: Phaser.Input.Keyboard.Key): string[]{
+        let actions: string[] = [];
+        let keys = Object.keys(this.actions);
+        for(let Actionkey of keys){
+            if(this.actions[Actionkey].key == checkKey){
+                actions.push(Actionkey);
+            }
+        }
+        return actions;
+    }
+
+    setDelay(){
+
+    }
 }
 
 /**This is the varible used to store our one instance of our singlton class, this
