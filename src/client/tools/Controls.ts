@@ -29,6 +29,7 @@ export class Controls {
         this.inputManager = scene.input;
         this.loadKeyBindings();
         this.emitter = SignalManager.get();
+        this.globalCheckable = true;
     }
 
     /**Allows getting the single global instance of this class, must
