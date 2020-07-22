@@ -4,6 +4,7 @@ import { Controls } from "../tools/Controls";
 import { Player } from "../classes/Player";
 import { Console } from "../tools/Console";
 import { SignalManager } from "../tools/SignalManager";
+import { tiledata } from "../classes/ui/BuildMenu";
 
 /** Island
  * Purpose: Phaser Scene with a basic starting example island for what the final
@@ -22,6 +23,7 @@ export class Island extends Phaser.Scene {
     tilemapWidthInPixels: number;
     /**Used to store the height of the tilemap in Pixels */
     tilemapHeightInPixels: number;
+    rotation: number;
 
     /**Tilemaps */
     /**The main map used in this scene */
@@ -70,6 +72,10 @@ export class Island extends Phaser.Scene {
      * looking like it is hammering the block in place */
     hammeringTween: Phaser.Tweens.Tween;
 
+    //tiledata
+    /**This stores the currently selected tile based on information sent from the BuildMenu class */
+    currentTile: tiledata;
+
     /**Calls to the parent constructor to construct the scene. Parents adds
      * the key of the scene that is passed in below to the game objects list
      * of Phaser scenes
@@ -84,6 +90,7 @@ export class Island extends Phaser.Scene {
     init() {
         this.cameras.main.setZoom(2);
         this.player = new Player(this);
+        this.rotation = 0;
     }
 
     /**Used to initally create all of our assets and set up the games scene/stage the
@@ -97,6 +104,8 @@ export class Island extends Phaser.Scene {
         this.player.addPartyMemberByKey("craigTheTestDummy", "craigThePortrait");
         this.player.addCollisionByLayer(this.walkLayer);
         this.player.addCollisionByLayer(this.buildLayer);
+
+        this.controls = Controls.getInstance(this);
 
         /**setup the main camera */
         this.cameras.main.startFollow(this.player.party[0].sprite, true);
@@ -143,10 +152,14 @@ export class Island extends Phaser.Scene {
         this.buildUpdate();
     }
 
+    createBuildButtons(){
+
+    }
+
     buildUpdate() {
         //grab the cursor's current point in the world taking into account the camera
         let worldPoint = <Phaser.Math.Vector2>this.input.activePointer.positionToCamera(this.cameras.main);
-        let testTile: Phaser.Math.Vector2 = this.buildLayer.worldToTileXY(worldPoint.x, worldPoint.y, true);
+        let testTile: Phaser.Math.Vector2 = this.buildLayer.worldToTileXY(worldPoint.x, worldPoint.y,true);
         let tilecoord = this.buildLayer.tileToWorldXY(testTile.x, testTile.y);
         //move cursor tile
         this.cursorTile.x = tilecoord.x;
@@ -155,11 +168,27 @@ export class Island extends Phaser.Scene {
         this.hammerCursor.x = worldPoint.x - 10;
         this.hammerCursor.y = worldPoint.y - 10;
         //define what to do when clicking in build mode
-        if (this.input.manager.activePointer.isDown) {
-            this.hammeringTween.play();
-            let testTile: Phaser.Math.Vector2 = this.buildLayer.worldToTileXY(worldPoint.x, worldPoint.y, true);
-            let tile = this.buildLayer.putTileAtWorldXY(611, worldPoint.x, worldPoint.y);
-            tile.setCollision(true);
+        if (this.input.manager.activePointer.isDown && this.currentTile) {
+            //needed varibles
+            let canPlace: boolean = true;
+            let playerTile = this.buildLayer.worldToTileXY(this.player.party[0].sprite.x,this.player.party[0].sprite.y,true);
+            //check for radius around player
+            console.log(Math.abs(playerTile.x - testTile.x),Math.abs(playerTile.y - testTile.y))
+            if(Math.abs(playerTile.x - testTile.x) > 6 || Math.abs(playerTile.y - testTile.y) > 6){
+                canPlace = false;
+            }
+            //check we are not building on the player
+            if(Math.abs(playerTile.x - testTile.x) < 2 && Math.abs(playerTile.y - testTile.y) < 2){
+                canPlace = false;
+            }
+            //if all previous checks were good then place the block
+            if(canPlace){
+                this.hammeringTween.play();
+                let tilesetStart = this.testBuildSpriteSheet.firstgid;
+                let tile = this.buildLayer.putTileAtWorldXY(tilesetStart + this.currentTile.tileSetOffSet, worldPoint.x, worldPoint.y);
+                tile.rotation = Phaser.Math.DegToRad(this.rotation);
+                tile.setCollision(true);
+            }
         }
     }
 
@@ -183,6 +212,11 @@ export class Island extends Phaser.Scene {
             }
 
         }, this);
+
+        this.signals.on("newTileSelected", (incomingTile: tiledata) => {
+            this.currentTile = incomingTile;
+            this.cursorTile.setTexture("testBuildSpriteSheetTable",incomingTile.tileSetOffSet);
+        })
 
     }
 

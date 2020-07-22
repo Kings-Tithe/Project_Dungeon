@@ -1,18 +1,24 @@
 import { Hud } from "../../scenes/overlays/Hud";
 import { GAME_WIDTH } from "../../tools/Globals";
+import { SignalManager } from "../../tools/SignalManager";
 
 export class BuildMenu {
 
     private hud: Hud;
     private menuDiv: HTMLDivElement;
     private dom: Phaser.GameObjects.DOMElement;
-    visible: boolean;
+    private tiles: tiledata[]; 
+    public visible: boolean;
+    public currentTile: tiledata;
+    private emitter: SignalManager;
 
 
     private constructor(hud: Hud) {
         //inital values
         this.visible = false;
         this.hud = hud;
+        this.importTiles();
+        this.emitter = SignalManager.get();
         //create div
         this.menuDiv = document.createElement("div");
         this.menuDiv.style.width = '256px';
@@ -23,16 +29,12 @@ export class BuildMenu {
         this.menuDiv.style.borderStyle = "solid";
         this.menuDiv.style.borderColor = "#915b20";
         this.menuDiv.style.borderWidth = "6px";
+        this.menuDiv.style.overflowY = "auto";
         //create list
         let list = document.createElement("ul");
         list.style.listStyle = "none";
         list.style.padding = "0px";
         list.style.margin = "3px";
-        let temp = {
-            name: "Temp Test",
-            count: 667,
-            required: "9 wood, 5 stone"
-        }
         //populate list
         for (let i = 0; i < 8; i++) {
             // List item object, contains details for each block
@@ -59,17 +61,16 @@ export class BuildMenu {
             textsList.style.margin = "0px 0px 10px 10px";
             textsList.style.verticalAlign = "center";
             textsList.style.lineHeight = "1.2";
-            textsList.innerHTML = `<li>${temp.name}</li>`;
-            textsList.innerHTML += `<li>${temp.count}</li>`;
-            textsList.innerHTML += `<li style="display: inline">${temp.required}</li>`;
+            textsList.innerHTML = `<li>${this.tiles[i].name}</li>`;
+            textsList.innerHTML += `<li>${this.tiles[i].count}</li>`;
             // Append item elements to list
             item.appendChild(image);
             item.appendChild(textsList);
             list.appendChild(item);
             // Assign a callback to clicking on the item
             item.onclick = () => {
-                // tileSelect(i);
-                console.log(`You picked tile ${i}`);
+                console.log(this.tiles[i]);
+                this.emitter.emit("newTileSelected",this.tiles[i]);
             }
         }
         // Style the list items
@@ -80,7 +81,6 @@ export class BuildMenu {
         list.appendChild(styling);
         // Combine html elements
         this.menuDiv.appendChild(list);
-        this.menuDiv.style.overflowY = "auto";
         this.dom = this.hud.add.dom((GAME_WIDTH - 256) - 10, 18, this.menuDiv);
         this.dom.setDepth(99).setOrigin(0);
         this.dom.setVisible(false);
@@ -99,9 +99,30 @@ export class BuildMenu {
         this.dom.setVisible(show);
     }
 
+    importTiles(){
+        /*Eventually these will be enumerated in a file but for now it is all
+        generated here */
+        this.tiles = [];
+        for(let i = 0; i < 8; i++){
+            this.tiles[i] = {
+                tileSetKey: "testBuildSpriteSheet",
+                tileSetOffSet: i,
+                name: "TestTile",
+                count: ((i * 10) % 3) + 1
+            }
+        }
+    }
+
 }
 
 /**This is the varible used to store our one instance of our singlton class, this
  * is a module level variable and cannot be seen by other scripts.
  */
 let instance: BuildMenu = null;
+
+export interface tiledata {
+    tileSetKey: string,
+    tileSetOffSet: number,
+    name: string,
+    count: number
+}
