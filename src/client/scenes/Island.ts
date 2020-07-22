@@ -148,7 +148,7 @@ export class Island extends Phaser.Scene {
         this.player.updatePlayerInput();
         this.player.update();
         if(this.inBuildMode && this.currentTile){
-            this.buildUpdate();
+            this.buildPlaceUpdate();
         }
     }
 
@@ -170,7 +170,7 @@ export class Island extends Phaser.Scene {
         this.cursorTween.pause();
     }
 
-    buildUpdate() {
+    buildPlaceUpdate() {
         //grab the cursor's current point in the world taking into account the camera
         let worldPoint = <Phaser.Math.Vector2>this.input.activePointer.positionToCamera(this.cameras.main);
         let worldTile: Phaser.Math.Vector2 = this.buildLayer.worldToTileXY(worldPoint.x, worldPoint.y,true);
