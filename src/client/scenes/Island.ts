@@ -65,7 +65,7 @@ export class Island extends Phaser.Scene {
     /**Used to show players where they are about to build */
     cursorTile: Phaser.GameObjects.Sprite;
     /**Used as a build mode icon of the hammer, does a hammering motion when placing a tile */
-    hammerCursor: Phaser.GameObjects.Sprite;
+    toolCursor: Phaser.GameObjects.Sprite;
 
     //tweens
     /**Those tween is played when clicking in build mode and make the hammer cursor
@@ -83,6 +83,9 @@ export class Island extends Phaser.Scene {
     /**Used to tell weather this scene is currently in build mode or not */
     inBuildMode: boolean;
 
+    //string
+    toolSelected: string;
+
     /**Calls to the parent constructor to construct the scene. Parents adds
      * the key of the scene that is passed in below to the game objects list
      * of Phaser scenes
@@ -99,6 +102,7 @@ export class Island extends Phaser.Scene {
         this.player = new Player(this);
         this.rotation = 0;
         this.inBuildMode = false;
+        this.toolSelected = "hammer";
     }
 
     /**Used to initally create all of our assets and set up the games scene/stage the
@@ -128,12 +132,12 @@ export class Island extends Phaser.Scene {
         });
 
         //create build mode hammer cursor
-        this.hammerCursor = this.add.sprite(0, 0, "hammerIcon");
-        this.hammerCursor.setScale(1);
-        this.hammerCursor.setDepth(100);
-        this.hammerCursor.setVisible(false);
+        this.toolCursor = this.add.sprite(0, 0, "hammerIcon");
+        this.toolCursor.setScale(1);
+        this.toolCursor.setDepth(100);
+        this.toolCursor.setVisible(false);
         this.hammeringTween = this.tweens.add({
-            targets: this.hammerCursor,
+            targets: this.toolCursor,
             angle: 90,
             duration: 150,
             paused: true,
@@ -152,10 +156,6 @@ export class Island extends Phaser.Scene {
         }
     }
 
-    createBuildButtons(){
-
-    }
-
     enterBuildMode(){
         this.inBuildMode = true;
         if(this.cursorTile){
@@ -165,9 +165,11 @@ export class Island extends Phaser.Scene {
 
     exitBuildMode(){
         this.inBuildMode = false;
-        this.cursorTile.setVisible(false);
-        this.hammerCursor.setVisible(false);
-        this.cursorTween.pause();
+        this.toolCursor.setVisible(false);
+        if(this.cursorTile){
+            this.cursorTile.setVisible(false);
+            this.cursorTween.pause();
+        }
     }
 
     buildPlaceUpdate() {
@@ -176,11 +178,11 @@ export class Island extends Phaser.Scene {
         let worldTile: Phaser.Math.Vector2 = this.buildLayer.worldToTileXY(worldPoint.x, worldPoint.y,true);
         let tilecoord = this.buildLayer.tileToWorldXY(worldTile.x, worldTile.y);
         //move cursor tile
-        this.cursorTile.x = tilecoord.x;
-        this.cursorTile.y = tilecoord.y;
+        this.cursorTile.x = tilecoord.x + 8;
+        this.cursorTile.y = tilecoord.y + 8;
         //move cursor hammer
-        this.hammerCursor.x = worldPoint.x - 10;
-        this.hammerCursor.y = worldPoint.y - 10;
+        this.toolCursor.x = worldPoint.x - 10;
+        this.toolCursor.y = worldPoint.y - 10;
         //check if a block could be placed this update
         let canPlace: boolean = true;
         //check for radius around player
@@ -196,20 +198,27 @@ export class Island extends Phaser.Scene {
             canPlace = false;
         }
         //determine if to show the cursors or not
-        if(canPlace){
+        if(canPlace && this.toolSelected == "hammer"){
             this.cursorTile.setVisible(true);
-            this.hammerCursor.setVisible(true);
+            this.toolCursor.setVisible(true);
+        } else if (canPlace && this.toolSelected == "pick"){
+            this.cursorTile.setVisible(false);
+            this.toolCursor.setVisible(true);
         } else {
             this.cursorTile.setVisible(false);
-            this.hammerCursor.setVisible(false);
+            this.toolCursor.setVisible(false);
         }
         //define what to do when clicking in build mode
         if (this.input.manager.activePointer.isDown && this.currentTile && canPlace) {
             this.hammeringTween.play();
-            let tilesetStart = this.testBuildSpriteSheet.firstgid;
-            let tile = this.buildLayer.putTileAtWorldXY(tilesetStart + this.currentTile.tileSetOffSet, worldPoint.x, worldPoint.y);
-            tile.rotation = Phaser.Math.DegToRad(this.rotation);
-            tile.setCollision(true);
+            if(this.toolSelected == "hammer"){
+                let tilesetStart = this.testBuildSpriteSheet.firstgid;
+                let tile = this.buildLayer.putTileAtWorldXY(tilesetStart + this.currentTile.tileSetOffSet, worldPoint.x, worldPoint.y);
+                tile.rotation = Phaser.Math.DegToRad(this.rotation);
+                tile.setCollision(true);
+            } else if (this.toolSelected == "pick"){
+                this.buildLayer.removeTileAtWorldXY(worldPoint.x, worldPoint.y);
+            }
         }
     }
 
@@ -240,10 +249,11 @@ export class Island extends Phaser.Scene {
             } else {
                 //create build modes cursor tile
                 this.cursorTile = this.add.sprite(0, 0, incomingTile.tileSetKey+"Table", incomingTile.tileSetOffSet);
-                this.cursorTile.setOrigin(0, 0);
+                this.cursorTile.setOrigin(.5,.5);
                 this.cursorTile.setAlpha(.7);
                 this.cursorTile.setDepth(100);
                 this.cursorTile.setVisible(false);
+                this.cursorTile.rotation = Phaser.Math.DegToRad(this.rotation);
                 this.cursorTween = this.tweens.add({
                     targets: this.cursorTile,
                     alpha: .3,
@@ -257,14 +267,30 @@ export class Island extends Phaser.Scene {
 
         this.signals.on("rotate block right-down", () => {
             this.rotation += 90;
+            if(this.cursorTile){
+                this.cursorTile.rotation = Phaser.Math.DegToRad(this.rotation);
+            }
         })
 
         this.signals.on("rotate block left-down", () => {
             this.rotation -= 90;
+            if(this.cursorTile){
+                this.cursorTile.rotation = Phaser.Math.DegToRad(this.rotation);
+            }
         })
 
         this.signals.on("enterBuildMode", this.enterBuildMode.bind(this));
         this.signals.on("exitBuildMode", this.exitBuildMode.bind(this));
+
+        this.signals.on("buildMenuHammerSelected", () => {
+            this.toolSelected = "hammer";
+            this.toolCursor.setTexture("hammerIcon");
+        })
+
+        this.signals.on("buildMenuPickSelected", () => {
+            this.toolSelected = "pick";
+            this.toolCursor.setTexture("pickIcon");
+        })
     }
 
     /**Creates and puts together the primary tilemap for this scene*/

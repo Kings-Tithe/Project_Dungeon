@@ -19,6 +19,18 @@ export class BuildMenu {
     /**Tells weather or not we are currently in building mode */
     inBuildingMode: boolean;
 
+    //sprites
+    /**This button is used to turn the block to be place 90 towards the right */
+    flipRightButton: Phaser.GameObjects.Sprite;
+    /**This button is used to turn the block to be place 90 towards the left */
+    flipLeftButton: Phaser.GameObjects.Sprite;
+    /**Used to select the build tool*/
+    hammerButton: Phaser.GameObjects.Sprite;
+    /**Used to select the destroy tool */
+    pickButton: Phaser.GameObjects.Sprite;
+
+    //string
+    toolSelected: string;
 
     private constructor(hud: Hud) {
         //inital values
@@ -26,6 +38,7 @@ export class BuildMenu {
         this.hud = hud;
         this.importTiles();
         this.emitter = SignalManager.get();
+        this.toolSelected = "hammer";
         //create div
         this.menuDiv = document.createElement("div");
         this.menuDiv.style.width = '256px';
@@ -79,6 +92,7 @@ export class BuildMenu {
                 console.log(this.tiles[i]);
                 this.emitter.emit("newTileSelected",this.tiles[i]);
             }
+            this.createBuildButtons(hud);
         }
         // Style the list items
         let styling = document.createElement('style');
@@ -104,6 +118,11 @@ export class BuildMenu {
 
     toggle(show = !this.visible) {
         this.dom.setVisible(show);
+        this.flipRightButton.setVisible(show);
+        this.flipLeftButton.setVisible(show);
+        this.hammerButton.setVisible(show);
+        this.pickButton.setVisible(show);
+
     }
 
     importTiles(){
@@ -138,6 +157,52 @@ export class BuildMenu {
                 }
             })
         }
+    }
+
+    createBuildButtons(hud: Hud){
+        //create flip right button
+        this.flipRightButton = hud.add.sprite(350,52,"flipRightIcon");
+        this.flipRightButton.setDepth(50);
+        this.flipRightButton.setVisible(false);
+        this.flipRightButton.setInteractive();
+        /*here we use the controls action key as if the button had been pressed, this
+        means less code in the end and accomplishes the same thing */
+        this.flipRightButton.on("pointerdown", () => {
+            this.emitter.emit("rotate block right-down")
+        });
+
+        //create flip left button
+        this.flipLeftButton = hud.add.sprite(300,52,"flipLeftIcon");
+        this.flipLeftButton.setDepth(50);
+        this.flipLeftButton.setVisible(false);
+        this.flipLeftButton.setInteractive();
+        /*here we use the controls action key as if the button had been pressed, this
+        means less code in the end and accomplishes the same thing */
+        this.flipLeftButton.on("pointerdown", () => {
+            this.emitter.emit("rotate block left-down")
+        });
+
+        //create hammer button
+        this.hammerButton = hud.add.sprite(400,52,"hammerIcon");
+        this.hammerButton.setDepth(50);
+        this.hammerButton.setScale(2);
+        this.hammerButton.setVisible(false);
+        this.hammerButton.setInteractive()
+        this.hammerButton.on("pointerdown", () => {
+            this.toolSelected = "hammer";
+            this.emitter.emit("buildMenuHammerSelected");
+        })
+
+        //create pick button
+        this.pickButton = hud.add.sprite(450,52,"pickIcon");
+        this.pickButton.setDepth(50);
+        this.pickButton.setScale(2);
+        this.pickButton.setVisible(false);
+        this.pickButton.setInteractive()
+        this.pickButton.on("pointerdown", () => {
+            this.toolSelected = "pick";
+            this.emitter.emit("buildMenuPickSelected");
+        })
     }
 
     /**Makes any changes that need to be made when entering building mode */

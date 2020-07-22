@@ -38,6 +38,9 @@ export class LoadAssets extends Scene {
             "bookIcon": "I/images/book.png",
             "outlineOfMan": "I/images/free-use/outlineOfManBrown.png",
             "hammerIcon": "I/images/hammerIcon.png",
+            "pickIcon": "I/images/pickIcon.png",
+            "flipRightIcon": "I/images/icon_flip_right.png",
+            "flipLeftIcon": "I/images/icon_flip_left.png",
 
 
             //Spritesheet
