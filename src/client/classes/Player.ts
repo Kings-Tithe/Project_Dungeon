@@ -160,7 +160,7 @@ export class Player {
             //unshift adds an element to the front of the array and returns the new length of the array
             let newlength = this.path.unshift({ x: newX, y: newY, facing: newFacing });
             /*to help with performance we wait till it fill to 200 then splice off
-            everyhting back down to 80 */
+            everything back down to 80 */
             // if (newlength > 200) {
             //     this.path.splice(80);
             // }
@@ -183,7 +183,7 @@ export class Player {
                 /**the distance on the y-axis between our current position and desired position */
                 let differenceY = Math.abs(this.path[i * this.nodeOffSet].y - this.party[i].sprite.y);
 
-                /*if we have for some reason gotten more then 50 pixels from our target, this is kinda as a
+                /*if we have for some reason gotten more then 30 pixels from our target, this is kinda as a
                 last resort catch if anything get in their way or stops them for some reason */
                 if (Math.hypot(differenceX, differenceY) > 30) {
                     this.party[i].moveTo(this.path[i * this.nodeOffSet].x, this.path[i * this.nodeOffSet].y);

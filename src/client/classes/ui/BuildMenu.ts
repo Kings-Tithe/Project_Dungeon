@@ -12,6 +12,13 @@ export class BuildMenu {
     public currentTile: tiledata;
     private emitter: SignalManager;
 
+    /**Sprite used to toggle one and off the building menu */
+    buildingToggleButton: Phaser.GameObjects.Sprite;
+
+    //boolean
+    /**Tells weather or not we are currently in building mode */
+    inBuildingMode: boolean;
+
 
     private constructor(hud: Hud) {
         //inital values
@@ -111,6 +118,44 @@ export class BuildMenu {
                 count: ((i * 10) % 3) + 1
             }
         }
+    }
+
+    placeToggleButton(hud: Hud, buttonX: number, buttonY: number){
+        if(this.buildingToggleButton){
+            this.buildingToggleButton.x = buttonX;
+            this.buildingToggleButton.y = buttonY;
+        } else {
+            //create the building menu and toggle button
+            this.buildingToggleButton = hud.add.sprite(buttonX, buttonY, "hammerIcon");
+            this.buildingToggleButton.setScale(2);
+            this.buildingToggleButton.setDepth(2);
+            this.buildingToggleButton.setInteractive();
+            this.buildingToggleButton.on("pointerdown", () => {
+                if (this.inBuildingMode) {
+                    this.exitBuildMode();
+                } else {
+                    this.enterBuildMode();
+                }
+            })
+        }
+    }
+
+    /**Makes any changes that need to be made when entering building mode */
+    enterBuildMode() {
+        //set that we are now in building mode
+        this.inBuildingMode = true;
+        this.toggle(true);
+        //emit that we have entered build mode
+        this.emitter.emit("enterBuildMode");
+    }
+
+    /**Makes any changes that need to be made when entering building mode */
+    exitBuildMode() {
+        //set that we are no longer in building mode
+        this.inBuildingMode = false;
+        this.toggle(false);
+        //emit that we are no longer in build mode
+        this.emitter.emit("exitBuildMode");
     }
 
 }

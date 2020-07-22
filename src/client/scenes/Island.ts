@@ -71,10 +71,17 @@ export class Island extends Phaser.Scene {
     /**Those tween is played when clicking in build mode and make the hammer cursor
      * looking like it is hammering the block in place */
     hammeringTween: Phaser.Tweens.Tween;
+    /**This give the effect of the block selected with the building mode fading back and
+     * forth */
+    cursorTween: Phaser.Tweens.Tween;
 
     //tiledata
     /**This stores the currently selected tile based on information sent from the BuildMenu class */
     currentTile: tiledata;
+
+    //booleans
+    /**Used to tell weather this scene is currently in build mode or not */
+    inBuildMode: boolean;
 
     /**Calls to the parent constructor to construct the scene. Parents adds
      * the key of the scene that is passed in below to the game objects list
@@ -91,6 +98,7 @@ export class Island extends Phaser.Scene {
         this.cameras.main.setZoom(2);
         this.player = new Player(this);
         this.rotation = 0;
+        this.inBuildMode = false;
     }
 
     /**Used to initally create all of our assets and set up the games scene/stage the
@@ -119,21 +127,11 @@ export class Island extends Phaser.Scene {
             this.y = Math.round(this.y);
         });
 
-        //create build modes cursor tile
-        this.cursorTile = this.add.sprite(0, 0, "testBuildSpriteSheetTable", 6);
-        this.cursorTile.setOrigin(0, 0);
-        this.cursorTile.setAlpha(.65);
-        this.cursorTile.setDepth(100);
-        var cursorTween = this.tweens.add({
-            targets: this.cursorTile,
-            alpha: .2,
-            duration: 1000,
-            repeat: -1,
-            yoyo: true
-        });
+        //create build mode hammer cursor
         this.hammerCursor = this.add.sprite(0, 0, "hammerIcon");
         this.hammerCursor.setScale(1);
         this.hammerCursor.setDepth(100);
+        this.hammerCursor.setVisible(false);
         this.hammeringTween = this.tweens.add({
             targets: this.hammerCursor,
             angle: 90,
@@ -149,46 +147,69 @@ export class Island extends Phaser.Scene {
     update() {
         this.player.updatePlayerInput();
         this.player.update();
-        this.buildUpdate();
+        if(this.inBuildMode && this.currentTile){
+            this.buildUpdate();
+        }
     }
 
     createBuildButtons(){
 
     }
 
+    enterBuildMode(){
+        this.inBuildMode = true;
+        if(this.cursorTile){
+            this.cursorTween.resume();
+        }
+    }
+
+    exitBuildMode(){
+        this.inBuildMode = false;
+        this.cursorTile.setVisible(false);
+        this.hammerCursor.setVisible(false);
+        this.cursorTween.pause();
+    }
+
     buildUpdate() {
         //grab the cursor's current point in the world taking into account the camera
         let worldPoint = <Phaser.Math.Vector2>this.input.activePointer.positionToCamera(this.cameras.main);
-        let testTile: Phaser.Math.Vector2 = this.buildLayer.worldToTileXY(worldPoint.x, worldPoint.y,true);
-        let tilecoord = this.buildLayer.tileToWorldXY(testTile.x, testTile.y);
+        let worldTile: Phaser.Math.Vector2 = this.buildLayer.worldToTileXY(worldPoint.x, worldPoint.y,true);
+        let tilecoord = this.buildLayer.tileToWorldXY(worldTile.x, worldTile.y);
         //move cursor tile
         this.cursorTile.x = tilecoord.x;
         this.cursorTile.y = tilecoord.y;
         //move cursor hammer
         this.hammerCursor.x = worldPoint.x - 10;
         this.hammerCursor.y = worldPoint.y - 10;
+        //check if a block could be placed this update
+        let canPlace: boolean = true;
+        //check for radius around player
+        let differenceX = Math.abs(this.player.party[0].sprite.x - tilecoord.x);
+        let differenceY = Math.abs(this.player.party[0].sprite.y - tilecoord.y)
+        if(Math.hypot(differenceX, differenceY) > 125){
+            canPlace = false;
+        }
+        //check we are not building on the player
+        let playerBounds = this.player.party[0].sprite.getBounds();
+        let tilebounds = new Phaser.Geom.Rectangle(tilecoord.x, tilecoord.y, 16, 16);
+        if(Phaser.Geom.Rectangle.Overlaps(playerBounds,tilebounds)){
+            canPlace = false;
+        }
+        //determine if to show the cursors or not
+        if(canPlace){
+            this.cursorTile.setVisible(true);
+            this.hammerCursor.setVisible(true);
+        } else {
+            this.cursorTile.setVisible(false);
+            this.hammerCursor.setVisible(false);
+        }
         //define what to do when clicking in build mode
-        if (this.input.manager.activePointer.isDown && this.currentTile) {
-            //needed varibles
-            let canPlace: boolean = true;
-            let playerTile = this.buildLayer.worldToTileXY(this.player.party[0].sprite.x,this.player.party[0].sprite.y,true);
-            //check for radius around player
-            console.log(Math.abs(playerTile.x - testTile.x),Math.abs(playerTile.y - testTile.y))
-            if(Math.abs(playerTile.x - testTile.x) > 6 || Math.abs(playerTile.y - testTile.y) > 6){
-                canPlace = false;
-            }
-            //check we are not building on the player
-            if(Math.abs(playerTile.x - testTile.x) < 2 && Math.abs(playerTile.y - testTile.y) < 2){
-                canPlace = false;
-            }
-            //if all previous checks were good then place the block
-            if(canPlace){
-                this.hammeringTween.play();
-                let tilesetStart = this.testBuildSpriteSheet.firstgid;
-                let tile = this.buildLayer.putTileAtWorldXY(tilesetStart + this.currentTile.tileSetOffSet, worldPoint.x, worldPoint.y);
-                tile.rotation = Phaser.Math.DegToRad(this.rotation);
-                tile.setCollision(true);
-            }
+        if (this.input.manager.activePointer.isDown && this.currentTile && canPlace) {
+            this.hammeringTween.play();
+            let tilesetStart = this.testBuildSpriteSheet.firstgid;
+            let tile = this.buildLayer.putTileAtWorldXY(tilesetStart + this.currentTile.tileSetOffSet, worldPoint.x, worldPoint.y);
+            tile.rotation = Phaser.Math.DegToRad(this.rotation);
+            tile.setCollision(true);
         }
     }
 
@@ -214,10 +235,36 @@ export class Island extends Phaser.Scene {
         }, this);
 
         this.signals.on("newTileSelected", (incomingTile: tiledata) => {
+            if (this.currentTile){
+                this.cursorTile.setTexture(incomingTile.tileSetKey+"Table",incomingTile.tileSetOffSet);
+            } else {
+                //create build modes cursor tile
+                this.cursorTile = this.add.sprite(0, 0, incomingTile.tileSetKey+"Table", incomingTile.tileSetOffSet);
+                this.cursorTile.setOrigin(0, 0);
+                this.cursorTile.setAlpha(.7);
+                this.cursorTile.setDepth(100);
+                this.cursorTile.setVisible(false);
+                this.cursorTween = this.tweens.add({
+                    targets: this.cursorTile,
+                    alpha: .3,
+                    duration: 1000,
+                    repeat: -1,
+                    yoyo: true
+                });
+            }
             this.currentTile = incomingTile;
-            this.cursorTile.setTexture("testBuildSpriteSheetTable",incomingTile.tileSetOffSet);
         })
 
+        this.signals.on("rotate block right-down", () => {
+            this.rotation += 90;
+        })
+
+        this.signals.on("rotate block left-down", () => {
+            this.rotation -= 90;
+        })
+
+        this.signals.on("enterBuildMode", this.enterBuildMode.bind(this));
+        this.signals.on("exitBuildMode", this.exitBuildMode.bind(this));
     }
 
     /**Creates and puts together the primary tilemap for this scene*/

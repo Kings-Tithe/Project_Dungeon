@@ -21,8 +21,6 @@ export class Hud extends Phaser.Scene {
     /**Sprite frame at the top of the screen that other ui elements hit ontop of it
      * sets a depth of 5. The character portrait sits under it */
     characterFrame: Phaser.GameObjects.Sprite;
-    /**Sprite used to toggle one and off the building menu */
-    buildingToggleButton: Phaser.GameObjects.Sprite;
 
     //strings
     /**Stores the spritekey of the currently in use character portrait */
@@ -36,9 +34,6 @@ export class Hud extends Phaser.Scene {
     /**The instance of our character sheet part of the hud */
     characterSheet: CharacterSheet;
 
-    //boolean
-    /**Tells weather or not we are currently in building mode */
-    inBuildingMode: boolean;
     buildMenu: BuildMenu;
 
     constructor() {
@@ -46,7 +41,6 @@ export class Hud extends Phaser.Scene {
 
         //needs to be instantiated before use
         this.portraitSprites = {};
-        this.inBuildingMode = false;
 
         //events to listen for
         this.signals = SignalManager.get();
@@ -62,6 +56,7 @@ export class Hud extends Phaser.Scene {
         let con = Console.get(this);
         // Create a buidling menu ui element
         this.buildMenu = BuildMenu.get(this);
+        this.buildMenu.placeToggleButton(this,130,52);
 
         // Listen for keypress and handle hud events
         hookToMethod(document, 'onkeypress', (ret, ev) => {
@@ -80,34 +75,6 @@ export class Hud extends Phaser.Scene {
         //create our character sheet
         this.characterSheet.createToggleButton(95, 52);
         this.characterSheet.createCharacterSheet();
-
-        //create the building menu and toggle button
-        this.buildingToggleButton = this.add.sprite(130, 52, "hammerIcon");
-        this.buildingToggleButton.setScale(2);
-        this.buildingToggleButton.setDepth(2);
-        this.buildingToggleButton.setInteractive();
-        this.buildingToggleButton.on("pointerdown", () => {
-            if (this.inBuildingMode) {
-                this.exitBuildMode();
-            } else {
-                this.enterBuildMode();
-            }
-            console.log(this.inBuildingMode);
-        })
-    }
-
-    /**Makes any changes that need to be made when entering building mode */
-    enterBuildMode() {
-        //set that we are now in building mode
-        this.inBuildingMode = true;
-        this.buildMenu.toggle(true);
-    }
-
-    /**Makes any changes that need to be made when entering building mode */
-    exitBuildMode() {
-        //set that we are no longer in building mode
-        this.inBuildingMode = false;
-        this.buildMenu.toggle(false);
     }
 
     /**Used to add to the list of character portrait sprites we have in portraitSprites */

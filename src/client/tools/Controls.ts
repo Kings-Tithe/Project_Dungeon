@@ -86,6 +86,27 @@ export class Controls {
             delayed: false,
             checkable: true
         }
+        this.actions["change leader"] = {
+            actionKey: "change leader", 
+            onceDelay: defaultOnceDelay, 
+            key:this.inputManager.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.C), 
+            delayed: false,
+            checkable: true
+        }
+        this.actions["rotate block right"] = {
+            actionKey: "rotate block right", 
+            onceDelay: defaultOnceDelay, 
+            key:this.inputManager.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E), 
+            delayed: false,
+            checkable: true
+        }
+        this.actions["rotate block left"] = {
+            actionKey: "rotate block left", 
+            onceDelay: defaultOnceDelay, 
+            key:this.inputManager.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Q), 
+            delayed: false,
+            checkable: true
+        }
 
         //once our list is loaded up we can go ahead and set everything up
         let keys = Object.keys(this.actions)
@@ -232,8 +253,15 @@ export class Controls {
         return actions;
     }
 
-    setDelay(){
-
+    /**
+     * This is used to set the duration of the timeout delay that is 
+     * set after a action's key is pressed
+     * @param actionKey the action to set the delay for 
+     * @param delayTime The amount of time in ms to delay before the 
+     * key can be triggered again
+     */
+    setDelay(actionKey: string, delayTime: number){
+        this.actions[actionKey].onceDelay = delayTime;
     }
 }
 
