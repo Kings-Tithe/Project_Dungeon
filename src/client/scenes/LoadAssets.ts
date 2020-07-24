@@ -24,7 +24,7 @@ export class LoadAssets extends Scene {
          * T = Tilemap
          */
         this.files = {
-            //mages
+            //images
             "islandA1": "I/images/tilesets/islandA1.png",
             "islandA2": "I/images/tilesets/islandA2.png",
             "islandB": "I/images/tilesets/islandB.png",
@@ -48,6 +48,7 @@ export class LoadAssets extends Scene {
 
             //Tilemaps
             "islandUpleft": "T/tilemaps/islandUpleft.json",
+            "islandNorthSector": "T/tilemaps/islandNorthSector.json",
         }
 
     }
