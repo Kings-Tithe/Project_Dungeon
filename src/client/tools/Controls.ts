@@ -2,19 +2,17 @@ import { SignalManager } from "./SignalManager";
 
 /**Controls
  * Hanldes the storing and polling of keys that have been assigned to certain
- * in-game actions. It is set up so that there can eventually be a menu for
- * adjusting keyboard controls.
+ * in-game actions, these actions are stored in seperate schemes. A scheme should
+ * never be set to more then one scene at a time, this would defeat the point of the
+ * schemes. A scene can however have multiple schemes applied to it and in all likely hood
+ * will. Note: schemes should not have actions of the same name as other schemes. It is set
+ * up so that there can eventually be a menu for adjusting keyboard controls.
  */
 export class Controls {
 
     //member varibles
     /**Keys */
-    actions: { [key: string]: ActionI }
-
-    //input manager
-    /**Refernces to the games input manager, used to create Phaser's key objects
-     * so that we can use this class to poll them during the game. */
-    inputManager: Phaser.Input.InputPlugin;
+    schemes: { [key: string]: Ischeme }
 
     //event emitter
     emitter: SignalManager;
@@ -24,9 +22,8 @@ export class Controls {
 
 
 
-    private constructor(scene: Phaser.Scene){
-        this.actions = {};
-        this.inputManager = scene.input;
+    private constructor(){
+        this.schemes = {};
         this.loadKeyBindings();
         this.emitter = SignalManager.get();
         this.globalCheckable = true;
@@ -37,10 +34,10 @@ export class Controls {
      * @param scene the inital scene this is being grabbed in, simply used to grab a refernce to the
      * global input manager
      */
-    static getInstance(scene: Phaser.Scene){
+    static getInstance(){
         //if an instance has not been made yet, create one
         if (instance == null){
-            instance = new Controls(scene);
+            instance = new Controls();
         }
         //as long as we have an instance, return it
         return instance;
@@ -49,72 +46,113 @@ export class Controls {
     /**Eventually this will be stored in a key_config.json somewhere on the
      * local machine However until then there are default values here*/
     loadKeyBindings(){
-        let defaultOnceDelay: number = 400;
-        //fill this.keys will all the keys we will need to poll in this scene
-        this.actions["walk up"] = {
-            actionKey: "walk up", 
-            onceDelay: defaultOnceDelay, 
-            key:this.inputManager.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W), 
-            delayed: false,
-            checkable: true
+        //generate schemes
+        this.schemes["Player"] = {
+            name: "Player",
+            actions: {},
+            currentScene: null
         }
-        this.actions["walk left"] = {
-            actionKey: "walk left", 
-            onceDelay: defaultOnceDelay, 
-            key:this.inputManager.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A), 
-            delayed: false,
-            checkable: true
+        this.schemes["User Interface"] = {
+            name: "User Interface",
+            actions: {},
+            currentScene: null
         }
-        this.actions["walk down"] = {
-            actionKey: "walk down", 
-            onceDelay: defaultOnceDelay, 
-            key:this.inputManager.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S), 
-            delayed: false,
-            checkable: true
-        }
-        this.actions["walk right"] = {
-            actionKey: "walk right", 
-            onceDelay: defaultOnceDelay, 
-            key:this.inputManager.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D), 
-            delayed: false,
-            checkable: true
-        }
-        this.actions["change leader"] = {
-            actionKey: "change leader", 
-            onceDelay: defaultOnceDelay, 
-            key:this.inputManager.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.E), 
-            delayed: false,
-            checkable: true
+        this.schemes["Scene"] = {
+            name: "Scene",
+            actions: {},
+            currentScene: null
         }
 
-        //once our list is loaded up we can go ahead and set everything up
-        let keys = Object.keys(this.actions)
-        for(let key of keys){
-            /*set it to globally emit the actions key plus -down when pressed down and not delayed, then delay
-            it's self for the delayed period */
-            this.actions[key].key.on("down", () => {
-                if(!this.actions[key].delayed && this.actions[key].checkable && this.globalCheckable){
-                    this.emitter.emit(this.actions[key].actionKey + "-down");
-                    this.actions[key].delayed = true;
-                    setTimeout(() => {
-                        this.actions[key].delayed = false;
-                    }, this.actions[key].onceDelay);
-                }
-            });
-            //set it to globally emit the actions key plus -up first released
-            this.actions[key].key.on("up", () => {
-                if(this.actions[key].checkable && this.globalCheckable){
-                    this.emitter.emit(this.actions[key].actionKey + "-up");
-                }
-            });
+        let defaultdelayDuration: number = 400;
+        //fill this.keys will all the keys we will need to poll in this scene
+        this.schemes["Player"].actions["walk up"] = {
+            actionKey: "walk up", 
+            delayDuration: defaultdelayDuration, 
+            keyCode: Phaser.Input.Keyboard.KeyCodes.W,
+            key: null, 
+            delayed: false,
+            checkable: true
         }
-        //set up the emitter for when any key is pressed
-        this.inputManager.keyboard.on("keydown",() => {
-            this.emitter.emit("anyKey-down");
-        })
-        this.inputManager.keyboard.on("keyup", () => {
-            this.emitter.emit("anyKey-up");
-        })
+        this.schemes["Player"].actions["walk left"] = {
+            actionKey: "walk left", 
+            delayDuration: defaultdelayDuration, 
+            keyCode: Phaser.Input.Keyboard.KeyCodes.A,
+            key: null,  
+            delayed: false,
+            checkable: true
+        }
+        this.schemes["Player"].actions["walk down"] = {
+            actionKey: "walk down", 
+            delayDuration: defaultdelayDuration, 
+            keyCode: Phaser.Input.Keyboard.KeyCodes.S,
+            key: null,  
+            delayed: false,
+            checkable: true
+        }
+        this.schemes["Player"].actions["walk right"] = {
+            actionKey: "walk right", 
+            delayDuration: defaultdelayDuration, 
+            keyCode: Phaser.Input.Keyboard.KeyCodes.D,
+            key: null,  
+            delayed: false,
+            checkable: true
+        }
+        this.schemes["Player"].actions["change leader"] = {
+            actionKey: "change leader", 
+            delayDuration: defaultdelayDuration, 
+            keyCode: Phaser.Input.Keyboard.KeyCodes.E,
+            key: null,  
+            delayed: false,
+            checkable: true
+        }
+        this.schemes["Scene"].actions["pause scene"] = {
+            actionKey: "pauseScene", 
+            delayDuration: defaultdelayDuration, 
+            keyCode: Phaser.Input.Keyboard.KeyCodes.ESC,
+            key: null,  
+            delayed: false,
+            checkable: true
+        }
+        this.schemes["User Interface"].actions["pause"] = {
+            actionKey: "pause", 
+            delayDuration: defaultdelayDuration, 
+            keyCode: Phaser.Input.Keyboard.KeyCodes.ESC,
+            key: null,  
+            delayed: false,
+            checkable: true
+        }
+    }
+
+    applyScheme(scene: Phaser.Scene, schemeKeys: string[]){
+        for(let schemeKey of schemeKeys){
+            //set the schemes current scene
+            this.schemes[schemeKey].currentScene = scene;
+            //create/replace the key objects to allow polling and set up the listeners for the keys
+            for(let actionKey of Object.keys(this.schemes[schemeKey].actions)){
+                this.schemes[schemeKey].actions[actionKey].key = scene.input.keyboard.addKey(this.schemes[schemeKey].actions[actionKey].keyCode);
+                this.addKeyListeners(schemeKey, actionKey);
+        }
+        }
+    }
+
+    addKeyListeners(schemeKey: string, actionKey: string){
+    /*set it to globally emit the actions key plus -down when pressed down and not delayed, then delay
+        it's self for the delayed period */
+        this.schemes[schemeKey].actions[actionKey].key.on("down", () => {
+            if(!this.schemes[schemeKey].actions[actionKey].delayed && this.schemes[schemeKey].actions[actionKey].checkable && this.globalCheckable){
+                this.emitter.emit(actionKey + "-down");
+                this.schemes[schemeKey].actions[actionKey].delayed = true;
+                setTimeout(() => {
+                    this.schemes[schemeKey].actions[actionKey].delayed = false;
+                }, this.schemes[schemeKey].actions[actionKey].delayDuration);
+            }
+        });
+        //set it to globally emit the actions key plus -up first released
+        this.schemes[schemeKey].actions[actionKey].key.on("up", () => {
+            if(this.schemes[schemeKey].actions[actionKey].checkable && this.globalCheckable){
+                this.emitter.emit(actionKey + "-up");
+            }
+        });
     }
 
     /**
@@ -123,35 +161,13 @@ export class Controls {
      * @param actionKey the action string to change
      * @param newKey The new Phaser key object to change the action to
      */
-    changeKey(actionKey:string, newKey: Phaser.Input.Keyboard.Key){
+    changeKey(schemeKey: string, actionKey:string, newKey: string){
         //completely remove old key
-        let checkable = this.actions[actionKey].key.enabled;
-        this.actions[actionKey].key.removeAllListeners();
-        this.inputManager.keyboard.removeKey(this.actions[actionKey].key);
-        this.actions[actionKey].key.destroy;
+        this.schemes[schemeKey].actions[actionKey].key.removeAllListeners();
+        this.schemes[schemeKey].currentScene.input.keyboard.removeKey(this.schemes[schemeKey].actions[actionKey].key);
+        this.schemes[schemeKey].actions[actionKey].key.destroy;
         //set up the new key
-        this.actions[actionKey].key = newKey;
-        /*set it to globally emit the actions key plus -down when pressed down and not delayed, then delay
-        it's self for the delayed period */
-        this.actions[actionKey].key.on("down", () => {
-            if(!this.actions[actionKey].delayed && this.actions[actionKey].checkable && this.globalCheckable){
-                this.emitter.emit(this.actions[actionKey].actionKey + "-down");
-                this.actions[actionKey].delayed = true;
-                setTimeout(() => {
-                    this.actions[actionKey].delayed = false;
-                }, this.actions[actionKey].onceDelay);
-            }
-        });
-        //set it to globally emit the actions key plus -up first released
-        this.actions[actionKey].key.on("up", () => {
-            if (this.actions[actionKey].checkable && this.globalCheckable){
-                this.emitter.emit(this.actions[actionKey].actionKey + "-up");
-            }
-        });
-        //make sure to carry over the actions checkable state
-        if(!checkable){
-            this.actions[actionKey].key.enabled = checkable;
-        }
+        this.schemes[schemeKey].actions[actionKey].key = this.schemes[schemeKey].currentScene.input.keyboard.addKey(newKey);
     }
 
     /**
@@ -160,8 +176,8 @@ export class Controls {
      * actions that might use the same key to be used.
      * @param state water to disbale or enable the given actions key
      */
-    setActionCheckable(actionKey: string, state: boolean){
-        this.actions[actionKey].checkable = state;
+    setActionCheckable(schemeKey: string, actionKey: string, state: boolean){
+        this.schemes[schemeKey].actions[actionKey].checkable = state;
     }
 
     /**This disables or enables a key to bed checkable, id a key is disabled all actions
@@ -184,22 +200,22 @@ export class Controls {
     /**Used to poll a key and see if it is pressed down 
      * @param key the string key of the action being polled
     */
-    isDown(key: string){
-        if (this.actions[key] && this.actions[key].checkable && this.globalCheckable){
-            return this.actions[key].key.isDown;
+    isDown(schemeKey: string, actionKey: string){
+        if (this.schemes[schemeKey] && this.schemes[schemeKey].actions[actionKey] && this.schemes[schemeKey].actions[actionKey].checkable && this.globalCheckable){
+            return this.schemes[schemeKey].actions[actionKey].key.isDown;
         } else {
-            console.log("Error: no known keybinding for the action: " + key);
+            console.log("Error: no known keybinding for the action: " + actionKey);
         }
     }
 
     /**Used to poll a key and see if it is currently not pressed
     * @param key the string key of the action being polled
     */
-   isUp(key: string){
-        if (this.actions[key] && this.actions[key].checkable && this.globalCheckable){
-            return this.actions[key].key.isUp;
+   isUp(schemeKey: string, actionKey: string){
+        if (this.schemes[schemeKey].actions[actionKey] && this.schemes[schemeKey].actions[actionKey].checkable && this.globalCheckable){
+            return this.schemes[schemeKey].actions[actionKey].key.isUp;
         } else {
-            console.log("Error: no known keybinding for the action: " + key);
+            console.log("Error: no known keybinding for the action: " + actionKey);
         }
     }
 
@@ -207,33 +223,19 @@ export class Controls {
      * Used to check how long a actions key has been down
      * @param actionKey the action to check the keys duration
      */
-    downDuration(actionKey: string): number{
-        return this.actions[actionKey].key.getDuration();
+    downDuration(schemeKey: string, actionKey: string): number{
+        return this.schemes[schemeKey].actions[actionKey].key.getDuration();
     }
 
     /**Tells you what key is attached to an action
      * @param actionKey the action to check the key for
      */
-    whatKey(actionKey: string): Phaser.Input.Keyboard.Key{
-        return this.actions[actionKey].key;
+    whatKey(schemeKey: string, actionKey: string): Phaser.Input.Keyboard.Key{
+        return this.schemes[schemeKey].actions[actionKey].key;
     }
 
-    /**Tells you what action(s) are attached to a key
-     * @param key the key to check the actions for
-     */
-    whatActions(checkKey: Phaser.Input.Keyboard.Key): string[]{
-        let actions: string[] = [];
-        let keys = Object.keys(this.actions);
-        for(let Actionkey of keys){
-            if(this.actions[Actionkey].key == checkKey){
-                actions.push(Actionkey);
-            }
-        }
-        return actions;
-    }
-
-    setDelay(){
-
+    setDelay(schemeKey: string, actionKey: string, duration: number){
+        this.schemes[schemeKey].actions[actionKey].delayDuration = duration;
     }
 }
 
@@ -244,15 +246,26 @@ let instance: Controls;
 /**Class level interface used to store information important to each action and
  * related key binding
  */
-interface ActionI {
+interface IAction {
     /**The string used to signal the related in-game action */
     actionKey: string,
-    /**Phaser key object assocated with the action */
+    /**String that tells the key generator what key to add to the scene */
+    keyCode: number,
+    /**Stores the key object so we can poll it later on */
     key: Phaser.Input.Keyboard.Key,
     /**Delay used between single key press detections */
-    onceDelay: number,
+    delayDuration: number,
     /**Boolean telling if the key is currently delayed or not */
     delayed: boolean,
     /**tells weather or not the action can be checked at the time */
     checkable: boolean
+}
+
+interface Ischeme {
+    /**The name of the scheme used internally */
+    name: string,
+    /**A list of actions that this scheme holds */
+    actions: {[key: string]: IAction};
+    /**Stores the current scene using this scheme */
+    currentScene: Phaser.Scene
 }
