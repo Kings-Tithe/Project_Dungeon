@@ -14,11 +14,12 @@
     "build:client": "node electron-build.js",
     "build:server": "pkg compiled-js/server.js --out-path ./dist/server --targets node12-linux-x64,node12-macos-x64,node12-win-x64"
   },
-  "repository": "https://github.com/zachkingcade/Project_Dungeon.git",
+  "repository": "https://github.com/kings-tithe/Project_Dungeon.git",
   "author": "King's Tithe <zachkingcade@gmail.com>",
   "license": "None",
   "private": true,
   "dependencies": {
+    "easystarjs": "^0.4.3",
     "phaser": "^3.23.0",
     "yarn": "^1.22.4"
   },

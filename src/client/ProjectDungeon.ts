@@ -2,6 +2,7 @@ import * as Phaser from 'phaser';
 import { Island } from './scenes/Island';
 import { LoadAssets } from './scenes/LoadAssets';
 import { Hud } from './scenes/overlays/Hud';
+import { PathTest } from './scenes/PathTest';
 
 /**Dungeon_Project game configuration, including settings such as render type,
  * logical size, anti-aliasing, and more. */
@@ -14,7 +15,8 @@ const config: Phaser.Types.Core.GameConfig = {
     scene: [
         LoadAssets,
         Island,
-        Hud
+        Hud,
+        PathTest
     ],
 
     /** Title to display on the game */
@@ -30,7 +32,7 @@ const config: Phaser.Types.Core.GameConfig = {
         default: 'arcade',
         arcade: {
             gravity: { y: 0 },
-            debug: false
+            debug: true
         }
     },
     /** Black background when nothing else is being displayed over it */

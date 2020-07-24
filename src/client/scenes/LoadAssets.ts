@@ -48,6 +48,7 @@ export class LoadAssets extends Scene {
 
             //Tilemaps
             "islandUpleft": "T/tilemaps/islandUpleft.json",
+            "pathTest": "T/tilemaps/pathTest.json"
         }
 
     }
@@ -81,7 +82,7 @@ export class LoadAssets extends Scene {
      */
     create() {
         //start the next scene
-        this.scene.start('Island');
+        this.scene.start('PathTest');
     }
 
 }
