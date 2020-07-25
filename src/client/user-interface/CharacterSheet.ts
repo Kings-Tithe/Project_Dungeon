@@ -412,18 +412,18 @@ export class CharacterSheet {
      */
     updateSheet(character: Character){
         //update all the test elements
-        this.Name.setText(character.name);
-        this.Level.setText("Level: " + character.level.toString());
-        this.EXP.setText("EXP: " + character.exp.toString());
-        this.FocusText.setText(character.focus.toString());
-        this.EnduranceText.setText(character.endurance.toString());
-        this.SpeedText.setText(character.speed.toString());
-        this.MightText.setText(character.might.toString());
-        this.LifeText.setText("Life: " + character.life.toString());
-        this.EnergyText.setText("Energy: " + character.energy.toString());
-        this.BattleSpeedText.setText("Battle Speed: " + character.battleSpeed.toString());
+        this.Name.setText(character.data.name);
+        this.Level.setText("Level: " + character.data.level.toString());
+        this.EXP.setText("EXP: " + character.data.exp.toString());
+        this.FocusText.setText(character.data.focus.toString());
+        this.EnduranceText.setText(character.data.endurance.toString());
+        this.SpeedText.setText(character.data.speed.toString());
+        this.MightText.setText(character.data.might.toString());
+        this.LifeText.setText("Life: " + character.data.life.toString());
+        this.EnergyText.setText("Energy: " + character.data.energy.toString());
+        this.BattleSpeedText.setText("Battle Speed: " + character.data.battleSpeed.toString());
         //update the portrait
-        this.sheetPortrait.setTexture(character.portraitKey);
+        this.sheetPortrait.setTexture(`${character.key}-portrait`);
     }
 
     /**A function ran when ever the global event "partyChange" is heard. This denotes that
@@ -436,16 +436,16 @@ export class CharacterSheet {
         this.party = newParty;
         //first we set what we already have to have the correct values
         for(let i = 0; i < this.party.length && i < this.portraitIcons.length; i++){
-            this.portraitIcons[i].setTexture(this.party[i].portraitKey);
+            this.portraitIcons[i].setTexture(`${this.party[i].key}-portrait`);
         }
         //now if needed we create more
         for(let i = this.portraitIcons.length; i < this.party.length; i++){
             let newIcon: Phaser.GameObjects.Sprite;
             //check if dragzone exists and either create to it or to 0,0 where it will be created
             if(this.dragZone){
-                newIcon = this.currentScene.add.sprite(this.dragZone.x + 860,this.dragZone.y + ((55 * i) + 90),this.party[i].portraitKey);
+                newIcon = this.currentScene.add.sprite(this.dragZone.x + 860,this.dragZone.y + ((55 * i) + 90),`${this.party[i].key}-portrait`);
             } else {
-                newIcon = this.currentScene.add.sprite(860,(55 * i) + 90,this.party[i].portraitKey);
+                newIcon = this.currentScene.add.sprite(860,(55 * i) + 90,`${this.party[i].key}-portrait`);
             }
             //check if the character sheet is currently open, set scale accordingly
             if(this.toggleVisible){

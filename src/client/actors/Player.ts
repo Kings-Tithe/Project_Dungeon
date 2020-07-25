@@ -1,6 +1,6 @@
 import { Character } from "./Character";
-import { Controls } from "../tools/Controls";
-import { SignalManager } from "../tools/SignalManager";
+import { Controls } from "../services/Controls";
+import { SignalManager } from "../services/SignalManager";
 
 /**Player
  * Holds all the information and functionality of the player themselves
@@ -91,7 +91,7 @@ export class Player {
      * @param key The sprite key for this party members sprite */
     addPartyMemberByKey(key: string, portrait: string) {
         //construct our new party member and add them to the party
-        let newPartyMember = new Character(this.currentScene.anims);
+        let newPartyMember = new Character();
         newPartyMember.createSprite(this.currentScene, key, portrait, this.x, this.y);
         this.party.push(newPartyMember);
         // Add colliders between this party member and all collision layers
@@ -137,10 +137,10 @@ export class Player {
         //remove the current leader from the front and add them to the back
         this.party.push(this.party.shift());
         //set the new leader and make sure their facing the same direction as the old one
-        this.party[0].moveTo(this.x, this.y);
+        this.party[0].setPosition(this.x, this.y);
         this.party[0].facingDirection = direction;
         //change the hud's portrait to refelct the new leader
-        this.globalEmitter.emit("changePortrait", this.party[0].portraitKey);
+        this.globalEmitter.emit("changePortrait", this.party[0].key + '-portrait');
         //fix the current scenes main camera to follow the new leader
         this.currentScene.cameras.main.startFollow(this.party[0].sprite, true);
         //set timeout to allow for leader changing again
@@ -186,7 +186,7 @@ export class Player {
                 /*if we have for some reason gotten more then 30 pixels from our target, this is kinda as a
                 last resort catch if anything get in their way or stops them for some reason */
                 if (Math.hypot(differenceX, differenceY) > 30) {
-                    this.party[i].moveTo(this.path[i * this.nodeOffSet].x, this.path[i * this.nodeOffSet].y);
+                    this.party[i].setPosition(this.path[i * this.nodeOffSet].x, this.path[i * this.nodeOffSet].y);
                 } //if we are atleast more then 3 pixels away from our target but not more then 50 
                 else if (Math.hypot(differenceX, differenceY) > this.idleZone) {
                     this.currentScene.physics.moveTo(this.party[i].sprite, this.path[i * this.nodeOffSet].x, this.path[i * this.nodeOffSet].y, this.freeRoamSpeed * 1.1535);
@@ -199,14 +199,15 @@ export class Player {
                 if (body.velocity.x || body.velocity.y) {
                     /* check if the animation is already playing, otherwise it will restart it repeatadle making it 
                     look like only the first frame of the animation */
-                    if (this.party[i].sprite.anims.getCurrentKey() != this.party[i].spriteKey + "walk_" + this.path[i * this.nodeOffSet].facing) {
-                        this.currentScene.anims.play(this.party[i].spriteKey + "walk_" + this.path[i * this.nodeOffSet].facing, this.party[i].sprite);
+                    if (this.party[i].sprite.anims.getCurrentKey() != `${this.party[i].key}-animation-walk-${this.path[i * this.nodeOffSet].facing}`) {
+                        this.currentScene.anims.play(`${this.party[i].key}-animation-walk-${this.path[i * this.nodeOffSet].facing}`, this.party[i].sprite);
                     }
                 } else {
                     /* check if the animation is already playing, otherwise it will restart it repeatadle making it 
                     look like only the first frame of the animation */
-                    if (this.party[i].sprite.anims.getCurrentKey() != this.party[i].spriteKey + "idle_" + this.path[i * this.nodeOffSet].facing) {
-                        this.currentScene.anims.play(this.party[i].spriteKey + "idle_" + this.path[i * this.nodeOffSet].facing, this.party[i].sprite);
+                    if (this.party[i].sprite.anims.isPlaying) {
+                        this.party[i].sprite.anims.restart(false);
+                        this.party[i].sprite.anims.stop();
                     }
                 }
             }
@@ -253,16 +254,16 @@ export class Player {
         //first we'll check for key pressed related to movement and move the leader based on those
         let x = 0;
         let y = 0;
-        if (this.controls.isDown("Player","walk up")) {
+        if (this.controls.isDown("Player", "walk up")) {
             y -= this.freeRoamSpeed;
         }
-        if (this.controls.isDown("Player","walk down")) {
+        if (this.controls.isDown("Player", "walk down")) {
             y += this.freeRoamSpeed;
         }
-        if (this.controls.isDown("Player","walk left")) {
+        if (this.controls.isDown("Player", "walk left")) {
             x -= this.freeRoamSpeed;
         }
-        if (this.controls.isDown("Player","walk right")) {
+        if (this.controls.isDown("Player", "walk right")) {
             x += this.freeRoamSpeed;
         }
         if (this.leaderChangeTimeOut) {
@@ -271,7 +272,7 @@ export class Player {
         }
         this.party[0].UpdateMovement(x, y);
         //check for input to change the party leader
-        if (this.controls.isDown("Player","change leader") && !this.leaderChangeTimeOut) {
+        if (this.controls.isDown("Player", "change leader") && !this.leaderChangeTimeOut) {
             this.changeLeader();
         }
     }

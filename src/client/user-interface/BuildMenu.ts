@@ -1,6 +1,6 @@
-import { Hud } from "../../scenes/overlays/Hud";
-import { GAME_WIDTH } from "../../tools/Globals";
-import { SignalManager } from "../../tools/SignalManager";
+import { Hud } from "../scenes/overlays/Hud";
+import { GAME_WIDTH } from "../tools/Globals";
+import { SignalManager } from "../services/SignalManager";
 
 export class BuildMenu {
 
@@ -44,7 +44,7 @@ export class BuildMenu {
         this.menuDiv.style.width = '256px';
         this.menuDiv.style.height = '684px';
         this.menuDiv.style.padding = "0px";
-        this.menuDiv.style.backgroundImage = "url('./assets/images/wooden_Background.png')";
+        this.menuDiv.style.backgroundImage = "url('./assets/images/user-interface/wooden_Background.png')";
         this.menuDiv.style.backgroundAttachment = "local";
         this.menuDiv.style.borderStyle = "solid";
         this.menuDiv.style.borderColor = "#915b20";
