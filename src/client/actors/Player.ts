@@ -1,6 +1,8 @@
 import { Character } from "./Character";
 import { Controls } from "../services/Controls";
 import { SignalManager } from "../services/SignalManager";
+import { playableCharacterMap } from './index'
+import { ICharacterData } from "../../interfaces/ICharacterData";
 
 /**Player
  * Holds all the information and functionality of the player themselves
@@ -85,21 +87,29 @@ export class Player {
         this.path[0] = { x: this.x, y: this.y, facing: "down" };
     }
 
-    /**Adds a party member to the list by a passed in spritekey, this
-     * constructs a new character object to add a new member by the character
+    /**
+     * Adds a party member to the list by a passed in class key, this
+     * constructs a new character object, to add a new member by the character
      * object use addPartyMemberByObject()
      * @param key The sprite key for this party members sprite */
-    addPartyMemberByKey(key: string, portrait: string) {
+    addPartyMemberByKey(scene: Phaser.Scene, key: string, data?: ICharacterData){
+        let characterClass: (typeof Character) = playableCharacterMap[key];
+        console.log(playableCharacterMap);
+        console.log(key,characterClass);
         //construct our new party member and add them to the party
-        let newPartyMember = new Character();
-        newPartyMember.createSprite(this.currentScene, key, portrait, this.x, this.y);
+        let newPartyMember;
+        if(data){
+            newPartyMember = new characterClass(data);
+        } else {
+            newPartyMember = new characterClass();
+        }
+        newPartyMember.createSprite(scene, this.x, this.y);
         this.party.push(newPartyMember);
         // Add colliders between this party member and all collision layers
         this.collisionLayers.forEach((layer) => {
             this.currentScene.physics.add.collider(newPartyMember.sprite, layer);
         }, this);
         this.globalEmitter.emit("partyChange", this.party);
-        this.globalEmitter.emit("addPortrait", portrait);
     }
 
     /**Adds a party member to the list by a passed in character object,

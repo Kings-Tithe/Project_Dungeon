@@ -42,18 +42,16 @@ export class LoadAssets extends Scene {
 
 
         // Loading Spritesheets
-        this.load.spritesheet("greg", `${this.assets}/images/characters/gregTheTestDummy.png`, { frameWidth: 32, frameHeight: 32 });
-        this.load.spritesheet("dreg", `${this.assets}/images/characters/dregTheTestDummy.png`, { frameWidth: 32, frameHeight: 32 });
-        this.load.spritesheet("meg", `${this.assets}/images/characters/megTheTestDummy.png`, { frameWidth: 32, frameHeight: 32 });
-        this.load.spritesheet("craig", `${this.assets}/images/characters/craigTheTestDummy.png`, { frameWidth: 32, frameHeight: 32 });
+        this.load.spritesheet("greg-spritesheet", `${this.assets}/images/characters/gregTheTestDummy.png`, { frameWidth: 32, frameHeight: 32 });
+        this.load.spritesheet("dreg-spritesheet", `${this.assets}/images/characters/dregTheTestDummy.png`, { frameWidth: 32, frameHeight: 32 });
+        this.load.spritesheet("meg-spritesheet", `${this.assets}/images/characters/megTheTestDummy.png`, { frameWidth: 32, frameHeight: 32 });
+        this.load.spritesheet("craig-spritesheet", `${this.assets}/images/characters/craigTheTestDummy.png`, { frameWidth: 32, frameHeight: 32 });
+        this.load.spritesheet("testBuildSpriteSheetTable", `${this.assets}/images/tilesets/testBuildSpriteSheet.png`, { frameWidth: 16, frameHeight: 16 })
+        this.load.spritesheet("woodenBackground", `${this.assets}/images/user-interface/wooden_Background.png`, { frameWidth: 256, frameHeight: 72 })
 
         // Loading Tilemaps
         this.load.tilemapTiledJSON("islandUpleft", `${this.assets}/tilemaps/islandUpleft.json`);
         this.load.tilemapTiledJSON("islandNorthSector", `${this.assets}/tilemaps/islandNorthSector.json`);
-
-
-        this.load.spritesheet("testBuildSpriteSheetTable", `${this.assets}/images/tilesets/testBuildSpriteSheet.png`, { frameWidth: 16, frameHeight: 16 })
-        this.load.spritesheet("woodenBackground", `${this.assets}/images/user-interface/wooden_Background.png`, { frameWidth: 256, frameHeight: 72 })
     }
 
     /**

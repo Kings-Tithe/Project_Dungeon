@@ -1,4 +1,3 @@
-import { playableCharacterMap } from '../index';
 import { Character } from "../Character";
 import { ICharacterData } from "../../../interfaces/ICharacterData";
 
@@ -31,5 +30,3 @@ let defaultDreg: ICharacterData = {
     exp: 0,
     level: 0
 }
-
-playableCharacterMap["dreg"] = Dreg;

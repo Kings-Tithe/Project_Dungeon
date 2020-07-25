@@ -1,5 +1,10 @@
+// Use Character class to define the type of the map
 import { Character } from './Character';
+import { Dreg } from './player-characters/Dreg';
 
-console.log("Typeof classes:", typeof Character);
 export var playableCharacterMap: { [key: string]: typeof Character } = {};
-console.log(playableCharacterMap);
+export const addToPlayableCharacterMap = function(key: string, characterClass: typeof Character){
+    playableCharacterMap[key] = characterClass;
+}
+
+addToPlayableCharacterMap("dreg", Dreg);

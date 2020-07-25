@@ -115,7 +115,7 @@ export class Island extends Phaser.Scene {
         this.createListeners();
         this.controls.applyScheme(this,["Player", "Scene"]);
         this.player = new Player(this, this.tilemapWidthInPixels / 2, this.tilemapHeightInPixels / 2);
-        this.player.addPartyMemberByKey("craig", "craig-portrait");
+        this.player.addPartyMemberByKey(this,"dreg");
         this.player.addCollisionByLayer(this.walkLayer);
         this.player.addCollisionByLayer(this.buildLayer);
 
@@ -239,7 +239,7 @@ export class Island extends Phaser.Scene {
                 command.shift();
                 // For each party member name passed in, add them to the party
                 command.forEach((member: string) => {
-                    this.player.addPartyMemberByKey(member, member + "-portrait");
+                    this.player.addPartyMemberByKey(this,member);
                 }, this);
             }
 

@@ -1,13 +1,13 @@
-import { playableCharacterMap } from './index';
 import { ICharacterData } from '../../interfaces/ICharacterData';
 
 /** Character
  * Purpose: This is a character the player can play has, has such
  * it has stats and values a regular npc would not such as attack
- * and speed. It also holds a visual representation of it's self of
- * which can be created and destroyed based on if the character's sprite
- * will be being used at any given time. It also has a portrait used
- * for menus and user-interface elements.
+ * and speed. It also holds a visual representation of it's self.
+ * Important:----------------------------------------------------
+ * This class is not meant to be used on it's own and is instead
+ * meant to be extended, it needs atleast a given key to properly
+ * construct.
  */
 
 export class Character {
@@ -35,7 +35,12 @@ export class Character {
     animationManager: Phaser.Animations.AnimationManager;
 
 
-    /**Creates an instance of our character
+    /**
+     * Creates an instance of our character, if a character data
+     * is not passed in defaulted values at the bottom of the this
+     * module will be used.
+     * @param incomingData a way of setting the internal data values when
+     * constructing this class
      */
     constructor(incomingData?: ICharacterData) {
         if (incomingData) {
@@ -46,13 +51,10 @@ export class Character {
     }
 
     /**
-     * Used to construct the sprite from an interface, eventually this will be
-     * imported but for now
+     * Replaces the internal data for this character in the format of ICharacterData
+     * @param incomingData The data to replace the classes current data with in the
+     *  format of ICharacterData
      */
-    createFromKey(scene: Phaser.Scene, x: number = 0, y: number = 0) {
-        this.createSprite(scene, this.key + "-spritesheet", this.key + "-portrait", x, y);
-    }
-
     setInterface(incomingData: ICharacterData) {
         this.data = incomingData;
     }
@@ -62,58 +64,264 @@ export class Character {
         return this.data;
     }
 
+    /**
+     * This sets the characters name
+     * @param newName The name to set the character's name to
+     */
+    setName(newName: string){
+        this.data.name = newName;
+    }
+
+    /**
+     * This sets the value of the character's Focus
+     * @param number Either the number to replace the current value with or
+     * the number to offset the current value by
+     * @param offset Determines if number replace the current value or if it
+     * is added to the current value. If true then it will offset the value,
+     * if set the false it will simply replace the current value, default
+     * is false.
+     */
+    setFocus(number: number, offset: boolean = false){
+        if (!offset){
+            this.data.focus = number;
+        } else {
+            this.data.focus += number;
+        }
+    }
+
+    /**
+     * This sets the character's endurance
+     * @param number Either the number to replace the current value with or
+     * the number to offset the current value by
+     * @param offset Determines if number replace the current value or if it
+     * is added to the current value. If true then it will offset the value,
+     * if set the false it will simply replace the current value, default
+     * is false.
+     */
+    setEndurance(number: number, offset: boolean = false){
+        if (!offset){
+           this.data.endurance = number;
+        } else {
+            this.data.endurance += number;
+        }
+    }
+
+    /**
+     * This sets the character's speed
+     * @param number Either the number to replace the current value with or
+     * the number to offset the current value by
+     * @param offset Determines if number replace the current value or if it
+     * is added to the current value. If true then it will offset the value,
+     * if set the false it will simply replace the current value, default
+     * is false.
+     */
+    setSpeed(number: number, offset: boolean = false){
+        if (!offset){
+            this.data.speed  = number;
+        } else {
+            this.data.speed += number;
+        }
+    }
+
+    /**
+     * This sets the character's might
+     * @param number Either the number to replace the current value with or
+     * the number to offset the current value by
+     * @param offset Determines if number replace the current value or if it
+     * is added to the current value. If true then it will offset the value,
+     * if set the false it will simply replace the current value, default
+     * is false.
+     */
+    setMight (number: number, offset: boolean = false){
+        if (!offset){
+            this.data.might  = number;
+        } else {
+            this.data.might += number;
+        }
+    }
+
+    /**
+     * This sets the character's battle speed
+     * @param number Either the number to replace the current value with or
+     * the number to offset the current value by
+     * @param offset Determines if number replace the current value or if it
+     * is added to the current value. If true then it will offset the value,
+     * if set the false it will simply replace the current value, default
+     * is false.
+     */
+    setBattleSpeed(number: number, offset: boolean = false){
+        if (!offset){
+            this.data.battleSpeed  = number;
+        } else {
+            this.data.battleSpeed += number;
+        }
+    }
+
+    /**
+     * This sets the character's life
+     * @param number Either the number to replace the current value with or
+     * the number to offset the current value by
+     * @param offset Determines if number replace the current value or if it
+     * is added to the current value. If true then it will offset the value,
+     * if set the false it will simply replace the current value, default
+     * is false.
+     */
+    setLife(number: number, offset: boolean = false){
+        if (!offset){
+            this.data.life  = number;
+        } else {
+            this.data.life += number;
+        }
+    }
+
+    /**
+     * This sets the character's critical chance
+     * @param number Either the number to replace the current value with or
+     * the number to offset the current value by
+     * @param offset Determines if number replace the current value or if it
+     * is added to the current value. If true then it will offset the value,
+     * if set the false it will simply replace the current value, default
+     * is false.
+     */
+    setCriticalChance (number: number, offset: boolean = false){
+        if (!offset){
+            this.data.criticalChance  = number;
+        } else {
+            this.data.criticalChance += number;
+        }
+    }
+
+    /**
+     * This sets the character's energy
+     * @param number Either the number to replace the current value with or
+     * the number to offset the current value by
+     * @param offset Determines if number replace the current value or if it
+     * is added to the current value. If true then it will offset the value,
+     * if set the false it will simply replace the current value, default
+     * is false.
+     */
+    setEnergy(number: number, offset: boolean = false){
+        if (!offset){
+            this.data.energy  = number;
+        } else {
+            this.data.energy += number;
+        }
+    }
+
+    /**
+     * This sets the character's carry capacity
+     * @param number Either the number to replace the current value with or
+     * the number to offset the current value by
+     * @param offset Determines if number replace the current value or if it
+     * is added to the current value. If true then it will offset the value,
+     * if set the false it will simply replace the current value, default
+     * is false.
+     */
+    setCarryCapacity(number: number, offset: boolean = false){
+        if (!offset){
+            this.data.carryCapacity  = number;
+        } else {
+            this.data.carryCapacity += number;
+        }
+    }
+
+    /**
+     * This sets the character's experience
+     * @param number Either the number to replace the current value with or
+     * the number to offset the current value by
+     * @param offset Determines if number replace the current value or if it
+     * is added to the current value. If true then it will offset the value,
+     * if set the false it will simply replace the current value, default
+     * is false.
+     */
+    setExp(number: number, offset: boolean = false){
+        if (!offset){
+            this.data.exp  = number;
+        } else {
+            this.data.exp += number;
+        }
+    }
+
+    /**
+     * This sets the character's level
+     * @param number Either the number to replace the current value with or
+     * the number to offset the current value by
+     * @param offset Determines if number replace the current value or if it
+     * is added to the current value. If true then it will offset the value,
+     * if set the false it will simply replace the current value, default
+     * is false.
+     */
+    setLevel(number: number, offset: boolean = false){
+        if (!offset){
+            this.data.level  = number;
+        } else {
+            this.data.level += number;
+        }
+    }
+
+    /**
+     * This sets the character sprites's depth
+     * @param newDepth The value to set the sprite's depth to
+     */
+    setDepth(newDepth){
+        this.sprite.setDepth(newDepth);
+    }
+
+
     /**Constructs the sprite for the character based on a spriteKey
      * @param scene The Phaser scene to initially add the sprite to
-     * @param spriteKey The sprite key to create the sprite from, this will then be stored as part
-     * of the class
      * @param x The x coordinate to create the sprite at
      * @param y The y coordinate to create the sprite at
      */
-    createSprite(scene: Phaser.Scene, spriteKey: string, portraitKey: string, x: number = 0, y: number = 0) {
-        //store this scenes animation manager
-        this.animationManager = scene.anims;
-        /**generate the inital sprite */
-        this.sprite = scene.physics.add.sprite(x, y, spriteKey, 0);
-        this.sprite.ignoreDestroy = true;
-        this.sprite.setDepth(500);
-        /**generate all the animations associated with this sprite */
-        /**animation for character walking right */
-        scene.anims.create({
-            key: this.key + '-animation-walk-right',
-            frames: scene.anims.generateFrameNumbers(spriteKey, { start: 8, end: 15 }),
-            frameRate: 7,
-            repeat: -1
-        });
-        //animation for character walking up
-        scene.anims.create({
-            key: this.key + '-animation-walk-up',
-            frames: scene.anims.generateFrameNumbers(spriteKey, { start: 16, end: 23 }),
-            frameRate: 7,
-            repeat: -1
-        });
-        //animation for character walking down
-        scene.anims.create({
-            key: this.key + '-animation-walk-down',
-            frames: scene.anims.generateFrameNumbers(spriteKey, { start: 24, end: 31 }),
-            frameRate: 7,
-            repeat: -1
-        });
-        //animation for character walking left
-        scene.anims.create({
-            key: this.key + '-animation-walk-left',
-            frames: scene.anims.generateFrameNumbers(spriteKey, { start: 32, end: 39 }),
-            frameRate: 7,
-            repeat: -1
-        });
-        //set players inital animation
-        this.sprite.anims.play(this.key + '-animation-walk-down');
-        this.sprite.anims.stop();
-        this.facingDirection = "down";
-
-        //set hitbox to cover lower 16x16 block of character, around it's feet
-        let body = <Phaser.Physics.Arcade.Body>this.sprite.body;
-        body.setSize(16, 16, false);
-        body.setOffset(8, 16);
+    createSprite(scene: Phaser.Scene, x: number = 0, y: number = 0): boolean {
+        if(this.key){
+            let spriteKey = this.key + "-spritesheet";
+            //store this scenes animation manager
+            this.animationManager = scene.anims;
+            /**generate the inital sprite */
+            this.sprite = scene.physics.add.sprite(x, y, spriteKey, 0);
+            /**generate all the animations associated with this sprite */
+            /**animation for character walking right */
+            scene.anims.create({
+                key: this.key + '-animation-walk-right',
+                frames: scene.anims.generateFrameNumbers(spriteKey, { start: 8, end: 15 }),
+                frameRate: 7,
+                repeat: -1
+            });
+            //animation for character walking up
+            scene.anims.create({
+                key: this.key + '-animation-walk-up',
+                frames: scene.anims.generateFrameNumbers(spriteKey, { start: 16, end: 23 }),
+                frameRate: 7,
+                repeat: -1
+            });
+            //animation for character walking down
+            scene.anims.create({
+                key: this.key + '-animation-walk-down',
+                frames: scene.anims.generateFrameNumbers(spriteKey, { start: 24, end: 31 }),
+                frameRate: 7,
+                repeat: -1
+            });
+            //animation for character walking left
+            scene.anims.create({
+                key: this.key + '-animation-walk-left',
+                frames: scene.anims.generateFrameNumbers(spriteKey, { start: 32, end: 39 }),
+                frameRate: 7,
+                repeat: -1
+            });
+            //set players inital animation
+            this.sprite.anims.play(this.key + '-animation-walk-down');
+            this.sprite.anims.stop();
+            this.facingDirection = "down";
+    
+            //set hitbox to cover lower 16x16 block of character, around it's feet
+            let body = <Phaser.Physics.Arcade.Body>this.sprite.body;
+            body.setSize(16, 16, false);
+            body.setOffset(8, 16);   
+        } else {
+            console.log("You must give the character class a key before trying to use it.");
+            return;
+        }
     }
 
     /**Used to move the character in small increments, is meant to be used in an update loop
@@ -188,8 +396,7 @@ export class Character {
 
 }
 
-playableCharacterMap['character'] = Character;
-
+/**Default values used if no interface is passed in upon construction */
 let defaultData: ICharacterData = {
     name: "",
     focus: 0,
