@@ -1,10 +1,10 @@
 import { hookToMethod } from "../tools/Hook";
-import { Character } from "../classes/Character";
-import { Controls } from "../tools/Controls";
-import { Player } from "../classes/Player";
-import { Console } from "../tools/Console";
-import { SignalManager } from "../tools/SignalManager";
-import { tiledata } from "../classes/ui/BuildMenu";
+import { Character } from "../actors/Character";
+import { Controls } from "../services/Controls";
+import { Player } from "../actors/Player";
+import { Console } from "../user-interface/Console";
+import { SignalManager } from "../services/SignalManager";
+import { tiledata } from "../user-interface/BuildMenu";
 
 /** Island
  * Purpose: Phaser Scene with a basic starting example island for what the final

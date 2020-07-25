@@ -1,5 +1,5 @@
-import { hookToMethod } from "./Hook";
-import { SignalManager } from "./SignalManager";
+import { hookToMethod } from "../tools/Hook";
+import { SignalManager } from "../services/SignalManager";
 import { Hud } from "../scenes/overlays/Hud";
 
 /**

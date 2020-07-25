@@ -14,46 +14,6 @@ export class LoadAssets extends Scene {
     /**Creates instance of Scene */
     constructor() {
         super('LoadAssets');
-        /**
-         * List of all asset files which need to be loaded. Each line starts
-         * with an asset type identifying code, then the path to the asset starting
-         * from the assets folder/from the path held by this.assetsFolder.
-         * A = Audio
-         * I = Image
-         * S = Spritesheet
-         * T = Tilemap
-         */
-        this.files = {
-            //images
-            "islandA1": "I/images/tilesets/islandA1.png",
-            "islandA2": "I/images/tilesets/islandA2.png",
-            "islandB": "I/images/tilesets/islandB.png",
-            "islandC": "I/images/tilesets/islandC.png",
-            "testBuildSpriteSheet": "I/images/tilesets/testBuildSpriteSheet.png",
-            "gregThePortrait": "I/images/gregThePortrait.png",
-            "dregThePortrait": "I/images/dregThePortrait.png",
-            "megThePortrait": "I/images/megThePortrait.png",
-            "craigThePortrait": "I/images/craigThePortrait.png",
-            "characterFrame": "I/images/character_frame.png",
-            "bookIcon": "I/images/book.png",
-            "outlineOfMan": "I/images/free-use/outlineOfManBrown.png",
-            "hammerIcon": "I/images/hammerIcon.png",
-            "pickIcon": "I/images/pickIcon.png",
-            "flipRightIcon": "I/images/icon_flip_right.png",
-            "flipLeftIcon": "I/images/icon_flip_left.png",
-
-
-            //Spritesheet
-            "gregTheTestDummy": "S/images/gregTheTestDummy.png",
-            "dregTheTestDummy": "S/images/dregTheTestDummy.png",
-            "megTheTestDummy": "S/images/megTheTestDummy.png",
-            "craigTheTestDummy": "S/images/craigTheTestDummy.png",
-
-            //Tilemaps
-            "islandUpleft": "T/tilemaps/islandUpleft.json",
-            "islandNorthSector": "T/tilemaps/islandNorthSector.json",
-        }
-
     }
 
     /**
@@ -62,23 +22,38 @@ export class LoadAssets extends Scene {
      */
     preload() {
 
-        //loop through every key in the file list
-        for (let key of Object.keys(this.files)) {
-            /**Check the type of asset, then load the asset. When loading, take
-             * a slice that doesn't include the first character. That first
-             * character just tells use the type of asset. */
-            if (this.files[key][0] == 'S') {
-                this.load.spritesheet(key, this.assetsFolder + this.files[key].slice(1), { frameWidth: 32, frameHeight: 32 });
-            } else if (this.files[key][0] == 'I') {
-                this.load.image(key, this.assetsFolder + this.files[key].slice(1));
-            } else if (this.files[key][0] == 'A') {
-                this.load.audio(key, this.assetsFolder + this.files[key].slice(1));
-            } else if (this.files[key][0] == 'T') {
-                this.load.tilemapTiledJSON(key, this.assetsFolder + this.files[key].slice(1))
-            }
-        }
-        this.load.spritesheet("testBuildSpriteSheetTable", this.assetsFolder + "/images/tilesets/testBuildSpriteSheet.png",{ frameWidth: 16, frameHeight: 16 })
-        this.load.spritesheet("woodenBackground", this.assetsFolder + "/images/wooden_Background.png",{ frameWidth: 256, frameHeight: 72 })
+        // Loading Images
+        this.load.image("islandA1", "I/images/tilesets/islandA1.png");
+        this.load.image("islandA2", "images/tilesets/islandA2.png");
+        this.load.image("islandB", "images/tilesets/islandB.png");
+        this.load.image("islandC", "images/tilesets/islandC.png");
+        this.load.image("testBuildSpriteSheet", "images/tilesets/testBuildSpriteSheet.png");
+        this.load.image("gregThePortrait", "images/characters/potraits/gregThePortrait.png");
+        this.load.image("dregThePortrait", "images/characters/potraits/dregThePortrait.png");
+        this.load.image("megThePortrait", "images/characters/potraits/megThePortrait.png");
+        this.load.image("craigThePortrait", "images/characters/potraits/craigThePortrait.png");
+        this.load.image("characterFrame", "images/user-interface/character_frame.png");
+        this.load.image("bookIcon", "images/user-interface/book.png");
+        this.load.image("outlineOfMan", "images/free-use/outlineOfManBrown.png");
+        this.load.image("hammerIcon", "images/user-interface/hammerIcon.png");
+        this.load.image("pickIcon", "images/user-interface/pickIcon.png");
+        this.load.image("flipRightIcon", "images/user-interface/icon_flip_right.png");
+        this.load.image("flipLeftIcon", "images/user-interface/icon_flip_left.png");
+
+
+        // Loading Spritesheets
+        this.load.spritesheet("gregTheTestDummy", "images/character/gregTheTestDummy.png");
+        this.load.spritesheet("dregTheTestDummy", "images/character/dregTheTestDummy.png");
+        this.load.spritesheet("megTheTestDummy", "images/character/megTheTestDummy.png");
+        this.load.spritesheet("craigTheTestDummy", "images/character/craigTheTestDummy.png");
+
+        // Loading Tilemaps
+        this.load.tilemapTiledJSON("islandUpleft", "tilemaps/islandUpleft.json");
+        this.load.tilemapTiledJSON("islandNorthSector", "tilemaps/islandNorthSector.json");
+
+
+        this.load.spritesheet("testBuildSpriteSheetTable", this.assetsFolder + "/images/tilesets/testBuildSpriteSheet.png", { frameWidth: 16, frameHeight: 16 })
+        this.load.spritesheet("woodenBackground", this.assetsFolder + "/images/wooden_Background.png", { frameWidth: 256, frameHeight: 72 })
     }
 
     /**

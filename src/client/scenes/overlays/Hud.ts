@@ -1,9 +1,9 @@
-import { Console } from "../../tools/Console";
-import { BuildMenu } from "../../classes/ui/BuildMenu";
+import { Console } from "../../user-interface/Console";
+import { BuildMenu } from "../../user-interface/BuildMenu";
 import { hookToMethod } from "../../tools/Hook";
-import { SignalManager } from "../../tools/SignalManager";
-import { CharacterSheet } from "../../classes/CharacterSheet";
-import { Controls } from "../../tools/Controls";
+import { SignalManager } from "../../services/SignalManager";
+import { CharacterSheet } from "../../user-interface/CharacterSheet";
+import { Controls } from "../../services/Controls";
 import { GAME_WIDTH, GAME_HEIGHT, CENTER } from "../../tools/Globals";
 
 /**

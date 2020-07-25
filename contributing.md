@@ -63,8 +63,12 @@ signals.on('evil-king-death', ()=>{
 });
 ```
 
-### Files
-Files have no particular naming convention though **camelCase** or **snake_case** are generally preferred. In addition, files in the same folder should preferably use the same naming convention.
+### Files & Folders
+Source files have no particular naming convention though **camelCase** or **snake_case** are generally preferred. In addition, files in the same folder should preferably use the same naming convention.
+
+For script files in the root directory, we prefer **dot.case** (dots separating words). Even still, in the root directory there are exceptions. For example, Node's `package-lock.json`. This file cannot be renamed and thus does not follow our conventions.
+
+Folders also have no set convention, though we generally lean towards **kebab-case**.
 
 ## Comment Blocks
 We utilize JSDoc for comment blocks. Here's a nice cheatsheet: https://devhints.io/jsdoc

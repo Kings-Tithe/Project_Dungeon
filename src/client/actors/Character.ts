@@ -1,3 +1,5 @@
+import { ICharacterData } from '../../interfaces/ICharacterData';
+
 /** Character
  * Purpose: This is a character the player can play has, has such
  * it has stats and values a regular npc would not such as attack
@@ -17,6 +19,10 @@ export class Character {
     /**Sprite of the characters portrait that display when they are the leader
      * and on their character sheet */
     portrait: Phaser.GameObjects.Sprite;
+
+    //Character Interface
+    /**This interface holds all the raw data associated with a Character */
+    interface: ICharacterData;
 
     /**Numbers */
     /**Stores the characters set depth, only meant to change when changing party 

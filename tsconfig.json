@@ -4,6 +4,6 @@
         "sourceMap": true
     },
     "exclude": [
-        "tiled_projects/**"
+        "tiled-projects/**"
     ]
 }

@@ -1,7 +1,7 @@
-import { Console } from "../tools/Console";
-import { SignalManager } from "../tools/SignalManager";
+import { Console } from "../user-interface/Console";
+import { SignalManager } from "../services/SignalManager";
 import { CENTER, GAME_WIDTH } from "../tools/Globals";
-import { Character } from "./Character";
+import { Character } from "../actors/Character";
 
 export class CharacterSheet {
 
