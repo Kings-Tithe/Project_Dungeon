@@ -71,7 +71,7 @@ export class Player {
         this.collisionLayers = [];
         this.path = [];
         this.party = [];
-        this.controls = Controls.getInstance(scene);
+        this.controls = Controls.getInstance();
         //default values
         this.money = 0;
         this.freeRoamSpeed = 130;
@@ -253,16 +253,16 @@ export class Player {
         //first we'll check for key pressed related to movement and move the leader based on those
         let x = 0;
         let y = 0;
-        if (this.controls.isDown("walk up")) {
+        if (this.controls.isDown("Player","walk up")) {
             y -= this.freeRoamSpeed;
         }
-        if (this.controls.isDown("walk down")) {
+        if (this.controls.isDown("Player","walk down")) {
             y += this.freeRoamSpeed;
         }
-        if (this.controls.isDown("walk left")) {
+        if (this.controls.isDown("Player","walk left")) {
             x -= this.freeRoamSpeed;
         }
-        if (this.controls.isDown("walk right")) {
+        if (this.controls.isDown("Player","walk right")) {
             x += this.freeRoamSpeed;
         }
         if (this.leaderChangeTimeOut) {
@@ -271,7 +271,7 @@ export class Player {
         }
         this.party[0].UpdateMovement(x, y);
         //check for input to change the party leader
-        if (this.controls.isDown("change leader") && !this.leaderChangeTimeOut) {
+        if (this.controls.isDown("Player","change leader") && !this.leaderChangeTimeOut) {
             this.changeLeader();
         }
     }

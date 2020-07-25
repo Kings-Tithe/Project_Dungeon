@@ -53,11 +53,11 @@ export class Island extends Phaser.Scene {
     /**The Player containing our party and other relevent details */
     player: Player;
 
-    /**control handler */
-    controls: Controls;
-
     // Handles signals from other scenes/classes
     signals: SignalManager;
+
+    //controls
+    controls: Controls;
 
     /**Calls to the parent constructor to construct the scene. Parents adds
      * the key of the scene that is passed in below to the game objects list
@@ -72,7 +72,8 @@ export class Island extends Phaser.Scene {
      */
     init() {
         this.cameras.main.setZoom(2);
-        this.player = new Player(this);
+        this.signals = SignalManager.get();
+        this.controls = Controls.getInstance();
     }
 
     /**Used to initally create all of our assets and set up the games scene/stage the
@@ -82,6 +83,7 @@ export class Island extends Phaser.Scene {
     create() {
         this.createTileMap();
         this.createListeners();
+        this.controls.applyScheme(this,["Player", "Scene"]);
         this.player = new Player(this, this.tilemapWidthInPixels / 2, this.tilemapHeightInPixels / 2);
         this.player.addPartyMemberByKey("craigTheTestDummy", "craigThePortrait");
         this.player.addCollisionByLayer(this.walkLayer);
@@ -127,6 +129,12 @@ export class Island extends Phaser.Scene {
             }
 
         }, this);
+
+        this.signals.on("pause scene-down",() => {
+            this.signals.emit("pausing","Island");
+            this.scene.pause("Island");
+            this.input.keyboard.resetKeys();
+        })
 
     }
 

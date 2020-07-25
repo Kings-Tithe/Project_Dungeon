@@ -433,7 +433,6 @@ export class CharacterSheet {
      * @param newParty A copy of the new party after what ever member changes were just made
      */
     partyChange(newParty){
-        console.log("running party change");
         this.party = newParty;
         //first we set what we already have to have the correct values
         for(let i = 0; i < this.party.length && i < this.portraitIcons.length; i++){
