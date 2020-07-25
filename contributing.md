@@ -41,7 +41,7 @@ class NPCManager{}
 ```
 
 ### Interfaces
-Interfaces are named exactly like classes but should start with the capital letter `I`.
+Interfaces are named exactly like classes but should start with the capital letter **I**.
 
 Consider the following examples:
 
@@ -51,98 +51,24 @@ interface ITileData{}
 interface IShopItem{}
 ```
 
+### Internal IDs, Keys, Signals, etc...
+Identifiers in the form of strings passed around internally, such as sprite keys, event identifiers, and item ids should utilize **kebab-case** naming conventions.
+
+Consider the following examples:
+
+```js
+this.load.image('smiley-face', 'Smiley Face.png');
+signals.on('evil-king-death', ()=>{
+    signals.emit('quest-901-complete', data);
+});
+```
+
+### Files
+Files have no particular naming convention though **camelCase** or **snake_case** are generally preferred. In addition, files in the same folder should preferably use the same naming convention.
+
 ## Comment Blocks
 We utilize JSDoc for comment blocks. Here's a nice cheatsheet: https://devhints.io/jsdoc
 
-### Variables
-Variables should all start with a JSDoc style comment block explaining what it does. Example:
-```js
-/** variable used as an example of variable commenting standards */
-let myVar
-```
-
-### Interfaces
-Interfaces are basically a grouped and enumerated set of variables, as such they should simply be commented like a variables. Example:
-```js
-/** This interface is used to store my first 3 variables used as an example of interface commenting */
-interface example {
-  /** here is the first variable for this interface */
-  varibleName: theTypeOfMyVariable,
-  /** here is the second variable for this interface */
-  SecondVar: string,
-  /** here is the third variable for this interface */
-  myThirdVar: number,
-}
-```
-
-### Classes
-Classes should start with a comment block containing the purpose and a list of the functions it has. The list of
-functions should be in the order that they apear in the file to make it easier to search through the file. Below
-that comment block should be the class declaration. Inside the class declaration before any functions should be
-a list of member varibles seperated out by type and commented as described above. Followed by all the functions 
-for the class. Each function should have a comment block above it listing it's call, purpose, parameters and
-anything returned. Note in the below example how destroy is an example of a function only named after the action it
-performs talked about above in the section on function names. Example:
-```js
-/** Example Class
- * Purpose: The purpose of this class is to generally show how our classes comments should be structured
- * This is by far the longest example on this page. Boss Timer is called by the example class as a off
- * hand example description.
- * 
- * Functions:
- * constructor(scene: Phaser.Scene)
- * createBossExample(spriteKey: string)
- * updateBossDealth(damage: number)
- * onBossDeath()
- * Destroy()
- */
-
-class Example {
-
-    /** Memeber Variables */
-
-    //numbers
-    /** Used to keep track of the bosses current health */
-    bossCurrentHealth: number;
-    /** Used to Keep track of the bosses starting/max health*/
-    bossMaxHealth: number;
-
-    //string
-    /** Holds the key associated with the bosses sprite */
-    bossSpriteKey: string;
-
-    //sprite
-    /** Contains the bosses graphical representation/sprite */
-    bossSprite: Phaser.GameObjects.Sprite;
-
-    /** constructor
-     * Constructs and initiates all the required starting varibles associated with this class
-     * @scene used to add all Phaser elements created by the constructor to the scene  */
-    constructor(scene: Phaser.Scene){}
-
-    /** createBossExample 
-     * Creates and instantiates the boss
-     * @param spriteKey used to construct a Phaser.Gameobjects.Sprite object */
-    createBossExample(spriteKey: string){}
-
-    /** updateBossHealth
-     * Updates the bosses health based on a passed in damage amount, if bosses health is equal
-     * to or less than 0, call onBossDeath().
-     * @Damage - Number - the amount of health to take away from the bosses health pool 
-     * @returns - Number - remaining health after reduction*/
-    updateBossHealth(damage: number){}
-
-    /** onBossDeath
-     * Called whenever the boss' health drops below or equal to 0 */
-    onBossDeath(){}
-
-    /** Destroy
-     * Used to release all varibles and elements related to this class */
-    Destroy(){}
-}
-```
-
-### Things to keep in mind
+## Things to keep in mind
 - Remeber to keep track of all references to your varibles, especially when creating destroy functions.
-- Don't leave anything running in the background, such as setInterval()s these can be easy to forget to
-close but can cause all sorts of problems especially once your out of the scene where you started them.
+- Shut down any additional processes/timers when changing scenes. It's easy to forget about calls to `setInterval()`
