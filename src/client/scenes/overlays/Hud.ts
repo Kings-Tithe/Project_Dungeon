@@ -120,6 +120,20 @@ export class Hud extends Phaser.Scene {
         //create our character sheet
         this.characterSheet.createToggleButton(95, 52);
         this.characterSheet.createCharacterSheet();
+
+        //create pause fog
+        this.pauseFog = this.add.graphics();
+        this.pauseFog.fillStyle(0x19abb5,.4);
+        this.pauseFog.fillRect(0,0,GAME_WIDTH,GAME_HEIGHT);
+        this.pauseFog.visible = false;
+
+        //create pausedText
+        this.pausedText = this.add.text(CENTER.x, CENTER.y - 200, "Paused", {
+            fontSize: "40px",
+            color: "#4aff26"
+        });
+        this.pausedText.setOrigin(.5,.5);
+        this.pausedText.visible = false;
     }
 
     /**Used to add to the list of character portrait sprites we have in portraitSprites */
