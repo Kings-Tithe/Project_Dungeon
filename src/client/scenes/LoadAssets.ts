@@ -29,7 +29,7 @@ export class LoadAssets extends Scene {
             "islandA2": "I/images/tilesets/islandA2.png",
             "islandB": "I/images/tilesets/islandB.png",
             "islandC": "I/images/tilesets/islandC.png",
-            "buildingSet": "I/images/tilesets/testBuildSpriteSheet.png",
+            "testBuildSpriteSheet": "I/images/tilesets/testBuildSpriteSheet.png",
             "gregThePortrait": "I/images/gregThePortrait.png",
             "dregThePortrait": "I/images/dregThePortrait.png",
             "megThePortrait": "I/images/megThePortrait.png",
@@ -38,6 +38,9 @@ export class LoadAssets extends Scene {
             "bookIcon": "I/images/book.png",
             "outlineOfMan": "I/images/free-use/outlineOfManBrown.png",
             "hammerIcon": "I/images/hammerIcon.png",
+            "pickIcon": "I/images/pickIcon.png",
+            "flipRightIcon": "I/images/icon_flip_right.png",
+            "flipLeftIcon": "I/images/icon_flip_left.png",
 
 
             //Spritesheet
@@ -74,6 +77,8 @@ export class LoadAssets extends Scene {
                 this.load.tilemapTiledJSON(key, this.assetsFolder + this.files[key].slice(1))
             }
         }
+        this.load.spritesheet("testBuildSpriteSheetTable", this.assetsFolder + "/images/tilesets/testBuildSpriteSheet.png",{ frameWidth: 16, frameHeight: 16 })
+        this.load.spritesheet("woodenBackground", this.assetsFolder + "/images/wooden_Background.png",{ frameWidth: 256, frameHeight: 72 })
     }
 
     /**

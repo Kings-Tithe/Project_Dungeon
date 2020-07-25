@@ -192,8 +192,8 @@ export class Character {
 
         //set hitbox to cover lower 16x16 block of character, around it's feet
         let body = <Phaser.Physics.Arcade.Body>this.sprite.body;
-        body.setSize(18, 16, false);
-        body.setOffset(7, 16);
+        body.setSize(16, 16, false);
+        body.setOffset(8, 16);
     }
 
     /**Used to move the character in small increments, is meant to be used in an update loop

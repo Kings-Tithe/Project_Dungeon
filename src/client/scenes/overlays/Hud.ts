@@ -1,4 +1,5 @@
 import { Console } from "../../tools/Console";
+import { BuildMenu } from "../../classes/ui/BuildMenu";
 import { hookToMethod } from "../../tools/Hook";
 import { SignalManager } from "../../tools/SignalManager";
 import { CharacterSheet } from "../../classes/CharacterSheet";
@@ -22,8 +23,6 @@ export class Hud extends Phaser.Scene {
     /**Sprite frame at the top of the screen that other ui elements hit ontop of it
      * sets a depth of 5. The character portrait sits under it */
     characterFrame: Phaser.GameObjects.Sprite;
-    /**Sprite used to toggle one and off the building menu */
-    buildingToggleButton: Phaser.GameObjects.Sprite;
 
     //strings
     /**Stores the spritekey of the currently in use character portrait */
@@ -55,6 +54,8 @@ export class Hud extends Phaser.Scene {
 
     //controls
     controls: Controls;
+    
+    buildMenu: BuildMenu;
 
     constructor() {
         super('Hud');
@@ -95,9 +96,13 @@ export class Hud extends Phaser.Scene {
     create() {
         // Create a game console
         let con = Console.get(this);
+        // Create a buidling menu ui element
+        this.buildMenu = BuildMenu.get(this);
+        this.buildMenu.placeToggleButton(this,130,52);
 
-        // Listen for the backtick key to toggle the console
+        // Listen for keypress and handle hud events
         hookToMethod(document, 'onkeypress', (ret, ev) => {
+            // Backtick (or tilde) key (`, ~) even opens/closes the console
             if (ev.which == '96') {
                 // Toggle the display of the console and phaser controls
                 con.toggleDisplay(this.game.input.keyboard);
@@ -110,50 +115,11 @@ export class Hud extends Phaser.Scene {
         //create character frame
         this.characterFrame = this.add.sprite(0, 0, "characterFrame").setOrigin(0, 0);
         this.characterFrame.setScale(2);
-        this.characterFrame.setDepth(1);
-        
+        this.characterFrame.setDepth(1)
+;
         //create our character sheet
-        this.characterSheet.createToggleButton(95,52);
+        this.characterSheet.createToggleButton(95, 52);
         this.characterSheet.createCharacterSheet();
-
-        //create the building menu and toggle button
-        this.buildingToggleButton = this.add.sprite(130,52,"hammerIcon");
-        this.buildingToggleButton.setScale(2);
-        this.buildingToggleButton.setDepth(2);
-        this.buildingToggleButton.setInteractive();
-        this.buildingToggleButton.on("pointerdown", () => {
-            if(this.inBuildingMode){
-                this.exitBuildMode();
-            } else {
-                this.enterBuildMode();
-            }
-        })
-
-        //create pause fog
-        this.pauseFog = this.add.graphics();
-        this.pauseFog.fillStyle(0x19abb5,.4);
-        this.pauseFog.fillRect(0,0,GAME_WIDTH,GAME_HEIGHT);
-        this.pauseFog.visible = false;
-
-        //create pausedText
-        this.pausedText = this.add.text(CENTER.x, CENTER.y - 200, "Paused", {
-            fontSize: "40px",
-            color: "#4aff26"
-        });
-        this.pausedText.setOrigin(.5,.5);
-        this.pausedText.visible = false;
-    }
-
-    /**Makes any changes that need to be made when entering building mode */
-    enterBuildMode(){
-        //set that we are now in building mode
-        this.inBuildingMode = true;
-    }
-
-    /**Makes any changes that need to be made when entering building mode */
-    exitBuildMode(){
-        //set that we are no longer in building mode
-        this.inBuildingMode = false;
     }
 
     /**Used to add to the list of character portrait sprites we have in portraitSprites */
