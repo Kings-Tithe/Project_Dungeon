@@ -115,6 +115,7 @@ export class Island extends Phaser.Scene {
         this.createListeners();
         this.controls.applyScheme(this,["Player", "Scene"]);
         this.player = new Player(this, this.tilemapWidthInPixels / 2, this.tilemapHeightInPixels / 2);
+        this.player.setDepth(100);
         this.player.addPartyMemberByKey(this,"dreg");
         this.player.addCollisionByLayer(this.walkLayer);
         this.player.addCollisionByLayer(this.buildLayer);

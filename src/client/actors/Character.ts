@@ -353,22 +353,22 @@ export class Character {
          and down if multiple keys are pressed. If no buttons are being pressed
          then set an idle animation */
         if (y > 0) {
-            if (this.sprite.anims.getCurrentKey() != this.key + '-animation-walk-down') {
+            if (this.sprite.anims.getCurrentKey() != this.key + '-animation-walk-down' || !this.sprite.anims.isPlaying) {
                 this.animationManager.play(this.key + '-animation-walk-down', this.sprite);
                 this.facingDirection = "down";
             }
         } else if (y < 0) {
-            if (this.sprite.anims.getCurrentKey() != this.key + '-animation-walk-up') {
+            if (this.sprite.anims.getCurrentKey() != this.key + '-animation-walk-up' || !this.sprite.anims.isPlaying) {
                 this.animationManager.play(this.key + '-animation-walk-up', this.sprite);
                 this.facingDirection = "up";
             }
         } else if (x > 0) {
-            if (this.sprite.anims.getCurrentKey() != this.key + '-animation-walk-right') {
+            if (this.sprite.anims.getCurrentKey() != this.key + '-animation-walk-right' || !this.sprite.anims.isPlaying) {
                 this.animationManager.play(this.key + '-animation-walk-right', this.sprite);
                 this.facingDirection = "right";
             }
         } else if (x < 0) {
-            if (this.sprite.anims.getCurrentKey() != this.key + '-animation-walk-left') {
+            if (this.sprite.anims.getCurrentKey() != this.key + '-animation-walk-left' || !this.sprite.anims.isPlaying) {
                 this.animationManager.play(this.key + '-animation-walk-left', this.sprite);
                 this.facingDirection = "left";
             }

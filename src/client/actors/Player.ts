@@ -7,7 +7,7 @@ import { ICharacterData } from "../../interfaces/ICharacterData";
 /**Player
  * Holds all the information and functionality of the player themselves
  * this is seperate from individual characters in that a player as a team
- * of character instead of playing as any one character. This class also 
+ * of characters instead of playing as any one character. This class also 
  * allows you to switch party members and who the leader of your party is.
  */
 export class Player {
@@ -28,8 +28,8 @@ export class Player {
     /**Used to allow the sprites of the non-leader party member to follow the leader */
     path: { x: number, y: number, facing: string; }[];
     /**the depth at which we start when setting the depth for characters it goes from here to
-     * +4 of here assuming 4 party members */
-    startDepth: number;
+     * the next whole integar, we use decimals to set the characters to one another.*/
+    depth: number;
     /**The area non-leader chracters must be within of the target area on the path to idle */
     idleZone: number;
     /**The number of nodes down the path each character stays back from one another */
@@ -77,7 +77,7 @@ export class Player {
         //default values
         this.money = 0;
         this.freeRoamSpeed = 130;
-        this.startDepth = 10;
+        this.depth = 0;
         this.nodeOffSet = 5;
         this.idleZone = 3;
         this.globalEmitter = SignalManager.get();
@@ -85,6 +85,15 @@ export class Player {
         the logic involving them is */
         this.leaderChangeTimeOut = false;
         this.path[0] = { x: this.x, y: this.y, facing: "down" };
+    }
+
+    /**
+     * This sets the classes internal depth, for more on class level
+     * depths see the client folder's README
+     * @param newDepth The number to set the internal depth to
+     */
+    setDepth(newDepth: number){
+        this.depth = newDepth;
     }
 
     /**
@@ -110,6 +119,7 @@ export class Player {
             this.currentScene.physics.add.collider(newPartyMember.sprite, layer);
         }, this);
         this.globalEmitter.emit("partyChange", this.party);
+        this.updateDepth();
     }
 
     /**Adds a party member to the list by a passed in character object,
@@ -158,7 +168,9 @@ export class Player {
     }
 
     /**Adds a new point/node to the path and checks to make sure the path
-     * has not grown bigger then 120 elements 
+     * has not grown bigger then the number of characters times 35 nodes.
+     * When it is bigger then that limit we splice it back down to 20 times
+     * the number of characters in the party.
      * @param newX      The x coordinate of the point trying to be added
      * @param newY      The x coordinate of the point trying to be added
      * @param newFacing The direction the leader is facing at this point
@@ -169,11 +181,11 @@ export class Player {
         if (Math.abs(newX - this.path[0].x) > 3 || Math.abs(newY - this.path[0].y) > 3) {
             //unshift adds an element to the front of the array and returns the new length of the array
             let newlength = this.path.unshift({ x: newX, y: newY, facing: newFacing });
-            /*to help with performance we wait till it fill to 200 then splice off
-            everything back down to 80 */
-            // if (newlength > 200) {
-            //     this.path.splice(80);
-            // }
+            /*to help with performance we wait till it fill to (characters * 35) then splice off
+            everything back down to (characters * 20) */
+            if (newlength > (this.party.length * 35)) {
+                this.path.splice(this.party.length * 20);
+            }
         }
     }
 
@@ -237,8 +249,10 @@ export class Player {
         //sort the array by y value
         heightArray.sort((a, b) => { return a.y - b.y; });
         //finally set their depth based on the sorted array
+        /**The amount that each character is from each other depth wise */
+        let increment = 1 / heightArray.length;
         for (let i = 0; i < heightArray.length; i++) {
-            this.party[heightArray[i].index].sprite.depth = this.startDepth + i;
+            this.party[heightArray[i].index].setDepth(this.depth + (increment * i));
         }
     }
 
