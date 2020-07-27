@@ -119,6 +119,9 @@ export class Player {
             this.currentScene.physics.add.collider(newPartyMember.sprite, layer);
         }, this);
         this.globalEmitter.emit("partyChange", this.party);
+        if (this.party.length < 2){
+            this.globalEmitter.emit("changePortrait", this.party[0].key + "-portrait");
+        }
         this.updateDepth();
     }
 

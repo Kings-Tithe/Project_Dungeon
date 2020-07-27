@@ -15,14 +15,11 @@ export class Hud extends Phaser.Scene {
     //Memeber Varibles
 
     //sprites
-    /**This stores all the potrait sprites for the characters in a party, it does
-     * so in the form of an array of objects where the objects hold the spritekey
-     * and the sprite it's self, the spritekey is stored so we can refrence that
-     * sprite more easily */
-    portraitSprites: { [key: string]: Phaser.GameObjects.Sprite };
     /**Sprite frame at the top of the screen that other ui elements hit ontop of it
      * sets a depth of 5. The character portrait sits under it */
     characterFrame: Phaser.GameObjects.Sprite;
+    /**The currently being shown portrait */
+    portrait: Phaser.GameObjects.Sprite;
 
     //strings
     /**Stores the spritekey of the currently in use character portrait */
@@ -61,7 +58,6 @@ export class Hud extends Phaser.Scene {
         super('Hud');
 
         //needs to be instantiated before use
-        this.portraitSprites = {};
         this.inBuildingMode = false;
         this.paused = false;
         this.pausedScenes = [];
@@ -69,7 +65,6 @@ export class Hud extends Phaser.Scene {
 
         //events to listen for
         this.signals = SignalManager.get();
-        this.signals.on("addPortrait", this.addPortraitSprite, this)
         this.signals.on("changePortrait", this.changePortraitSprite, this);
         this.signals.on("pause-down", () => {
             if(this.paused){
@@ -95,7 +90,7 @@ export class Hud extends Phaser.Scene {
 
     create() {
         // Create a game console
-        let con = Console.get(this);
+        //let con = Console.get(this);
         // Create a buidling menu ui element
         this.buildMenu = BuildMenu.get(this);
         this.buildMenu.placeToggleButton(this,130,52);
@@ -105,7 +100,7 @@ export class Hud extends Phaser.Scene {
             // Backtick (or tilde) key (`, ~) even opens/closes the console
             if (ev.which == '96') {
                 // Toggle the display of the console and phaser controls
-                con.toggleDisplay(this.game.input.keyboard);
+                //con.toggleDisplay(this.game.input.keyboard);
             }
         });
 
@@ -115,8 +110,8 @@ export class Hud extends Phaser.Scene {
         //create character frame
         this.characterFrame = this.add.sprite(0, 0, "characterFrame").setOrigin(0, 0);
         this.characterFrame.setScale(2);
-        this.characterFrame.setDepth(1)
-;
+        this.characterFrame.setDepth(1);
+
         //create our character sheet
         this.characterSheet.createToggleButton(95, 52);
         this.characterSheet.createCharacterSheet();
@@ -136,35 +131,15 @@ export class Hud extends Phaser.Scene {
         this.pausedText.visible = false;
     }
 
-    /**Used to add to the list of character portrait sprites we have in portraitSprites */
-    addPortraitSprite(spritekey: string) {
-        if (this.portraitSprites[spritekey] == null) {
-            //create the new sprite if it is not already in the list
-            let newPortrait = this.add.sprite(10, 12, spritekey).setOrigin(0, 0);
-            newPortrait.setScale(0);
-            newPortrait.setDepth(0);
-            //add to list
-            this.portraitSprites[spritekey] = newPortrait;
-        } else {
-            console.log(spritekey + " already exists in the spritePortrait list");
-        }
-
-        //if there is no sprite currently in use, use the new one
-        if (!this.currentPortrait) {
-            this.currentPortrait = spritekey;
-            this.portraitSprites[this.currentPortrait].setScale(1.3);
-        }
-    }
-
     /**Used to change what portrait is currently being shown */
     changePortraitSprite(spritekey) {
-        //if the sprite exists hide the current and scale to visible the passed in portrait
-        if (this.portraitSprites[spritekey] != null) {
-            this.portraitSprites[this.currentPortrait].setScale(0);
-            this.portraitSprites[spritekey].setScale(1.3);
-            this.currentPortrait = spritekey;
+        if(!this.portrait){
+            this.portrait = this.add.sprite(10, 12, spritekey)
+            this.portrait.setOrigin(0, 0);
+            this.portrait.setScale(1.3);
+            this.portrait.setDepth(0);
         } else {
-            console.log(spritekey + " does not exist in the spritePortrait list");
+            this.portrait.setTexture(spritekey);
         }
     }
 
