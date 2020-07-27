@@ -25,8 +25,8 @@ export class Controls {
     private constructor(){
         this.schemes = {};
         this.loadKeyBindings();
-        this.emitter = SignalManager.get();
         this.globalCheckable = true;
+        this.emitter = SignalManager.get();
     }
 
     /**Allows getting the single global instance of this class, must
@@ -123,6 +123,12 @@ export class Controls {
         }
     }
 
+    /**
+     * Allows applying schemes to a scene. A scheme cannot be applied to multiple
+     * scenes at a time. Multiple schemes can be applied to one scene.
+     * @param scene Scene to apply the scheme to
+     * @param schemeKeys The key(s) of the schemes to apply
+     */
     applyScheme(scene: Phaser.Scene, schemeKeys: string[]){
         for(let schemeKey of schemeKeys){
             //set the schemes current scene
@@ -135,6 +141,12 @@ export class Controls {
         }
     }
 
+    /**
+     * Adds the listeners for for a key of a scheme is pressed down and 
+     * let up at which point the global emitter will send -down and -up signals.
+     * @param schemeKey The scheme that holds the key to set up the listeners for
+     * @param actionKey The action key attached to the key to set up the listeners for
+     */
     addKeyListeners(schemeKey: string, actionKey: string){
     /*set it to globally emit the actions key plus -down when pressed down and not delayed, then delay
         it's self for the delayed period */
@@ -220,7 +232,7 @@ export class Controls {
     }
 
     /**
-     * Used to check how long a actions key has been down
+     * Used to check how long a action's key has been down
      * @param actionKey the action to check the keys duration
      */
     downDuration(schemeKey: string, actionKey: string): number{
@@ -234,6 +246,13 @@ export class Controls {
         return this.schemes[schemeKey].actions[actionKey].key;
     }
 
+    /**
+     * Sets the time to wait before allowing the emission of the -up and -down flags
+     * for a key
+     * @param schemeKey The scheme that holds the key to set the delay for 
+     * @param actionKey The action to set the delay for
+     * @param duration The duration to set the delay for
+     */
     setDelay(schemeKey: string, actionKey: string, duration: number){
         this.schemes[schemeKey].actions[actionKey].delayDuration = duration;
     }
