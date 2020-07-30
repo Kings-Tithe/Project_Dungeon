@@ -53,7 +53,7 @@ export class CharacterSheet {
     /**Labeling Text put above the text for the character's Speed*/
     SpeedLabel: Phaser.GameObjects.Text;
     /**Labeling Text put above the text for the character's Might*/
-    MightLebel: Phaser.GameObjects.Text;
+    MightLabel: Phaser.GameObjects.Text;
     /**Text representing the character's Level Focus*/
     FocusText: Phaser.GameObjects.Text;
     /**Text representing the character's Level Endurance*/
@@ -79,6 +79,9 @@ export class CharacterSheet {
     //scene
     currentScene: Phaser.Scene;
 
+    //numbers
+    depth: number;
+
     /**Constructs an instance of this class and initializes all the data, 
      * graphics are initially created in the createToggleButton and
      * createCharacterSheet functions
@@ -92,6 +95,7 @@ export class CharacterSheet {
         this.party = [];
         this.portraitIcons = [];
         this.eventEmitter.on("partyChange", this.partyChange, this);
+        this.depth = 0;
     }
 
     /**Constructs an instance of this class and creates all the internal sprites
@@ -101,10 +105,51 @@ export class CharacterSheet {
      */
     createToggleButton(x: number, y: number){
         this.characterSheetButton = this.currentScene.add.sprite(x,y,"bookIcon");
-        this.characterSheetButton.setDepth(2);
         this.characterSheetButton.setScale(.8);
         this.characterSheetButton.setInteractive();
         this.characterSheetButton.on("pointerdown", this.toggle, this);
+    }
+
+    /**
+     * Sets the depth for just the toggle button 
+     * @param newDepth The depth to set the toggle button at
+     */
+    setToggleButtonDepth(newDepth: number){
+        this.characterSheetButton.setDepth(newDepth);
+    }
+
+    /**
+     * Sets the depth for the whole character sheet
+     * @param newDepth The depth to set the toggle button at
+     */
+    setDepth(newDepth: number){
+        this.depth = newDepth;
+        this.Background.setDepth(newDepth);
+
+        newDepth += 0.1;
+        this.dragZone.setDepth(newDepth);
+        this.sheetPortrait.setDepth(newDepth);
+        this.Name.setDepth(newDepth);
+        this.Level.setDepth(newDepth);
+        this.EXP.setDepth(newDepth);
+        this.FocusLabel.setDepth(newDepth);
+        this.SpeedLabel.setDepth(newDepth);
+        this.EnduranceLabel.setDepth(newDepth);
+        this.MightLabel.setDepth(newDepth);
+        this.FocusBlock.setDepth(newDepth);
+        this.MightBlock.setDepth(newDepth);
+        this.SpeedBlock.setDepth(newDepth);
+        this.EnduranceBlock.setDepth(newDepth);
+        this.LifeText.setDepth(newDepth);
+        this.FocusText.setDepth(newDepth);
+        this.MightText.setDepth(newDepth);
+        this.SpeedText.setDepth(newDepth);
+        this.EnergyText.setDepth(newDepth);
+        this.EnduranceText.setDepth(newDepth);
+        this.BattleSpeedText.setDepth(newDepth);
+        for(let i = 0; i < this.portraitIcons.length; i++){
+            this.portraitIcons[i].setDepth(newDepth);
+        }
     }
 
     /**Initially creates all the visual elements for the class, this is done
@@ -155,9 +200,9 @@ export class CharacterSheet {
         this.SpeedLabel = this.currentScene.add.text(690,215,"Speed:",textConfig);
         this.SpeedLabel.setOrigin(.5,.5);
         this.SpeedLabel.setFontSize(16);
-        this.MightLebel = this.currentScene.add.text(790,215,"Might:",textConfig);
-        this.MightLebel.setOrigin(.5,.5);
-        this.MightLebel.setFontSize(16);
+        this.MightLabel = this.currentScene.add.text(790,215,"Might:",textConfig);
+        this.MightLabel.setOrigin(.5,.5);
+        this.MightLabel.setFontSize(16);
         //add blocks for stats
         this.FocusBlock = this.currentScene.add.graphics();
         this.FocusBlock.fillStyle(0x915b20,1);
@@ -233,7 +278,7 @@ export class CharacterSheet {
             this.FocusLabel.setVisible(false);
             this.EnduranceLabel.setVisible(false);
             this.SpeedLabel.setVisible(false);
-            this.MightLebel.setVisible(false);
+            this.MightLabel.setVisible(false);
             this.FocusBlock.setVisible(false);
             this.EnduranceBlock.setVisible(false);
             this.SpeedBlock.setVisible(false);
@@ -261,7 +306,7 @@ export class CharacterSheet {
             this.FocusLabel.setVisible(true);
             this.EnduranceLabel.setVisible(true);
             this.SpeedLabel.setVisible(true);
-            this.MightLebel.setVisible(true);
+            this.MightLabel.setVisible(true);
             this.FocusBlock.setVisible(true);
             this.EnduranceBlock.setVisible(true);
             this.SpeedBlock.setVisible(true);
@@ -297,7 +342,7 @@ export class CharacterSheet {
             this.FocusLabel.setVisible(false);
             this.EnduranceLabel.setVisible(false);
             this.SpeedLabel.setVisible(false);
-            this.MightLebel.setVisible(false);
+            this.MightLabel.setVisible(false);
             this.FocusBlock.setVisible(false);
             this.EnduranceBlock.setVisible(false);
             this.SpeedBlock.setVisible(false);
@@ -325,7 +370,7 @@ export class CharacterSheet {
             this.FocusLabel.setVisible(true);
             this.EnduranceLabel.setVisible(true);
             this.SpeedLabel.setVisible(true);
-            this.MightLebel.setVisible(true);
+            this.MightLabel.setVisible(true);
             this.FocusBlock.setVisible(true);
             this.EnduranceBlock.setVisible(true);
             this.SpeedBlock.setVisible(true);
@@ -390,8 +435,8 @@ export class CharacterSheet {
         this.EnduranceLabel.y = this.dragZone.y + 215;
         this.SpeedLabel.x = this.dragZone.x + 690;
         this.SpeedLabel.y = this.dragZone.y + 215;
-        this.MightLebel.x = this.dragZone.x + 790;
-        this.MightLebel.y = this.dragZone.y + 215;
+        this.MightLabel.x = this.dragZone.x + 790;
+        this.MightLabel.y = this.dragZone.y + 215;
         this.FocusText.x = this.dragZone.x + 490;
         this.FocusText.y = this.dragZone.y + 265;
         this.EnduranceText.x = this.dragZone.x + 590;
@@ -459,7 +504,7 @@ export class CharacterSheet {
             }
             //check if the character sheet is currently open, set scale accordingly
             newIcon.setScale(.75)
-            newIcon.setDepth(200);
+            newIcon.setDepth(this.depth);
             newIcon.setInteractive();
             newIcon.on("pointerdown", () => {this.updateSheet(this.party[i])});
             this.portraitIcons[i] = newIcon;

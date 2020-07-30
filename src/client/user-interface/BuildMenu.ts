@@ -32,6 +32,9 @@ export class BuildMenu {
     //string
     toolSelected: string;
 
+    //numbers
+    depth: number;
+
     private constructor(hud: Hud) {
         //inital values
         this.visible = false;
@@ -39,6 +42,7 @@ export class BuildMenu {
         this.importTiles();
         this.emitter = SignalManager.get();
         this.toolSelected = "hammer";
+        this.depth = 0;
         //create div
         this.menuDiv = document.createElement("div");
         this.menuDiv.style.width = '256px';
@@ -103,7 +107,8 @@ export class BuildMenu {
         // Combine html elements
         this.menuDiv.appendChild(list);
         this.dom = this.hud.add.dom((GAME_WIDTH - 256) - 10, 18, this.menuDiv);
-        this.dom.setDepth(99).setOrigin(0);
+        this.dom.setDepth(this.depth)
+        this.dom.setOrigin(0);
         this.dom.setVisible(false);
     }
 
@@ -123,6 +128,26 @@ export class BuildMenu {
         this.hammerButton.setVisible(show);
         this.pickButton.setVisible(show);
 
+    }
+
+     /**
+     * Sets the depth for just the toggle button 
+     * @param newDepth The depth to set the toggle button at
+     */
+    setToggleButtonDepth(newDepth: number){
+        this.buildingToggleButton.setDepth(newDepth);
+    }
+
+    /**
+     * Sets the depth for the whole build menu
+     * @param newDepth The depth to set the toggle button at
+     */
+    setDepth(newDepth: number){
+        this.dom.setDepth(newDepth);
+        this.pickButton.setDepth(newDepth);
+        this.hammerButton.setDepth(newDepth);
+        this.flipLeftButton.setDepth(newDepth);
+        this.flipRightButton.setDepth(newDepth);
     }
 
     importTiles(){
@@ -147,7 +172,6 @@ export class BuildMenu {
             //create the building menu and toggle button
             this.buildingToggleButton = hud.add.sprite(buttonX, buttonY, "hammerIcon");
             this.buildingToggleButton.setScale(2);
-            this.buildingToggleButton.setDepth(2);
             this.buildingToggleButton.setInteractive();
             this.buildingToggleButton.on("pointerdown", () => {
                 if (this.inBuildingMode) {
@@ -162,7 +186,7 @@ export class BuildMenu {
     createBuildButtons(hud: Hud){
         //create flip right button
         this.flipRightButton = hud.add.sprite(350,52,"flipRightIcon");
-        this.flipRightButton.setDepth(50);
+        this.flipRightButton.setDepth(this.depth);
         this.flipRightButton.setVisible(false);
         this.flipRightButton.setInteractive();
         /*here we use the controls action key as if the button had been pressed, this
@@ -173,7 +197,7 @@ export class BuildMenu {
 
         //create flip left button
         this.flipLeftButton = hud.add.sprite(300,52,"flipLeftIcon");
-        this.flipLeftButton.setDepth(50);
+        this.flipLeftButton.setDepth(this.depth);
         this.flipLeftButton.setVisible(false);
         this.flipLeftButton.setInteractive();
         /*here we use the controls action key as if the button had been pressed, this
@@ -184,7 +208,7 @@ export class BuildMenu {
 
         //create hammer button
         this.hammerButton = hud.add.sprite(400,52,"hammerIcon");
-        this.hammerButton.setDepth(50);
+        this.hammerButton.setDepth(this.depth);
         this.hammerButton.setScale(2);
         this.hammerButton.setVisible(false);
         this.hammerButton.setInteractive()
@@ -195,7 +219,7 @@ export class BuildMenu {
 
         //create pick button
         this.pickButton = hud.add.sprite(450,52,"pickIcon");
-        this.pickButton.setDepth(50);
+        this.pickButton.setDepth(this.depth);
         this.pickButton.setScale(2);
         this.pickButton.setVisible(false);
         this.pickButton.setInteractive()

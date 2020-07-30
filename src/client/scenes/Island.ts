@@ -6,6 +6,20 @@ import { Console } from "../user-interface/Console";
 import { SignalManager } from "../services/SignalManager";
 import { tiledata } from "../user-interface/BuildMenu";
 
+/*
+Depth Table
+Depth   | Object/Tile
+----------------------------------
+10.1    | Tool Cursor
+10      | Cursor Tile
+7       | Overhead Layer
+5       | Player
+2.3     | Build Layer
+2.2     | Walk Layer
+2.1     | Background Layer
+----------------------------------
+*/
+
 /** Island
  * Purpose: Phaser Scene with a basic starting example island for what the final
  * one might look like. This will be used to test new features and game mechanics 
@@ -115,7 +129,7 @@ export class Island extends Phaser.Scene {
         this.createListeners();
         this.controls.applyScheme(this,["Player", "Scene"]);
         this.player = new Player(this, this.tilemapWidthInPixels / 2, this.tilemapHeightInPixels / 2);
-        this.player.setDepth(100);
+        this.player.setDepth(5);
         this.player.addPartyMemberByKey(this,"dreg");
         this.player.addCollisionByLayer(this.walkLayer);
         this.player.addCollisionByLayer(this.buildLayer);
@@ -137,7 +151,7 @@ export class Island extends Phaser.Scene {
         //create build mode hammer cursor
         this.toolCursor = this.add.sprite(0, 0, "hammerIcon");
         this.toolCursor.setScale(1);
-        this.toolCursor.setDepth(100);
+        this.toolCursor.setDepth(10.1);
         this.toolCursor.setVisible(false);
         this.hammeringTween = this.tweens.add({
             targets: this.toolCursor,
@@ -260,7 +274,7 @@ export class Island extends Phaser.Scene {
                 this.cursorTile = this.add.sprite(0, 0, incomingTile.tileSetKey+"Table", incomingTile.tileSetOffSet);
                 this.cursorTile.setOrigin(.5,.5);
                 this.cursorTile.setAlpha(.7);
-                this.cursorTile.setDepth(100);
+                this.cursorTile.setDepth(10);
                 this.cursorTile.setVisible(false);
                 this.cursorTile.rotation = Phaser.Math.DegToRad(this.rotation);
                 this.cursorTween = this.tweens.add({
@@ -314,10 +328,10 @@ export class Island extends Phaser.Scene {
         this.overheadLayer = this.map.createStaticLayer("overhead", [this.islandB], 0, 0);
         this.buildLayer = this.map.createDynamicLayer("build", [this.testBuildSpriteSheet, this.islandA1]);
         //make sure the layers appear where they are supposed to in relation to the player
-        this.backgroundLayer.depth = 9;
-        this.walkLayer.depth = 9;
-        this.buildLayer.depth = 10;
-        this.overheadLayer.depth = 15;
+        this.backgroundLayer.depth = 2.1;
+        this.walkLayer.depth = 2.2;
+        this.buildLayer.depth = 2.3;
+        this.overheadLayer.depth = 7;
         //set collision for the walk layer 
         this.walkLayer.setCollisionByProperty({ passThru: false });
         //set varibles values to their proper values based on newly created tilemap 

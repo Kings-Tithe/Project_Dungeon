@@ -16,6 +16,7 @@ See the example chart below.
 ### Example Chart
 ``` ts
 /*
+Depth Table
 Depth   | Object/Tile
 ----------------------------------
 10      | Overlay image of some kind?

@@ -6,6 +6,20 @@ import { CharacterSheet } from "../../user-interface/CharacterSheet";
 import { Controls } from "../../services/Controls";
 import { GAME_WIDTH, GAME_HEIGHT, CENTER } from "../../tools/Globals";
 
+/*
+Depth Table
+Depth   | Object/Tile
+----------------------------------
+101     | Pause Text
+100     | Pause Fog
+5       | (All Toggle Buttons)
+4       | Build Menu
+3       | Character Frame
+2       | Character Portrait
+1       | Character Sheet
+----------------------------------
+*/
+
 /**
  * Hud scene that should display over the main game screen. Contains various
  * interactable elements and information for the player.
@@ -15,8 +29,8 @@ export class Hud extends Phaser.Scene {
     //Memeber Varibles
 
     //sprites
-    /**Sprite frame at the top of the screen that other ui elements hit ontop of it
-     * sets a depth of 5. The character portrait sits under it */
+    /**Sprite frame at the top of the screen that other ui element's toggle
+     * buttons sit on top of */
     characterFrame: Phaser.GameObjects.Sprite;
     /**The currently being shown portrait */
     portrait: Phaser.GameObjects.Sprite;
@@ -47,7 +61,7 @@ export class Hud extends Phaser.Scene {
 
     //text
     /**Displays text saying the game is paused when the game is paused */
-    pausedText: Phaser.GameObjects.Text;
+    pauseText: Phaser.GameObjects.Text;
 
     //controls
     controls: Controls;
@@ -69,7 +83,7 @@ export class Hud extends Phaser.Scene {
         this.signals.on("pause-down", () => {
             if(this.paused){
                 this.pauseFog.visible = false;
-                this.pausedText.visible = false;
+                this.pauseText.visible = false;
                 for(let i = 0; i < this.pausedScenes.length; i++){
                     this.scene.resume(this.pausedScenes[i]);
                 }
@@ -77,7 +91,7 @@ export class Hud extends Phaser.Scene {
             } else {
                 this.paused = true;
                 this.pauseFog.visible = true;
-                this.pausedText.visible = true;
+                this.pauseText.visible = true;
             }
         })
         this.signals.on("pausing", (incomingScene: string) => {
@@ -90,10 +104,12 @@ export class Hud extends Phaser.Scene {
 
     create() {
         // Create a game console
-        //let con = Console.get(this);
+        let con = Console.get(this);
         // Create a buidling menu ui element
         this.buildMenu = BuildMenu.get(this);
+        this.buildMenu.setDepth(4);
         this.buildMenu.placeToggleButton(this,130,52);
+        this.buildMenu.setToggleButtonDepth(5);
 
         // Listen for keypress and handle hud events
         hookToMethod(document, 'onkeypress', (ret, ev) => {
@@ -110,25 +126,29 @@ export class Hud extends Phaser.Scene {
         //create character frame
         this.characterFrame = this.add.sprite(0, 0, "characterFrame").setOrigin(0, 0);
         this.characterFrame.setScale(2);
-        this.characterFrame.setDepth(1);
+        this.characterFrame.setDepth(3);
 
         //create our character sheet
-        this.characterSheet.createToggleButton(95, 52);
         this.characterSheet.createCharacterSheet();
+        this.characterSheet.setDepth(1);
+        this.characterSheet.createToggleButton(95, 52);
+        this.characterSheet.setToggleButtonDepth(5);
 
         //create pause fog
         this.pauseFog = this.add.graphics();
         this.pauseFog.fillStyle(0x19abb5,.4);
         this.pauseFog.fillRect(0,0,GAME_WIDTH,GAME_HEIGHT);
         this.pauseFog.visible = false;
+        this.pauseFog.setDepth(100);
 
         //create pausedText
-        this.pausedText = this.add.text(CENTER.x, CENTER.y - 200, "Paused", {
+        this.pauseText = this.add.text(CENTER.x, CENTER.y - 200, "Paused", {
             fontSize: "40px",
             color: "#4aff26"
         });
-        this.pausedText.setOrigin(.5,.5);
-        this.pausedText.visible = false;
+        this.pauseText.setOrigin(.5,.5);
+        this.pauseText.visible = false;
+        this.pauseText.setDepth(101);
     }
 
     /**Used to change what portrait is currently being shown */
@@ -137,7 +157,7 @@ export class Hud extends Phaser.Scene {
             this.portrait = this.add.sprite(10, 12, spritekey)
             this.portrait.setOrigin(0, 0);
             this.portrait.setScale(1.3);
-            this.portrait.setDepth(0);
+            this.portrait.setDepth(2);
         } else {
             this.portrait.setTexture(spritekey);
         }
