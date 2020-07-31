@@ -173,6 +173,7 @@ export class Island extends Phaser.Scene {
         }
     }
 
+    /**Sets up varibles and logic for when entering build mode */
     enterBuildMode(){
         this.inBuildMode = true;
         if(this.cursorTile){
@@ -180,6 +181,7 @@ export class Island extends Phaser.Scene {
         }
     }
 
+    /**Sets up varibles and logic for when exiting build mode */
     exitBuildMode(){
         this.inBuildMode = false;
         this.toolCursor.setVisible(false);
@@ -189,6 +191,7 @@ export class Island extends Phaser.Scene {
         }
     }
 
+    /**Update function called in the update loop to run the logic for moving and placing blocks when in build mode. */
     buildPlaceUpdate() {
         //grab the cursor's current point in the world taking into account the camera
         let worldPoint = <Phaser.Math.Vector2>this.input.activePointer.positionToCamera(this.cameras.main);

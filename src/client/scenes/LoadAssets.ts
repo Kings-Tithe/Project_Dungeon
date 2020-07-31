@@ -28,10 +28,6 @@ export class LoadAssets extends Scene {
         this.load.image("islandB", `${this.assets}/images/tilesets/islandB.png`);
         this.load.image("islandC", `${this.assets}/images/tilesets/islandC.png`);
         this.load.image("testBuildSpriteSheet", `${this.assets}/images/tilesets/testBuildSpriteSheet.png`);
-        this.load.image("greg-portrait", `${this.assets}/images/characters/portraits/gregThePortrait.png`);
-        this.load.image("dreg-portrait", `${this.assets}/images/characters/portraits/dregThePortrait.png`);
-        this.load.image("meg-portrait", `${this.assets}/images/characters/portraits/megThePortrait.png`);
-        this.load.image("craig-portrait", `${this.assets}/images/characters/portraits/craigThePortrait.png`);
         this.load.image("characterFrame", `${this.assets}/images/user-interface/character_frame.png`);
         this.load.image("bookIcon", `${this.assets}/images/user-interface/book.png`);
         this.load.image("outlineOfMan", `${this.assets}/images/free-use/outlineOfManBrown.png`);
@@ -40,12 +36,14 @@ export class LoadAssets extends Scene {
         this.load.image("flipRightIcon", `${this.assets}/images/user-interface/icon_flip_right.png`);
         this.load.image("flipLeftIcon", `${this.assets}/images/user-interface/icon_flip_left.png`);
 
+        // Loading Characters
+        this.loadCharacter("greg");
+        this.loadCharacter("dreg");
+        this.loadCharacter("craig");
+        this.loadCharacter("meg");
+
 
         // Loading Spritesheets
-        this.load.spritesheet("greg-spritesheet", `${this.assets}/images/characters/gregTheTestDummy.png`, { frameWidth: 32, frameHeight: 32 });
-        this.load.spritesheet("dreg-spritesheet", `${this.assets}/images/characters/dregTheTestDummy.png`, { frameWidth: 32, frameHeight: 32 });
-        this.load.spritesheet("meg-spritesheet", `${this.assets}/images/characters/megTheTestDummy.png`, { frameWidth: 32, frameHeight: 32 });
-        this.load.spritesheet("craig-spritesheet", `${this.assets}/images/characters/craigTheTestDummy.png`, { frameWidth: 32, frameHeight: 32 });
         this.load.spritesheet("testBuildSpriteSheetTable", `${this.assets}/images/tilesets/testBuildSpriteSheet.png`, { frameWidth: 16, frameHeight: 16 })
         this.load.spritesheet("woodenBackground", `${this.assets}/images/user-interface/wooden_Background.png`, { frameWidth: 256, frameHeight: 72 })
 
@@ -61,6 +59,25 @@ export class LoadAssets extends Scene {
     create() {
         //start the next scene
         this.scene.start('Island');
+    }
+
+    /**
+     * Allows the quick and easy loading of a character and it's associated componets
+     * For this to work the assets in to be in an exact format with in the assets folder.
+     * Any assets that won't follow the format layed out below must be loaded manually
+     * Format:
+     * ---A characters main sprite sheet should be in the assets/images/characters folder
+     * with the the characters key + "Spritesheet" + .fileformat as the
+     * name
+     * ---A characters portrait must be in assets/images/characters/portraits, be named
+     * the characters key + "Portrait" + .fileformat
+     * @param characterKey the key of the character, generally their name
+     * @param fileFormat an optional file format in case the image files are not
+     * in default format, default format is png
+     */
+    loadCharacter(characterKey: string, fileFormat: string = ".png"){
+        this.load.spritesheet(characterKey + "-spritesheet" , this.assets + "/images/characters/" + characterKey + "Spritesheet" + fileFormat, { frameWidth: 32, frameHeight: 32 });
+        this.load.image(characterKey + "-portrait", this.assets + "/images/characters/portraits" + characterKey + "Portrait" + fileFormat);
     }
 
 }

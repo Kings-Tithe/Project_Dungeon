@@ -132,7 +132,7 @@ export class Hud extends Phaser.Scene {
         this.characterSheet.createCharacterSheet();
         this.characterSheet.setDepth(1);
         this.characterSheet.createToggleButton(95, 52);
-        this.characterSheet.setToggleButtonDepth(5);
+        this.characterSheet.setToggleButtonDepth(5); 
 
         //create pause fog
         this.pauseFog = this.add.graphics();

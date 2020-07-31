@@ -4,12 +4,23 @@ import { SignalManager } from "../services/SignalManager";
 
 export class BuildMenu {
 
+    /**The hud scene of which this menu exits in */
     private hud: Hud;
+
+    //HTML Elements
+    /** A div that holds the entire menu */
     private menuDiv: HTMLDivElement;
+    /**Refernce to the Phaser dom used here */
     private dom: Phaser.GameObjects.DOMElement;
+    /**This holds the information used to contruct the list 
+     * items in the main div element */
     private tiles: tiledata[]; 
+    /**Tells us if the menu is currently visible */
     public visible: boolean;
+    /**Used to hold what tile us currently selected */
     public currentTile: tiledata;
+    
+    //Global Emitter
     private emitter: SignalManager;
 
     /**Sprite used to toggle one and off the building menu */
@@ -30,9 +41,13 @@ export class BuildMenu {
     pickButton: Phaser.GameObjects.Sprite;
 
     //string
+    /**Tells us what tool us currently selected */
     toolSelected: string;
 
     //numbers
+    /**Handles the depth of non html elements (html elements can't use
+     * phaser's internal depth manager and always either apear on top
+     * or under the canvas) */
     depth: number;
 
     private constructor(hud: Hud) {
@@ -112,6 +127,10 @@ export class BuildMenu {
         this.dom.setVisible(false);
     }
 
+    /**Gets an instance of this class, the class is a singleton and as such
+     * ther is only one instance, this either creates and returns or just
+     * returns that instance based on if there is already an instance
+     */
     static get(hud: Hud) {
         //if an instance has not been made yet, create one
         if (instance == null) {
@@ -121,6 +140,7 @@ export class BuildMenu {
         return instance;
     }
 
+    /**Toggles if the menu is visible or not */
     toggle(show = !this.visible) {
         this.dom.setVisible(show);
         this.flipRightButton.setVisible(show);
@@ -150,6 +170,7 @@ export class BuildMenu {
         this.flipRightButton.setDepth(newDepth);
     }
 
+    /**Used to import all the tiles it is possible to use for building */
     importTiles(){
         /*Eventually these will be enumerated in a file but for now it is all
         generated here */
@@ -164,6 +185,12 @@ export class BuildMenu {
         }
     }
 
+    /**
+     * Chooses a place to place the toggle button on screen and creates it
+     * @param hud the current hud to create the button
+     * @param buttonX where to place the button on the x plane
+     * @param buttonY where to place the button on the y plane
+     */
     placeToggleButton(hud: Hud, buttonX: number, buttonY: number){
         if(this.buildingToggleButton){
             this.buildingToggleButton.x = buttonX;
@@ -183,6 +210,10 @@ export class BuildMenu {
         }
     }
 
+    /**
+     * Creates all the buttons in the menu at the top of the screen
+     * @param hud the current hud scene to create the button in 
+     */
     createBuildButtons(hud: Hud){
         //create flip right button
         this.flipRightButton = hud.add.sprite(350,52,"flipRightIcon");
