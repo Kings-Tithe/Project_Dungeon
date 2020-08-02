@@ -11,7 +11,7 @@ export class BuildMenu {
     /** A div that holds the entire menu */
     private menuDiv: HTMLDivElement;
     /**Refernce to the Phaser dom used here */
-    private dom: Phaser.GameObjects.DOMElement;
+    public dom: Phaser.GameObjects.DOMElement;
     /**This holds the information used to contruct the list 
      * items in the main div element */
     private tiles: tiledata[]; 
@@ -39,10 +39,24 @@ export class BuildMenu {
     hammerButton: Phaser.GameObjects.Sprite;
     /**Used to select the destroy tool */
     pickButton: Phaser.GameObjects.Sprite;
+    /**Used to select the floor layer */
+    floorButton: Phaser.GameObjects.Sprite;
+    /**Used to select the wall layer */
+    wallButton: Phaser.GameObjects.Sprite;
+    /**Used to select the roof layer */
+    roofButton: Phaser.GameObjects.Sprite;
+    /**Used to select the special object layer */
+    specialObjectButton: Phaser.GameObjects.Sprite;
 
     //string
     /**Tells us what tool us currently selected */
     toolSelected: string;
+    /**Tells us what layer is currently selected */
+    layerSelected: string;
+
+    //graghics
+    /**Used as a back drop to the build menus buttons */
+    buttonBackdrop: Phaser.GameObjects.Graphics;
 
     //numbers
     /**Handles the depth of non html elements (html elements can't use
@@ -128,7 +142,7 @@ export class BuildMenu {
     }
 
     /**Gets an instance of this class, the class is a singleton and as such
-     * ther is only one instance, this either creates and returns or just
+     * there is only one instance, this either creates and returns or just
      * returns that instance based on if there is already an instance
      */
     static get(hud: Hud) {
@@ -143,11 +157,16 @@ export class BuildMenu {
     /**Toggles if the menu is visible or not */
     toggle(show = !this.visible) {
         this.dom.setVisible(show);
+        this.buttonBackdrop.setVisible(show);
         this.flipRightButton.setVisible(show);
         this.flipLeftButton.setVisible(show);
         this.hammerButton.setVisible(show);
         this.pickButton.setVisible(show);
-
+        this.floorButton.setVisible(show);
+        this.wallButton.setVisible(show);
+        this.roofButton.setVisible(show);
+        this.specialObjectButton.setVisible(show);
+        this.visible = show;
     }
 
      /**
@@ -215,19 +234,16 @@ export class BuildMenu {
      * @param hud the current hud scene to create the button in 
      */
     createBuildButtons(hud: Hud){
-        //create flip right button
-        this.flipRightButton = hud.add.sprite(350,52,"flipRightIcon");
-        this.flipRightButton.setDepth(this.depth);
-        this.flipRightButton.setVisible(false);
-        this.flipRightButton.setInteractive();
-        /*here we use the controls action key as if the button had been pressed, this
-        means less code in the end and accomplishes the same thing */
-        this.flipRightButton.on("pointerdown", () => {
-            this.emitter.emit("rotate block right-down")
-        });
+        //create the background for the build buttons
+        this.buttonBackdrop = this.hud.add.graphics();
+        this.buttonBackdrop.fillStyle(0xb06e27,1);
+        this.buttonBackdrop.lineStyle(20,0x915b20,1)
+        this.buttonBackdrop.strokeRoundedRect(270, 25, 300, 75,20)
+        this.buttonBackdrop.fillRoundedRect(270, 25, 300, 75,20);
+        this.buttonBackdrop.setVisible(false);
 
         //create flip left button
-        this.flipLeftButton = hud.add.sprite(300,52,"flipLeftIcon");
+        this.flipLeftButton = hud.add.sprite(300,65,"flipLeftIcon");
         this.flipLeftButton.setDepth(this.depth);
         this.flipLeftButton.setVisible(false);
         this.flipLeftButton.setInteractive();
@@ -237,8 +253,19 @@ export class BuildMenu {
             this.emitter.emit("rotate block left-down")
         });
 
+        //create flip right button
+        this.flipRightButton = hud.add.sprite(350,65,"flipRightIcon");
+        this.flipRightButton.setDepth(this.depth);
+        this.flipRightButton.setVisible(false);
+        this.flipRightButton.setInteractive();
+        /*here we use the controls action key as if the button had been pressed, this
+        means less code in the end and accomplishes the same thing */
+        this.flipRightButton.on("pointerdown", () => {
+            this.emitter.emit("rotate block right-down")
+        });
+
         //create hammer button
-        this.hammerButton = hud.add.sprite(400,52,"hammerIcon");
+        this.hammerButton = hud.add.sprite(400,65,"hammerIcon");
         this.hammerButton.setDepth(this.depth);
         this.hammerButton.setScale(2);
         this.hammerButton.setVisible(false);
@@ -251,7 +278,7 @@ export class BuildMenu {
         })
 
         //create pick button
-        this.pickButton = hud.add.sprite(450,52,"pickIcon",0);
+        this.pickButton = hud.add.sprite(450,65,"pickIcon",0);
         this.pickButton.setDepth(this.depth);
         this.pickButton.setScale(2);
         this.pickButton.setVisible(false);
@@ -261,6 +288,48 @@ export class BuildMenu {
             this.hammerButton.setTexture("hammerIcon",0);
             this.pickButton.setTexture("pickIcon", 1);
             this.emitter.emit("buildMenuPickSelected");
+        })
+
+        //create the layer selection keys
+        //create floor button
+        this.floorButton = hud.add.sprite(500,93,"floorIcon");
+        this.floorButton.setDepth(this.depth);
+        this.floorButton.setScale(.75);
+        this.floorButton.setVisible(false);
+        this.floorButton.setInteractive()
+        this.floorButton.on("pointerdown", () => {
+            this.layerSelected = "floor";
+            this.floorButton.setTexture("floorIcon",1);
+        })
+        //create wall button
+        this.wallButton = hud.add.sprite(500,74,"wallIcon");
+        this.wallButton.setDepth(this.depth);
+        this.wallButton.setScale(.75);
+        this.wallButton.setVisible(false);
+        this.wallButton.setInteractive()
+        this.wallButton.on("pointerdown", () => {
+            this.layerSelected = "wall";
+            this.wallButton.setTexture("wallIcon",1);
+        })
+        //create roof button
+        this.roofButton = hud.add.sprite(500,44,"roofIcon");
+        this.roofButton.setDepth(this.depth);
+        this.roofButton.setScale(.75);
+        this.roofButton.setVisible(false);
+        this.roofButton.setInteractive()
+        this.roofButton.on("pointerdown", () => {
+            this.layerSelected = "roof";
+            this.roofButton.setTexture("roofIcon",1);
+        })
+        //create special Object button
+        this.specialObjectButton = hud.add.sprite(543,73,"doorIcon");
+        this.specialObjectButton.setDepth(this.depth);
+        this.specialObjectButton.setScale(1);
+        this.specialObjectButton.setVisible(false);
+        this.specialObjectButton.setInteractive()
+        this.specialObjectButton.on("pointerdown", () => {
+            this.layerSelected = "special";
+            this.specialObjectButton.setTexture("doorIcon",1);
         })
     }
 
