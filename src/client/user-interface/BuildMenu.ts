@@ -245,17 +245,21 @@ export class BuildMenu {
         this.hammerButton.setInteractive()
         this.hammerButton.on("pointerdown", () => {
             this.toolSelected = "hammer";
+            this.hammerButton.setTexture("hammerIcon",1);
+            this.pickButton.setTexture("pickIcon", 0);
             this.emitter.emit("buildMenuHammerSelected");
         })
 
         //create pick button
-        this.pickButton = hud.add.sprite(450,52,"pickIcon");
+        this.pickButton = hud.add.sprite(450,52,"pickIcon",0);
         this.pickButton.setDepth(this.depth);
         this.pickButton.setScale(2);
         this.pickButton.setVisible(false);
         this.pickButton.setInteractive()
         this.pickButton.on("pointerdown", () => {
             this.toolSelected = "pick";
+            this.hammerButton.setTexture("hammerIcon",0);
+            this.pickButton.setTexture("pickIcon", 1);
             this.emitter.emit("buildMenuPickSelected");
         })
     }

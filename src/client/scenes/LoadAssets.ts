@@ -31,8 +31,6 @@ export class LoadAssets extends Scene {
         this.load.image("characterFrame", `${this.assets}/images/user-interface/character_frame.png`);
         this.load.image("bookIcon", `${this.assets}/images/user-interface/book.png`);
         this.load.image("outlineOfMan", `${this.assets}/images/free-use/outlineOfManBrown.png`);
-        this.load.image("hammerIcon", `${this.assets}/images/user-interface/hammerIcon.png`);
-        this.load.image("pickIcon", `${this.assets}/images/user-interface/pickIcon.png`);
         this.load.image("flipRightIcon", `${this.assets}/images/user-interface/icon_flip_right.png`);
         this.load.image("flipLeftIcon", `${this.assets}/images/user-interface/icon_flip_left.png`);
 
@@ -46,6 +44,12 @@ export class LoadAssets extends Scene {
         // Loading Spritesheets
         this.load.spritesheet("testBuildSpriteSheetTable", `${this.assets}/images/tilesets/testBuildSpriteSheet.png`, { frameWidth: 16, frameHeight: 16 })
         this.load.spritesheet("woodenBackground", `${this.assets}/images/user-interface/wooden_Background.png`, { frameWidth: 256, frameHeight: 72 })
+        this.load.spritesheet("hammerIcon", `${this.assets}/images/user-interface/hammerIcon.png`, { frameWidth: 14, frameHeight: 18 })
+        this.load.spritesheet("pickIcon", `${this.assets}/images/user-interface/pickIcon.png`, { frameWidth: 15, frameHeight: 17 })
+        this.load.spritesheet("doorIcon", `${this.assets}/images/user-interface/doorIcon.png`, { frameWidth: 26, frameHeight: 46 })
+        this.load.spritesheet("floorIcon", `${this.assets}/images/user-interface/floorIcon.png`, { frameWidth: 70, frameHeight: 16 })
+        this.load.spritesheet("wallIcon", `${this.assets}/images/user-interface/wallIcon.png`, { frameWidth: 70, frameHeight: 35 })
+        this.load.spritesheet("roofIcon", `${this.assets}/images/user-interface/roofIcon.png`, { frameWidth: 70, frameHeight: 47 })
 
         // Loading Tilemaps
         this.load.tilemapTiledJSON("islandUpleft", `${this.assets}/tilemaps/islandUpleft.json`);
@@ -77,7 +81,7 @@ export class LoadAssets extends Scene {
      */
     loadCharacter(characterKey: string, fileFormat: string = ".png"){
         this.load.spritesheet(characterKey + "-spritesheet" , this.assets + "/images/characters/" + characterKey + "Spritesheet" + fileFormat, { frameWidth: 32, frameHeight: 32 });
-        this.load.image(characterKey + "-portrait", this.assets + "/images/characters/portraits" + characterKey + "Portrait" + fileFormat);
+        this.load.image(characterKey + "-portrait", this.assets + "/images/characters/portraits/" + characterKey + "Portrait" + fileFormat);
     }
 
 }
