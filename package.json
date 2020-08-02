@@ -11,7 +11,7 @@
     "compile:client": "webpack --config webpack.prod.js",
     "compile:server": "tsc ./src/server/PDServer.ts --outFile ./compiled-js/server.js",
     "build": "yarn build:client && yarn build:server",
-    "build:client": "node electron-build.js",
+    "build:client": "node electron.build.js",
     "build:server": "pkg compiled-js/server.js --out-path ./dist/server --targets node12-linux-x64,node12-macos-x64,node12-win-x64"
   },
   "repository": "https://github.com/zachkingcade/Project_Dungeon.git",

@@ -9,48 +9,11 @@ export class LoadAssets extends Scene {
     /**List of all asset files which need to be loaded */
     private files: { [key: string]: string };
     /**A string that holds the path leading to the assets folder */
-    assetsFolder: string = "../../../assets"
+    assets: string = "../../../assets"
 
     /**Creates instance of Scene */
     constructor() {
         super('LoadAssets');
-        /**
-         * List of all asset files which need to be loaded. Each line starts
-         * with an asset type identifying code, then the path to the asset starting
-         * from the assets folder/from the path held by this.assetsFolder.
-         * A = Audio
-         * I = Image
-         * S = Spritesheet
-         * T = Tilemap
-         */
-        this.files = {
-            //images
-            "islandA1": "I/images/tilesets/islandA1.png",
-            "islandA2": "I/images/tilesets/islandA2.png",
-            "islandB": "I/images/tilesets/islandB.png",
-            "islandC": "I/images/tilesets/islandC.png",
-            "buildingSet": "I/images/tilesets/testBuildSpriteSheet.png",
-            "gregThePortrait": "I/images/gregThePortrait.png",
-            "dregThePortrait": "I/images/dregThePortrait.png",
-            "megThePortrait": "I/images/megThePortrait.png",
-            "craigThePortrait": "I/images/craigThePortrait.png",
-            "characterFrame": "I/images/character_frame.png",
-            "bookIcon": "I/images/book.png",
-            "outlineOfMan": "I/images/free-use/outlineOfManBrown.png",
-            "hammerIcon": "I/images/hammerIcon.png",
-
-
-            //Spritesheet
-            "gregTheTestDummy": "S/images/gregTheTestDummy.png",
-            "dregTheTestDummy": "S/images/dregTheTestDummy.png",
-            "megTheTestDummy": "S/images/megTheTestDummy.png",
-            "craigTheTestDummy": "S/images/craigTheTestDummy.png",
-
-            //Tilemaps
-            "islandUpleft": "T/tilemaps/islandUpleft.json",
-            "islandNorthSector": "T/tilemaps/islandNorthSector.json",
-        }
-
     }
 
     /**
@@ -59,21 +22,34 @@ export class LoadAssets extends Scene {
      */
     preload() {
 
-        //loop through every key in the file list
-        for (let key of Object.keys(this.files)) {
-            /**Check the type of asset, then load the asset. When loading, take
-             * a slice that doesn't include the first character. That first
-             * character just tells use the type of asset. */
-            if (this.files[key][0] == 'S') {
-                this.load.spritesheet(key, this.assetsFolder + this.files[key].slice(1), { frameWidth: 32, frameHeight: 32 });
-            } else if (this.files[key][0] == 'I') {
-                this.load.image(key, this.assetsFolder + this.files[key].slice(1));
-            } else if (this.files[key][0] == 'A') {
-                this.load.audio(key, this.assetsFolder + this.files[key].slice(1));
-            } else if (this.files[key][0] == 'T') {
-                this.load.tilemapTiledJSON(key, this.assetsFolder + this.files[key].slice(1))
-            }
-        }
+        // Loading Images
+        this.load.image("islandA1", `${this.assets}/images/tilesets/islandA1.png`);
+        this.load.image("islandA2", `${this.assets}/images/tilesets/islandA2.png`);
+        this.load.image("islandB", `${this.assets}/images/tilesets/islandB.png`);
+        this.load.image("islandC", `${this.assets}/images/tilesets/islandC.png`);
+        this.load.image("testBuildSpriteSheet", `${this.assets}/images/tilesets/testBuildSpriteSheet.png`);
+        this.load.image("characterFrame", `${this.assets}/images/user-interface/character_frame.png`);
+        this.load.image("bookIcon", `${this.assets}/images/user-interface/book.png`);
+        this.load.image("outlineOfMan", `${this.assets}/images/free-use/outlineOfManBrown.png`);
+        this.load.image("hammerIcon", `${this.assets}/images/user-interface/hammerIcon.png`);
+        this.load.image("pickIcon", `${this.assets}/images/user-interface/pickIcon.png`);
+        this.load.image("flipRightIcon", `${this.assets}/images/user-interface/icon_flip_right.png`);
+        this.load.image("flipLeftIcon", `${this.assets}/images/user-interface/icon_flip_left.png`);
+
+        // Loading Characters
+        this.loadCharacter("greg");
+        this.loadCharacter("dreg");
+        this.loadCharacter("craig");
+        this.loadCharacter("meg");
+
+
+        // Loading Spritesheets
+        this.load.spritesheet("testBuildSpriteSheetTable", `${this.assets}/images/tilesets/testBuildSpriteSheet.png`, { frameWidth: 16, frameHeight: 16 })
+        this.load.spritesheet("woodenBackground", `${this.assets}/images/user-interface/wooden_Background.png`, { frameWidth: 256, frameHeight: 72 })
+
+        // Loading Tilemaps
+        this.load.tilemapTiledJSON("islandUpleft", `${this.assets}/tilemaps/islandUpleft.json`);
+        this.load.tilemapTiledJSON("islandNorthSector", `${this.assets}/tilemaps/islandNorthSector.json`);
     }
 
     /**
@@ -83,6 +59,25 @@ export class LoadAssets extends Scene {
     create() {
         //start the next scene
         this.scene.start('Island');
+    }
+
+    /**
+     * Allows the quick and easy loading of a character and it's associated componets
+     * For this to work the assets in to be in an exact format with in the assets folder.
+     * Any assets that won't follow the format layed out below must be loaded manually
+     * Format:
+     * ---A characters main sprite sheet should be in the assets/images/characters folder
+     * with the the characters key + "Spritesheet" + .fileformat as the
+     * name
+     * ---A characters portrait must be in assets/images/characters/portraits, be named
+     * the characters key + "Portrait" + .fileformat
+     * @param characterKey the key of the character, generally their name
+     * @param fileFormat an optional file format in case the image files are not
+     * in default format, default format is png
+     */
+    loadCharacter(characterKey: string, fileFormat: string = ".png"){
+        this.load.spritesheet(characterKey + "-spritesheet" , this.assets + "/images/characters/" + characterKey + "Spritesheet" + fileFormat, { frameWidth: 32, frameHeight: 32 });
+        this.load.image(characterKey + "-portrait", this.assets + "/images/characters/portraits" + characterKey + "Portrait" + fileFormat);
     }
 
 }

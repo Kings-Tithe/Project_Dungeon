@@ -1,11 +1,13 @@
 import { Character } from "./Character";
-import { Controls } from "../tools/Controls";
-import { SignalManager } from "../tools/SignalManager";
+import { Controls } from "../services/Controls";
+import { SignalManager } from "../services/SignalManager";
+import { playableCharacterMap } from './index'
+import { ICharacterData } from "../../interfaces/ICharacterData";
 
 /**Player
  * Holds all the information and functionality of the player themselves
  * this is seperate from individual characters in that a player as a team
- * of character instead of playing as any one character. This class also 
+ * of characters instead of playing as any one character. This class also 
  * allows you to switch party members and who the leader of your party is.
  */
 export class Player {
@@ -26,8 +28,8 @@ export class Player {
     /**Used to allow the sprites of the non-leader party member to follow the leader */
     path: { x: number, y: number, facing: string; }[];
     /**the depth at which we start when setting the depth for characters it goes from here to
-     * +4 of here assuming 4 party members */
-    startDepth: number;
+     * the next whole integar, we use decimals to set the characters to one another.*/
+    depth: number;
     /**The area non-leader chracters must be within of the target area on the path to idle */
     idleZone: number;
     /**The number of nodes down the path each character stays back from one another */
@@ -71,11 +73,11 @@ export class Player {
         this.collisionLayers = [];
         this.path = [];
         this.party = [];
-        this.controls = Controls.getInstance(scene);
+        this.controls = Controls.getInstance();
         //default values
         this.money = 0;
         this.freeRoamSpeed = 130;
-        this.startDepth = 10;
+        this.depth = 0;
         this.nodeOffSet = 5;
         this.idleZone = 3;
         this.globalEmitter = SignalManager.get();
@@ -85,21 +87,42 @@ export class Player {
         this.path[0] = { x: this.x, y: this.y, facing: "down" };
     }
 
-    /**Adds a party member to the list by a passed in spritekey, this
-     * constructs a new character object to add a new member by the character
+    /**
+     * This sets the classes internal depth, for more on class level
+     * depths see the client folder's README
+     * @param newDepth The number to set the internal depth to
+     */
+    setDepth(newDepth: number){
+        this.depth = newDepth;
+    }
+
+    /**
+     * Adds a party member to the list by a passed in class key, this
+     * constructs a new character object, to add a new member by the character
      * object use addPartyMemberByObject()
      * @param key The sprite key for this party members sprite */
-    addPartyMemberByKey(key: string, portrait: string) {
+    addPartyMemberByKey(scene: Phaser.Scene, key: string, data?: ICharacterData){
+        let characterClass: (typeof Character) = playableCharacterMap[key];
+        console.log(playableCharacterMap);
+        console.log(key,characterClass);
         //construct our new party member and add them to the party
-        let newPartyMember = new Character(this.currentScene.anims);
-        newPartyMember.createSprite(this.currentScene, key, portrait, this.x, this.y);
+        let newPartyMember;
+        if(data){
+            newPartyMember = new characterClass(data);
+        } else {
+            newPartyMember = new characterClass();
+        }
+        newPartyMember.createSprite(scene, this.x, this.y);
         this.party.push(newPartyMember);
         // Add colliders between this party member and all collision layers
         this.collisionLayers.forEach((layer) => {
             this.currentScene.physics.add.collider(newPartyMember.sprite, layer);
         }, this);
         this.globalEmitter.emit("partyChange", this.party);
-        this.globalEmitter.emit("addPortrait", portrait);
+        if (this.party.length < 2){
+            this.globalEmitter.emit("changePortrait", this.party[0].key + "-portrait");
+        }
+        this.updateDepth();
     }
 
     /**Adds a party member to the list by a passed in character object,
@@ -137,10 +160,10 @@ export class Player {
         //remove the current leader from the front and add them to the back
         this.party.push(this.party.shift());
         //set the new leader and make sure their facing the same direction as the old one
-        this.party[0].moveTo(this.x, this.y);
+        this.party[0].setPosition(this.x, this.y);
         this.party[0].facingDirection = direction;
         //change the hud's portrait to refelct the new leader
-        this.globalEmitter.emit("changePortrait", this.party[0].portraitKey);
+        this.globalEmitter.emit("changePortrait", this.party[0].key + '-portrait');
         //fix the current scenes main camera to follow the new leader
         this.currentScene.cameras.main.startFollow(this.party[0].sprite, true);
         //set timeout to allow for leader changing again
@@ -148,7 +171,9 @@ export class Player {
     }
 
     /**Adds a new point/node to the path and checks to make sure the path
-     * has not grown bigger then 120 elements 
+     * has not grown bigger then the number of characters times 35 nodes.
+     * When it is bigger then that limit we splice it back down to 20 times
+     * the number of characters in the party.
      * @param newX      The x coordinate of the point trying to be added
      * @param newY      The x coordinate of the point trying to be added
      * @param newFacing The direction the leader is facing at this point
@@ -159,11 +184,11 @@ export class Player {
         if (Math.abs(newX - this.path[0].x) > 3 || Math.abs(newY - this.path[0].y) > 3) {
             //unshift adds an element to the front of the array and returns the new length of the array
             let newlength = this.path.unshift({ x: newX, y: newY, facing: newFacing });
-            /*to help with performance we wait till it fill to 200 then splice off
-            everyhting back down to 80 */
-            // if (newlength > 200) {
-            //     this.path.splice(80);
-            // }
+            /*to help with performance we wait till it fill to (characters * 35) then splice off
+            everything back down to (characters * 20) */
+            if (newlength > (this.party.length * 35)) {
+                this.path.splice(this.party.length * 20);
+            }
         }
     }
 
@@ -183,10 +208,10 @@ export class Player {
                 /**the distance on the y-axis between our current position and desired position */
                 let differenceY = Math.abs(this.path[i * this.nodeOffSet].y - this.party[i].sprite.y);
 
-                /*if we have for some reason gotten more then 50 pixels from our target, this is kinda as a
+                /*if we have for some reason gotten more then 30 pixels from our target, this is kinda as a
                 last resort catch if anything get in their way or stops them for some reason */
                 if (Math.hypot(differenceX, differenceY) > 30) {
-                    this.party[i].moveTo(this.path[i * this.nodeOffSet].x, this.path[i * this.nodeOffSet].y);
+                    this.party[i].setPosition(this.path[i * this.nodeOffSet].x, this.path[i * this.nodeOffSet].y);
                 } //if we are atleast more then 3 pixels away from our target but not more then 50 
                 else if (Math.hypot(differenceX, differenceY) > this.idleZone) {
                     this.currentScene.physics.moveTo(this.party[i].sprite, this.path[i * this.nodeOffSet].x, this.path[i * this.nodeOffSet].y, this.freeRoamSpeed * 1.1535);
@@ -199,14 +224,15 @@ export class Player {
                 if (body.velocity.x || body.velocity.y) {
                     /* check if the animation is already playing, otherwise it will restart it repeatadle making it 
                     look like only the first frame of the animation */
-                    if (this.party[i].sprite.anims.getCurrentKey() != this.party[i].spriteKey + "walk_" + this.path[i * this.nodeOffSet].facing) {
-                        this.currentScene.anims.play(this.party[i].spriteKey + "walk_" + this.path[i * this.nodeOffSet].facing, this.party[i].sprite);
+                    if (this.party[i].sprite.anims.getCurrentKey() != `${this.party[i].key}-animation-walk-${this.path[i * this.nodeOffSet].facing}`) {
+                        this.currentScene.anims.play(`${this.party[i].key}-animation-walk-${this.path[i * this.nodeOffSet].facing}`, this.party[i].sprite);
                     }
                 } else {
                     /* check if the animation is already playing, otherwise it will restart it repeatadle making it 
                     look like only the first frame of the animation */
-                    if (this.party[i].sprite.anims.getCurrentKey() != this.party[i].spriteKey + "idle_" + this.path[i * this.nodeOffSet].facing) {
-                        this.currentScene.anims.play(this.party[i].spriteKey + "idle_" + this.path[i * this.nodeOffSet].facing, this.party[i].sprite);
+                    if (this.party[i].sprite.anims.isPlaying) {
+                        this.party[i].sprite.anims.restart(false);
+                        this.party[i].sprite.anims.stop();
                     }
                 }
             }
@@ -226,8 +252,10 @@ export class Player {
         //sort the array by y value
         heightArray.sort((a, b) => { return a.y - b.y; });
         //finally set their depth based on the sorted array
+        /**The amount that each character is from each other depth wise */
+        let increment = 1 / heightArray.length;
         for (let i = 0; i < heightArray.length; i++) {
-            this.party[heightArray[i].index].sprite.depth = this.startDepth + i;
+            this.party[heightArray[i].index].setDepth(this.depth + (increment * i));
         }
     }
 
@@ -253,16 +281,16 @@ export class Player {
         //first we'll check for key pressed related to movement and move the leader based on those
         let x = 0;
         let y = 0;
-        if (this.controls.isDown("walk up")) {
+        if (this.controls.isDown("Player", "walk up")) {
             y -= this.freeRoamSpeed;
         }
-        if (this.controls.isDown("walk down")) {
+        if (this.controls.isDown("Player", "walk down")) {
             y += this.freeRoamSpeed;
         }
-        if (this.controls.isDown("walk left")) {
+        if (this.controls.isDown("Player", "walk left")) {
             x -= this.freeRoamSpeed;
         }
-        if (this.controls.isDown("walk right")) {
+        if (this.controls.isDown("Player", "walk right")) {
             x += this.freeRoamSpeed;
         }
         if (this.leaderChangeTimeOut) {
@@ -271,7 +299,7 @@ export class Player {
         }
         this.party[0].UpdateMovement(x, y);
         //check for input to change the party leader
-        if (this.controls.isDown("change leader") && !this.leaderChangeTimeOut) {
+        if (this.controls.isDown("Player", "change leader") && !this.leaderChangeTimeOut) {
             this.changeLeader();
         }
     }
