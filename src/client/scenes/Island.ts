@@ -62,8 +62,14 @@ export class Island extends Phaser.Scene {
     overheadLayer: Phaser.Tilemaps.StaticTilemapLayer;
 
     //dynamic layers
-    /**This is a layer used to test the building mechanics */
-    buildLayer: Phaser.Tilemaps.DynamicTilemapLayer;
+    /**Layer used for building floor tiles */
+    floorLayer: Phaser.Tilemaps.DynamicTilemapLayer;
+    /**Layer used for building wall tiles */
+    wallLayer: Phaser.Tilemaps.DynamicTilemapLayer;
+    /**Layer used for building floor tiles */
+    roofLayer: Phaser.Tilemaps.DynamicTilemapLayer;
+    /**Layer used for building floor tiles */
+    specialLayer: Phaser.Tilemaps.DynamicTilemapLayer;
 
     /**Player */
     /**The Player containing our party and other relevent details */
@@ -97,7 +103,10 @@ export class Island extends Phaser.Scene {
     inBuildMode: boolean;
 
     //string
+    /**keeps track of what tool is selected in the build menu */
     toolSelected: string;
+    /**keeps track of what layer is selected in the build menu */
+    layerSelected: string;
 
     /**Calls to the parent constructor to construct the scene. Parents adds
      * the key of the scene that is passed in below to the game objects list
@@ -117,7 +126,8 @@ export class Island extends Phaser.Scene {
         this.player = new Player(this);
         this.rotation = 0;
         this.inBuildMode = false;
-        this.toolSelected = "hammer";
+        this.toolSelected = "";
+        this.layerSelected = "";
     }
 
     /**Used to initally create all of our assets and set up the games scene/stage the
@@ -127,12 +137,13 @@ export class Island extends Phaser.Scene {
     create() {
         this.createTileMap();
         this.createListeners();
-        this.controls.applyScheme(this,["Player", "Scene"]);
+        this.controls.applyScheme(this,["Player", "Scene", "Building"]);
         this.player = new Player(this, this.tilemapWidthInPixels / 2, this.tilemapHeightInPixels / 2);
         this.player.setDepth(5);
         this.player.addPartyMemberByKey(this,"dreg");
         this.player.addCollisionByLayer(this.walkLayer);
-        this.player.addCollisionByLayer(this.buildLayer);
+        this.player.addCollisionByLayer(this.wallLayer);
+        this.player.addCollisionByLayer(this.specialLayer);
 
         this.controls = Controls.getInstance();
 
@@ -195,8 +206,8 @@ export class Island extends Phaser.Scene {
     buildPlaceUpdate() {
         //grab the cursor's current point in the world taking into account the camera
         let worldPoint = <Phaser.Math.Vector2>this.input.activePointer.positionToCamera(this.cameras.main);
-        let worldTile: Phaser.Math.Vector2 = this.buildLayer.worldToTileXY(worldPoint.x, worldPoint.y,true);
-        let tilecoord = this.buildLayer.tileToWorldXY(worldTile.x, worldTile.y);
+        let worldTile: Phaser.Math.Vector2 = this.walkLayer.worldToTileXY(worldPoint.x, worldPoint.y,true);
+        let tilecoord = this.walkLayer.tileToWorldXY(worldTile.x, worldTile.y);
         //move cursor tile
         this.cursorTile.x = tilecoord.x + 8;
         this.cursorTile.y = tilecoord.y + 8;
@@ -232,12 +243,22 @@ export class Island extends Phaser.Scene {
         if (this.input.manager.activePointer.isDown && this.currentTile && canPlace) {
             this.hammeringTween.play();
             if(this.toolSelected == "hammer"){
-                let tilesetStart = this.testBuildSpriteSheet.firstgid;
-                let tile = this.buildLayer.putTileAtWorldXY(tilesetStart + this.currentTile.tileSetOffSet, worldPoint.x, worldPoint.y);
-                tile.rotation = Phaser.Math.DegToRad(this.rotation);
-                tile.setCollision(true);
+                if(this.layerSelected == "floor"){
+                    let tilesetStart = this.testBuildSpriteSheet.firstgid;
+                    let tile = this.floorLayer.putTileAtWorldXY(tilesetStart + this.currentTile.tileSetOffSet, worldPoint.x, worldPoint.y);
+                    tile.rotation = Phaser.Math.DegToRad(this.rotation);
+                } else if (this.layerSelected == "wall"){
+                    let tilesetStart = this.testBuildSpriteSheet.firstgid;
+                    let tile = this.wallLayer.putTileAtWorldXY(tilesetStart + this.currentTile.tileSetOffSet, worldPoint.x, worldPoint.y);
+                    tile.rotation = Phaser.Math.DegToRad(this.rotation);
+                    tile.setCollision(true);
+                }
             } else if (this.toolSelected == "pick"){
-                this.buildLayer.removeTileAtWorldXY(worldPoint.x, worldPoint.y);
+                if(this.layerSelected == "floor"){
+                    this.floorLayer.removeTileAtWorldXY(worldPoint.x, worldPoint.y);
+                } else if (this.layerSelected == "wall") {
+                    this.wallLayer.removeTileAtWorldXY(worldPoint.x, worldPoint.y);
+                }
             }
         }
     }
@@ -317,6 +338,18 @@ export class Island extends Phaser.Scene {
             this.toolSelected = "pick";
             this.toolCursor.setTexture("pickIcon");
         })
+
+        this.signals.on("buildingLayerChanged", (newCurrentLayer: string) => {
+            this.layerSelected = newCurrentLayer;
+        })
+
+        this.signals.on("clearBuildingLayer", (newCurrentLayer: string) => {
+            this.layerSelected = "";
+        })
+
+        this.signals.on("clearBuildingTool", (newCurrentLayer: string) => {
+            this.toolSelected = "";
+        })
     }
 
     /**Creates and puts together the primary tilemap for this scene*/
@@ -329,12 +362,18 @@ export class Island extends Phaser.Scene {
         this.backgroundLayer = this.map.createStaticLayer("background", [this.islandA1, this.islandA2], 0, 0);
         this.walkLayer = this.map.createStaticLayer("walk", [this.islandA1, this.islandB], 0, 0);
         this.overheadLayer = this.map.createStaticLayer("overhead", [this.islandB], 0, 0);
-        this.buildLayer = this.map.createDynamicLayer("build", [this.testBuildSpriteSheet, this.islandA1]);
+        this.floorLayer = this.map.createBlankDynamicLayer("floor", [this.testBuildSpriteSheet, this.islandA1]);
+        this.wallLayer = this.map.createBlankDynamicLayer("wall", [this.testBuildSpriteSheet, this.islandA1]);
+        this.roofLayer = this.map.createBlankDynamicLayer("roof", [this.testBuildSpriteSheet, this.islandA1]);
+        this.specialLayer = this.map.createBlankDynamicLayer("special", [this.testBuildSpriteSheet, this.islandA1]);
         //make sure the layers appear where they are supposed to in relation to the player
         this.backgroundLayer.depth = 2.1;
         this.walkLayer.depth = 2.2;
-        this.buildLayer.depth = 2.3;
-        this.overheadLayer.depth = 7;
+        this.floorLayer.depth = 2.3;
+        this.wallLayer.depth = 2.4
+        this.specialLayer.depth = 2.5;
+        this.roofLayer.depth = 7;
+        this.overheadLayer.depth = 7.1;
         //set collision for the walk layer 
         this.walkLayer.setCollisionByProperty({ passThru: false });
         //set varibles values to their proper values based on newly created tilemap 

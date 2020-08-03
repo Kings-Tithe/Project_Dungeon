@@ -62,6 +62,11 @@ export class Controls {
             actions: {},
             currentScene: null
         }
+        this.schemes["Building"] = {
+            name: "Building",
+            actions: {},
+            currentScene: null
+        }
 
         let defaultdelayDuration: number = 400;
         //fill this.keys will all the keys we will need to poll in this scene
@@ -117,6 +122,22 @@ export class Controls {
             actionKey: "pause", 
             delayDuration: defaultdelayDuration, 
             keyCode: Phaser.Input.Keyboard.KeyCodes.ESC,
+            key: null,  
+            delayed: false,
+            checkable: true
+        }
+        this.schemes["Building"].actions["rotate block right"] = {
+            actionKey: "pause", 
+            delayDuration: defaultdelayDuration, 
+            keyCode: Phaser.Input.Keyboard.KeyCodes.E,
+            key: null,  
+            delayed: false,
+            checkable: true
+        }
+        this.schemes["Building"].actions["rotate block left"] = {
+            actionKey: "pause", 
+            delayDuration: defaultdelayDuration, 
+            keyCode: Phaser.Input.Keyboard.KeyCodes.Q,
             key: null,  
             delayed: false,
             checkable: true
