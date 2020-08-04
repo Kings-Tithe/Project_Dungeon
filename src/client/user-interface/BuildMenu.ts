@@ -136,16 +136,59 @@ export class BuildMenu {
         this.menuDiv.style.backgroundAttachment = "local";
         this.menuDiv.style.borderStyle = "solid";
         this.menuDiv.style.borderColor = "#915b20";
-        this.menuDiv.style.borderWidth = "6px";
-        this.menuDiv.style.overflowY = "auto";
-        this.menuDiv.style.borderRadius = "35px";
+        this.menuDiv.style.borderWidth = "8px";
+        this.menuDiv.style.overflowY = "overlay";
+        this.menuDiv.style.borderRadius = "30px";
         this.menuDiv.id = "mainDiv";
+
+        let scrollCursor = document.createElement("div");
+        scrollCursor.style.width = '20px';
+        scrollCursor.style.height = '20px';
+        scrollCursor.style.borderRadius = '10px';
+        scrollCursor.style.position = 'absolute';
+        scrollCursor.style.right = '3px';
+        scrollCursor.style.top = '10px';
+        scrollCursor.style.backgroundColor = "#FFF";
+        scrollCursor.draggable = true;
+        this.menuDiv.appendChild(scrollCursor);
+
+        let down = 0;
+
+        scrollCursor.onmousedown = ()=>{
+            down++;
+        }
+
+        scrollCursor.onmouseup = ()=>{
+            down? down-- : null;
+        }
+
+        scrollCursor.onmouseleave = ()=>{
+            down? down-- : null;
+        }
+
+        scrollCursor.onmousemove = (ev)=>{
+            if(down){
+                // not working yet
+                scrollCursor.style.top = `${ev.y}px`;
+            }
+        }
+
+        this.menuDiv.onscroll = ()=>{
+            let visualHeight = this.menuDiv.clientHeight - 30;
+            let offset = this.menuDiv.scrollTop;
+            let maxOffset = this.menuDiv.scrollHeight - visualHeight;
+            let scrollPercent = offset / maxOffset;
+            let visualOffset = scrollPercent * visualHeight;
+            let cursorPosition = offset + visualOffset + 10;
+            scrollCursor.style.top = `${cursorPosition}px`;
+        }
+
         let styling = document.createElement('style');
         styling.type = "text/css";
-        styling.innerHTML = "#mainDiv ::-webkit-scrollbar {\nwidth: 10px;\n}\n";
-        styling.innerHTML += "::-webkit-scrollbar-track {background: #f1f1f1;}\n";
-        styling.innerHTML += "::-webkit-scrollbar-thumb {background: #888;}\n";
-        styling.innerHTML += "::-webkit-scrollbar-thumb:hover {background: #555;}\n";
+        styling.innerHTML = "#mainDiv::-webkit-scrollbar { display:none; }\n";
+        // styling.innerHTML += "#mainDiv::-webkit-scrollbar-track { background: #754a1a; }\n";
+        // styling.innerHTML += "#mainDiv::-webkit-scrollbar-thumb { background: #b87327; }\n";
+        // styling.innerHTML += "#mainDiv::-webkit-scrollbar-thumb:hover { background: #8c581f; }\n";
         this.menuDiv.appendChild(styling);
     }
 
