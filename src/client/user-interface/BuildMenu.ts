@@ -97,6 +97,19 @@ export class BuildMenu {
         this.dom.setVisible(false);
         //create and set small top screen buttons
         this.createBuildButtons(hud);
+
+        //select default layer: floor
+        this.clearLayerSelect(false);
+        this.clearLists();
+        this.floorList.style.display = "block";
+        this.layerSelected = "floor";
+        this.floorButton.setTexture("floorIcon",1);
+        this.emitter.emit("buildingLayerChanged", this.layerSelected);
+        //select default tool: hammer
+        this.clearToolSelect();
+        this.toolSelected = "hammer";
+        this.hammerButton.setTexture("hammerIcon",1);
+        this.emitter.emit("buildMenuHammerSelected");
     }
 
     /**Gets an instance of this class, the class is a singleton and as such
