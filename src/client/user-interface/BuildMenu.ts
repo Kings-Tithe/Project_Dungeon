@@ -480,6 +480,11 @@ export class BuildMenu {
         if(emitEvent){
             this.emitter.emit("clearBuildingLayer");
         }
+        //clear current selected tile
+        if (this.currentSelectedItem){
+            this.currentSelectedItem.style.borderStyle = "none";
+            this.currentSelectedItem = null;
+        }
     }
 
     /**
@@ -527,9 +532,8 @@ export class BuildMenu {
         this.toggle(false);
         //emit that we are no longer in build mode
         this.emitter.emit("exitBuildMode");
-        this.clearToolSelect();
-        this.clearLayerSelect();
-        this.clearLayerSelect;
+        //deselect current selected item
+        this.currentSelectedItem.style.borderStyle = "none";
         this.currentSelectedItem = null;
     }
 
