@@ -112,6 +112,7 @@ export class BuildMenu {
         return instance;
     }
 
+    /**Create the main dic that contains the rest of the menu */
     createMainDiv(){
         //create div
         this.menuDiv = document.createElement("div");
@@ -184,6 +185,11 @@ export class BuildMenu {
         this.specialList.appendChild(styling);
     }
 
+    /**
+     * Create a new list item to be put in a layers list
+     * @param tile the tile data to construct the item from
+     * @returns the newly constructed item
+     */
     createListItem(tile: tiledata): HTMLLIElement{
         // List item object, contains details for each block
         let item = document.createElement('li');
@@ -199,6 +205,9 @@ export class BuildMenu {
         image.style.display = "inline-block";
         image.style.margin = "0px";
         image.style.padding = "0px";
+        /*make the images not draggable method suggested on stack overflow
+        had to prevent this because it caused an infinite build on the mouse */
+        image.ondragstart = () => {return false;};
         // Image data passed in a base 64 string
         image.src = this.hud.textures.getBase64('testBuildSpriteSheetTable', tile.tileSetOffSet);
         // Side text is a list within the list (so it's elements can be top->bottom)
@@ -214,7 +223,7 @@ export class BuildMenu {
         textsList.innerHTML += `<li>${tile.count}</li>`;
         // Assign a callback to clicking on the item
         item.onclick = () => {
-            this.swapTile(item);
+            this.swapItemSelection(item);
             this.emitter.emit("newTileSelected",tile);
         }
         // Append item elements to list
@@ -370,7 +379,12 @@ export class BuildMenu {
         }
     }
 
-    swapTile(newItem: HTMLLIElement){
+    /**
+     * swaps the selection border on the currently selected item and a newly
+     * selected item
+     * @param newItem The new item to add the border to 
+     */
+    swapItemSelection(newItem: HTMLLIElement){
         if (this.currentSelectedItem){
             this.currentSelectedItem.style.borderStyle = "none";
         }
@@ -393,7 +407,11 @@ export class BuildMenu {
         }
     }
 
-    /**Toggles if the menu is visible or not */
+    /**
+     * Toggles if the menu is visible or not
+     * @param show if to show the menu or not, defaults to the
+     * inverse of the current state
+     */
     toggle(show = !this.visible) {
         this.dom.setVisible(show);
         this.buttonBackdrop.setVisible(show);
@@ -472,6 +490,7 @@ export class BuildMenu {
         }
     }
 
+    /**Clears which lists are being displayed */
     clearLists(){
         this.floorList.style.display = "none";
         this.wallList.style.display = "none";

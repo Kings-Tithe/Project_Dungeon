@@ -11,13 +11,13 @@ import { TilemapBuilder } from "../services/TilemapBuilder";
 Depth Table
 Depth   | Object/Tile
 ----------------------------------
-10.1    | Tool Cursor
-10      | Cursor Tile
+10      | Builder- Cursors
+8       | Builder- Upper Layers
 7       | Overhead Layer
 5       | Player
-2.3     | Build Layer
-2.2     | Walk Layer
-2.1     | Background Layer
+2       | Builder- Lower Layers
+1.2     | Walk Layer
+1.1     | Background Layer
 ----------------------------------
 */
 
@@ -96,6 +96,9 @@ export class Island extends Phaser.Scene {
         //create tilempa and tilemap builder
         this.createTileMap();
         this.Builder = new TilemapBuilder(this,this.map);
+        this.Builder.setLowerDepth(2);
+        this.Builder.setUpperDepth(8);
+        this.Builder.setCursorDepth(10);
         //create player
         this.player = new Player(this, this.tilemapWidthInPixels / 2, this.tilemapHeightInPixels / 2);
         this.player.setDepth(5);

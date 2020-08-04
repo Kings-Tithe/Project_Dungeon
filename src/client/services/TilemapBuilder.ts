@@ -33,6 +33,8 @@ export class TilemapBuilder {
     upperDepth: number;
     /**Used to store the depth of layers meant to apear below the player */
     lowerDepth: number;
+    /**Used to store the depth of the cursors */
+    cursorDepth: number;
 
     //dynamic layers
     /**Layer used for building floor tiles */
@@ -99,17 +101,19 @@ export class TilemapBuilder {
         this.controls = Controls.getInstance();
         this.upperDepth = 0;
         this.lowerDepth = 0;
+        this.cursorDepth = 0;
         //create everything
         this.createLayers(map);
         this.createListeners();
         this.createToolCursor();
     }
 
+    /**creates the cursor tool ans sets all its default values */
     createToolCursor(){
         //create build mode hammer cursor
         this.toolCursor = this.currentScene.add.sprite(0, 0, "hammerIcon");
         this.toolCursor.setScale(1);
-        this.toolCursor.setDepth(10.1);
+        this.toolCursor.setDepth(this.cursorDepth + 0.1);
         this.toolCursor.setVisible(false);
         this.hammeringTween = this.currentScene.tweens.add({
             targets: this.toolCursor,
@@ -121,6 +125,11 @@ export class TilemapBuilder {
         });
     }
 
+    /**
+     * Creates the 4 building layers floor,wall,roof,special and
+     * the stores refernces to them.
+     * @param map the map to create the layers in
+     */
     createLayers(map: Phaser.Tilemaps.Tilemap){
         //eventually this will be imported in but for now it is hardcoded
         this.testBuildSpriteSheet = map.addTilesetImage("testBuildSpriteSheet");
@@ -154,17 +163,28 @@ export class TilemapBuilder {
         }
     }
 
-    /**adds collison to the player for the bulding players */
+    /**
+     * Adds collison to the player for the bulding players
+     * @param player The player to add collison to all the party members of 
+     * */
     addCollisionToPlayer(player: Player){
         player.addCollisionByLayer(this.wallLayer);
         player.addCollisionByLayer(this.specialLayer);
     }
 
+    /**
+     * Sets the depth for layers meant be shown above the player
+     * @param newDepth the depth to set the upper layers to
+     *  */
     setUpperDepth(newDepth: number){
         this.upperDepth = newDepth;
         this.roofLayer.depth = this.upperDepth;
     }
 
+    /**
+     * Sets the depth for layers meant be shown below the player
+     * @param newDepth the depth to set the lower layers to
+     *  */
     setLowerDepth(newDepth: number){
         this.lowerDepth = newDepth;
         this.floorLayer.depth = this.lowerDepth + 0.1;
@@ -172,10 +192,24 @@ export class TilemapBuilder {
         this.specialLayer.depth = this.lowerDepth + 0.3;
     }
 
-    /**Update function called in the update loop to run the logic for moving and placing blocks when in build mode. */
+    /**
+     * sets the depth of the cursors
+     * @param newDepth The new depth to set the cursors to */
+    setCursorDepth(newDepth: number){
+        this.cursorDepth = newDepth;
+        this.toolCursor.setDepth(this.cursorDepth + 0.1);
+        if (this.cursorTile){
+            this.cursorTile.setDepth(this.cursorDepth + 0.2);
+        }
+    }
+
+
+    /**
+     * Update function called in the update loop to run the logic for moving and placing blocks when in build mode. 
+     * @param player what player is doing the building here and we should check around to allow building
+     * */
     update(player: Player) {
         if(this.inBuildMode && this.currentTile){
-            console.log("we're here atleast");
             //grab the cursor's current point in the world taking into account the camera
             let worldPoint = <Phaser.Math.Vector2>this.currentScene.input.activePointer.positionToCamera(this.currentScene.cameras.main);
             let worldTile: Phaser.Math.Vector2 = this.floorLayer.worldToTileXY(worldPoint.x, worldPoint.y,true);
@@ -236,16 +270,20 @@ export class TilemapBuilder {
         }
     }
 
+    /**
+     * Creates all the listerns used by this class, this also allows the file to stay organized as all the
+     * listeners are listen in one place
+     */
     createListeners(){
         this.signals.on("newTileSelected", (incomingTile: tiledata) => {
-            if (this.currentTile){
+            if (this.cursorTile){
                 this.cursorTile.setTexture(incomingTile.tileSetKey+"Table",incomingTile.tileSetOffSet);
             } else {
                 //create build modes cursor tile
                 this.cursorTile = this.currentScene.add.sprite(0, 0, incomingTile.tileSetKey+"Table", incomingTile.tileSetOffSet);
                 this.cursorTile.setOrigin(.5,.5);
                 this.cursorTile.setAlpha(.7);
-                this.cursorTile.setDepth(10);
+                this.cursorTile.setDepth(this.cursorDepth + 0.2);
                 this.cursorTile.setVisible(false);
                 this.cursorTile.rotation = Phaser.Math.DegToRad(this.rotation);
                 this.cursorTween = this.currentScene.tweens.add({
