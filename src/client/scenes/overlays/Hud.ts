@@ -85,7 +85,8 @@ export class Hud extends Phaser.Scene {
                 this.pauseFog.visible = false;
                 this.pauseText.visible = false;
                 if(this.buildMenu.visible){
-                    this.buildMenu.dom.setVisible(true);
+                    this.buildMenu.MenuDom.setVisible(true);
+                    this.buildMenu.borderDom.setVisible(true);
                 }
                 for(let i = 0; i < this.pausedScenes.length; i++){
                     this.scene.resume(this.pausedScenes[i]);
@@ -97,7 +98,8 @@ export class Hud extends Phaser.Scene {
                 this.pauseText.visible = true;
                 console.log(this.buildMenu.visible)
                 if(this.buildMenu.visible){
-                    this.buildMenu.dom.setVisible(false);
+                    this.buildMenu.MenuDom.setVisible(false);
+                    this.buildMenu.borderDom.setVisible(false);
                 }
             }
         })

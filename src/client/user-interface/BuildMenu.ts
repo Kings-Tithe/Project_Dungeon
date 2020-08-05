@@ -1,7 +1,6 @@
 import { Hud } from "../scenes/overlays/Hud";
 import { GAME_WIDTH } from "../tools/Globals";
 import { SignalManager } from "../services/SignalManager";
-import SimpleBar from 'simplebar';
 
 
 export class BuildMenu {
@@ -12,8 +11,12 @@ export class BuildMenu {
     //HTML Elements
     /** A div that holds the entire menu */
     private menuDiv: HTMLDivElement;
+    /**A border that goes around the main div */
+    private borderDiv: HTMLDivElement;
     /**Refernce to the Phaser dom used here */
-    public dom: Phaser.GameObjects.DOMElement;
+    public MenuDom: Phaser.GameObjects.DOMElement;
+    /**Refernce to the Phaser dom used here */
+    public borderDom: Phaser.GameObjects.DOMElement;
     /**Used to hold the lists for the 4 layers */
     private floorList;
     private wallList;
@@ -93,10 +96,14 @@ export class BuildMenu {
         this.menuDiv.appendChild(this.roofList);
         this.menuDiv.appendChild(this.specialList);
         //create dom and add the main div
-        this.dom = this.hud.add.dom((GAME_WIDTH - 256) - 15, 18, this.menuDiv);
-        this.dom.setDepth(this.depth)
-        this.dom.setOrigin(0);
-        this.dom.setVisible(false);
+        this.borderDom = this.hud.add.dom(0,0,this.borderDiv);
+        this.borderDom.setDepth(this.depth)
+        this.borderDom.setOrigin(0);
+        this.borderDom.setVisible(false);
+        this.MenuDom = this.hud.add.dom(0,0,this.menuDiv);
+        this.MenuDom.setDepth(this.depth + 1)
+        this.MenuDom.setOrigin(0);
+        this.MenuDom.setVisible(false);
         //create and set small top screen buttons
         this.createBuildButtons(hud);
 
@@ -134,22 +141,42 @@ export class BuildMenu {
         this.menuDiv.style.width = '256px';
         this.menuDiv.style.height = '684px';
         this.menuDiv.style.padding = "0px";
+        this.menuDiv.style.margin = "0px";
         this.menuDiv.style.backgroundImage = "url('./assets/images/user-interface/wooden_Background.png')";
         this.menuDiv.style.backgroundAttachment = "local";
+        this.menuDiv.style.position = "absolute";
+        this.menuDiv.style.top = "18px";
+        this.menuDiv.style.left = (GAME_WIDTH-256-18).toString() + "px";
+        this.menuDiv.style.zIndex = "0";
         this.menuDiv.style.borderStyle = "solid";
         this.menuDiv.style.borderColor = "#915b20";
         this.menuDiv.style.borderWidth = "8px";
-        this.menuDiv.style.overflowY = "auto";
         this.menuDiv.style.borderRadius = "30px";
+        this.menuDiv.style.border
+        this.menuDiv.style.overflowY = "auto";
+        this.menuDiv.style.float = "left";
         this.menuDiv.id = "mainDiv";
 
+        //create border div
+        this.borderDiv = document.createElement("div");
+        this.borderDiv.style.width = '256px';
+        this.borderDiv.style.height = '684px';
+        this.borderDiv.style.backgroundColor = "#915b20"
+        this.borderDiv.style.position = "absolute";
+        this.borderDiv.style.top = "18px";
+        this.borderDiv.style.left = (GAME_WIDTH-256-18).toString() + "px";
+        this.borderDiv.style.zIndex = "1";
+        this.borderDiv.style.borderStyle = "solid";
+        this.borderDiv.style.borderColor = "#915b20";
+        this.borderDiv.style.borderWidth = "10px";
+        this.borderDiv.style.borderRadius = "30px";
+
         let style = document.createElement("style");
-        style.innerHTML = ".simplebar-scrollbar { height: 500px; background-color: #0F0; }";
+        style.innerHTML = "#mainDiv::-webkit-scrollbar {width: 8px;}";
+        style.innerHTML += "#mainDiv::-webkit-scrollbar-track {background: #915b20;}";
+        style.innerHTML += "#mainDiv::-webkit-scrollbar-thumb {background: #80511d;}";
+        style.innerHTML += "#mainDiv::-webkit-scrollbar-thumb:hover {background: #b87328;}";
         this.menuDiv.appendChild(style);
-
-        let bar = new SimpleBar(this.menuDiv);
-        console.log(bar);
-
     }
 
     /**Used to fill the layers lists with tiles from this.tiles */
@@ -171,7 +198,7 @@ export class BuildMenu {
         this.wallList.style.padding = "0px";
         this.wallList.style.margin = "3px";
         //populate list
-        for (let i = 1; i < 32; i++) {
+        for (let i = 1; i < 8; i++) {
             let newItem = this.createListItem(this.tiles[i % 8]);
             this.wallList.appendChild(newItem);
         }
@@ -429,7 +456,8 @@ export class BuildMenu {
      * inverse of the current state
      */
     toggle(show = !this.visible) {
-        this.dom.setVisible(show);
+        this.MenuDom.setVisible(show);
+        this.borderDom.setVisible(show);
         this.buttonBackdrop.setVisible(show);
         this.flipRightButton.setVisible(show);
         this.flipLeftButton.setVisible(show);
@@ -455,7 +483,6 @@ export class BuildMenu {
      * @param newDepth The depth to set the toggle button at
      */
     setDepth(newDepth: number) {
-        this.dom.setDepth(newDepth);
         this.pickButton.setDepth(newDepth);
         this.hammerButton.setDepth(newDepth);
         this.flipLeftButton.setDepth(newDepth);
@@ -536,8 +563,10 @@ export class BuildMenu {
         //emit that we are no longer in build mode
         this.emitter.emit("exitBuildMode");
         //deselect current selected item
-        this.currentSelectedItem.style.borderStyle = "none";
-        this.currentSelectedItem = null;
+        if(this.currentSelectedItem){
+            this.currentSelectedItem.style.borderStyle = "none";
+            this.currentSelectedItem = null;
+        }
     }
 
 }
