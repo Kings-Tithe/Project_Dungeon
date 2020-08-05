@@ -136,7 +136,9 @@ export class BuildMenu {
         this.menuDiv.style.height = '684px';
         this.menuDiv.style.padding = "0px";
         this.menuDiv.style.backgroundImage = "url('./assets/images/user-interface/wooden_Background.png')";
-        this.menuDiv.style.backgroundAttachment = "local";
+        this.menuDiv.style.backgroundAttachment = "fixed";
+        this.menuDiv.style.backgroundRepeat = "round";
+        this.menuDiv.style.backgroundSize = "280px";
         this.menuDiv.style.borderStyle = "solid";
         this.menuDiv.style.borderColor = "#915b20";
         this.menuDiv.style.borderWidth = "8px";
@@ -146,7 +148,11 @@ export class BuildMenu {
 
         let style = document.createElement("style");
         style.type = 'text/css';
-        // style.innerHTML = "ul { background-color: #0F0; }\n";
+        style.innerHTML = ".simplebar-content {\n";
+        style.innerHTML += "    background-image: url('./assets/images/user-interface/wooden_Background.png');\n";
+        style.innerHTML += "    background-attachment: local;\n";
+        style.innerHTML += "    background-size: 280px;\n";
+        style.innerHTML += "}\n";
         this.menuDiv.appendChild(style);
 
     }
@@ -157,7 +163,7 @@ export class BuildMenu {
         this.floorList = document.createElement("ul");
         this.floorList.style.listStyle = "none";
         this.floorList.style.padding = "0px";
-        this.floorList.style.margin = "3px";
+        this.floorList.style.margin = "0px";
         //populate list
         for (let i = 0; i < 1; i++) {
             let newItem = this.createListItem(this.tiles[i]);
@@ -168,7 +174,7 @@ export class BuildMenu {
         this.wallList = document.createElement("ul");
         this.wallList.style.listStyle = "none";
         this.wallList.style.padding = "0px";
-        this.wallList.style.margin = "3px";
+        this.wallList.style.margin = "0px";
         //populate list
         for (let i = 1; i < 32; i++) {
             let newItem = this.createListItem(this.tiles[i % 8]);
@@ -179,14 +185,14 @@ export class BuildMenu {
         this.roofList = document.createElement("ul");
         this.roofList.style.listStyle = "none";
         this.roofList.style.padding = "0px";
-        this.roofList.style.margin = "3px";
+        this.roofList.style.margin = "0px";
         //currently no tiles to populate with
 
-        //create roof list
+        //create special list
         this.specialList = document.createElement("ul");
         this.specialList.style.listStyle = "none";
         this.specialList.style.padding = "0px";
-        this.specialList.style.margin = "3px";
+        this.specialList.style.margin = "0px";
         //currently no tiles to populate with
 
         // Style the list items, this creates the back and forth color pattern on the lists
@@ -211,14 +217,15 @@ export class BuildMenu {
         item.style.display = "flex";
         item.style.alignItems = "center";
         item.className = "tileDesc";
-        item.style.marginBottom = "5px";
+        item.style.margin = "0px";
         item.style.padding = "0px";
         item.style.borderColor = "yellow";
+        // item.style.width = "110%";
         // Image of the block
         let image = document.createElement('img');
-        image.style.width = "64px";
+        image.style.width = "56px";
         image.style.display = "inline-block";
-        image.style.margin = "0px";
+        image.style.margin = "4px 0 4px 4px";
         image.style.padding = "0px";
         /*make the images not draggable method suggested on stack overflow
         had to prevent this because it caused an infinite build on the mouse */
