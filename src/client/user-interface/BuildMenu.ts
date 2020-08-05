@@ -1,6 +1,8 @@
 import { Hud } from "../scenes/overlays/Hud";
 import { GAME_WIDTH } from "../tools/Globals";
 import { SignalManager } from "../services/SignalManager";
+import SimpleBar from 'simplebar';
+
 
 export class BuildMenu {
 
@@ -19,7 +21,7 @@ export class BuildMenu {
     private specialList;
     /**Used to hold what tile us currently selected */
     public currentSelectedItem: HTMLLIElement;
-    
+
     //Global Emitter
     private emitter: SignalManager;
 
@@ -103,12 +105,12 @@ export class BuildMenu {
         this.clearLists();
         this.floorList.style.display = "block";
         this.layerSelected = "floor";
-        this.floorButton.setTexture("floorIcon",1);
+        this.floorButton.setTexture("floorIcon", 1);
         this.emitter.emit("buildingLayerChanged", this.layerSelected);
         //select default tool: hammer
         this.clearToolSelect();
         this.toolSelected = "hammer";
-        this.hammerButton.setTexture("hammerIcon",1);
+        this.hammerButton.setTexture("hammerIcon", 1);
         this.emitter.emit("buildMenuHammerSelected");
     }
 
@@ -126,7 +128,7 @@ export class BuildMenu {
     }
 
     /**Create the main dic that contains the rest of the menu */
-    createMainDiv(){
+    createMainDiv() {
         //create div
         this.menuDiv = document.createElement("div");
         this.menuDiv.style.width = '256px';
@@ -137,63 +139,70 @@ export class BuildMenu {
         this.menuDiv.style.borderStyle = "solid";
         this.menuDiv.style.borderColor = "#915b20";
         this.menuDiv.style.borderWidth = "8px";
-        this.menuDiv.style.overflowY = "overlay";
+        this.menuDiv.style.overflowY = "auto";
         this.menuDiv.style.borderRadius = "30px";
         this.menuDiv.id = "mainDiv";
 
-        let scrollCursor = document.createElement("div");
-        scrollCursor.style.width = '20px';
-        scrollCursor.style.height = '20px';
-        scrollCursor.style.borderRadius = '10px';
-        scrollCursor.style.position = 'absolute';
-        scrollCursor.style.right = '3px';
-        scrollCursor.style.top = '10px';
-        scrollCursor.style.backgroundColor = "#FFF";
-        scrollCursor.draggable = true;
-        this.menuDiv.appendChild(scrollCursor);
+        let style = document.createElement("style");
+        style.innerHTML = ".simplebar-scrollbar { height: 500px; background-color: #0F0; }";
+        this.menuDiv.appendChild(style);
 
-        let down = 0;
+        let bar = new SimpleBar(this.menuDiv);
+        console.log(bar);
 
-        scrollCursor.onmousedown = ()=>{
-            down++;
-        }
+        // let scrollCursor = document.createElement("div");
+        // scrollCursor.style.width = '20px';
+        // scrollCursor.style.height = '20px';
+        // scrollCursor.style.borderRadius = '10px';
+        // scrollCursor.style.position = 'absolute';
+        // scrollCursor.style.right = '3px';
+        // scrollCursor.style.top = '10px';
+        // scrollCursor.style.backgroundColor = "#FFF";
+        // scrollCursor.draggable = true;
+        // this.menuDiv.appendChild(scrollCursor);
 
-        scrollCursor.onmouseup = ()=>{
-            down? down-- : null;
-        }
+        // let down = 0;
 
-        scrollCursor.onmouseleave = ()=>{
-            down? down-- : null;
-        }
+        // scrollCursor.onmousedown = ()=>{
+        //     down++;
+        // }
 
-        scrollCursor.onmousemove = (ev)=>{
-            if(down){
-                // not working yet
-                scrollCursor.style.top = `${ev.y}px`;
-            }
-        }
+        // scrollCursor.onmouseup = ()=>{
+        //     down? down-- : null;
+        // }
 
-        this.menuDiv.onscroll = ()=>{
-            let visualHeight = this.menuDiv.clientHeight - 30;
-            let offset = this.menuDiv.scrollTop;
-            let maxOffset = this.menuDiv.scrollHeight - visualHeight;
-            let scrollPercent = offset / maxOffset;
-            let visualOffset = scrollPercent * visualHeight;
-            let cursorPosition = offset + visualOffset + 10;
-            scrollCursor.style.top = `${cursorPosition}px`;
-        }
+        // scrollCursor.onmouseleave = ()=>{
+        //     down? down-- : null;
+        // }
 
-        let styling = document.createElement('style');
-        styling.type = "text/css";
-        styling.innerHTML = "#mainDiv::-webkit-scrollbar { display:none; }\n";
+        // scrollCursor.onmousemove = (ev)=>{
+        //     if(down){
+        //         // not working yet
+        //         scrollCursor.style.top = `${ev.y}px`;
+        //     }
+        // }
+
+        // this.menuDiv.onscroll = ()=>{
+        //     let visualHeight = this.menuDiv.clientHeight - 30;
+        //     let offset = this.menuDiv.scrollTop;
+        //     let maxOffset = this.menuDiv.scrollHeight - visualHeight;
+        //     let scrollPercent = offset / maxOffset;
+        //     let visualOffset = scrollPercent * visualHeight;
+        //     let cursorPosition = offset + visualOffset + 10;
+        //     scrollCursor.style.top = `${cursorPosition}px`;
+        // }
+
+        // let styling = document.createElement('style');
+        // styling.type = "text/css";
+        // styling.innerHTML = "#mainDiv::-webkit-scrollbar { display:none; }\n";
         // styling.innerHTML += "#mainDiv::-webkit-scrollbar-track { background: #754a1a; }\n";
         // styling.innerHTML += "#mainDiv::-webkit-scrollbar-thumb { background: #b87327; }\n";
         // styling.innerHTML += "#mainDiv::-webkit-scrollbar-thumb:hover { background: #8c581f; }\n";
-        this.menuDiv.appendChild(styling);
+        // this.menuDiv.appendChild(styling);
     }
 
     /**Used to fill the layers lists with tiles from this.tiles */
-    createLists(){
+    createLists() {
         //create floor list
         this.floorList = document.createElement("ul");
         this.floorList.style.listStyle = "none";
@@ -246,7 +255,7 @@ export class BuildMenu {
      * @param tile the tile data to construct the item from
      * @returns the newly constructed item
      */
-    createListItem(tile: tiledata): HTMLLIElement{
+    createListItem(tile: tiledata): HTMLLIElement {
         // List item object, contains details for each block
         let item = document.createElement('li');
         item.style.display = "flex";
@@ -263,7 +272,7 @@ export class BuildMenu {
         image.style.padding = "0px";
         /*make the images not draggable method suggested on stack overflow
         had to prevent this because it caused an infinite build on the mouse */
-        image.ondragstart = () => {return false;};
+        image.ondragstart = () => { return false; };
         // Image data passed in a base 64 string
         image.src = this.hud.textures.getBase64('testBuildSpriteSheetTable', tile.tileSetOffSet);
         // Side text is a list within the list (so it's elements can be top->bottom)
@@ -280,7 +289,7 @@ export class BuildMenu {
         // Assign a callback to clicking on the item
         item.onclick = () => {
             this.swapItemSelection(item);
-            this.emitter.emit("newTileSelected",tile);
+            this.emitter.emit("newTileSelected", tile);
         }
         // Append item elements to list
         item.appendChild(image);
@@ -293,17 +302,17 @@ export class BuildMenu {
      * Creates all the buttons in the menu at the top of the screen
      * @param hud the current hud scene to create the button in 
      */
-    createBuildButtons(hud: Hud){
+    createBuildButtons(hud: Hud) {
         //create the background for the build buttons
         this.buttonBackdrop = this.hud.add.graphics();
-        this.buttonBackdrop.fillStyle(0xb06e27,1);
-        this.buttonBackdrop.lineStyle(20,0x915b20,1)
-        this.buttonBackdrop.strokeRoundedRect(270, 25, 300, 75,20)
-        this.buttonBackdrop.fillRoundedRect(270, 25, 300, 75,20);
+        this.buttonBackdrop.fillStyle(0xb06e27, 1);
+        this.buttonBackdrop.lineStyle(20, 0x915b20, 1)
+        this.buttonBackdrop.strokeRoundedRect(270, 25, 300, 75, 20)
+        this.buttonBackdrop.fillRoundedRect(270, 25, 300, 75, 20);
         this.buttonBackdrop.setVisible(false);
 
         //create flip left button
-        this.flipLeftButton = hud.add.sprite(300,65,"flipLeftIcon");
+        this.flipLeftButton = hud.add.sprite(300, 65, "flipLeftIcon");
         this.flipLeftButton.setDepth(this.depth);
         this.flipLeftButton.setVisible(false);
         this.flipLeftButton.setInteractive();
@@ -314,7 +323,7 @@ export class BuildMenu {
         });
 
         //create flip right button
-        this.flipRightButton = hud.add.sprite(350,65,"flipRightIcon");
+        this.flipRightButton = hud.add.sprite(350, 65, "flipRightIcon");
         this.flipRightButton.setDepth(this.depth);
         this.flipRightButton.setVisible(false);
         this.flipRightButton.setInteractive();
@@ -325,7 +334,7 @@ export class BuildMenu {
         });
 
         //create hammer button
-        this.hammerButton = hud.add.sprite(400,65,"hammerIcon");
+        this.hammerButton = hud.add.sprite(400, 65, "hammerIcon");
         this.hammerButton.setDepth(this.depth);
         this.hammerButton.setScale(2);
         this.hammerButton.setVisible(false);
@@ -333,12 +342,12 @@ export class BuildMenu {
         this.hammerButton.on("pointerdown", () => {
             this.clearToolSelect();
             this.toolSelected = "hammer";
-            this.hammerButton.setTexture("hammerIcon",1);
+            this.hammerButton.setTexture("hammerIcon", 1);
             this.emitter.emit("buildMenuHammerSelected");
         })
 
         //create pick button
-        this.pickButton = hud.add.sprite(450,65,"pickIcon",0);
+        this.pickButton = hud.add.sprite(450, 65, "pickIcon", 0);
         this.pickButton.setDepth(this.depth);
         this.pickButton.setScale(2);
         this.pickButton.setVisible(false);
@@ -352,7 +361,7 @@ export class BuildMenu {
 
         //create the layer selection keys
         //create floor button
-        this.floorButton = hud.add.sprite(500,93,"floorIcon");
+        this.floorButton = hud.add.sprite(500, 93, "floorIcon");
         this.floorButton.setDepth(this.depth);
         this.floorButton.setScale(.75);
         this.floorButton.setVisible(false);
@@ -362,11 +371,11 @@ export class BuildMenu {
             this.clearLists();
             this.floorList.style.display = "block";
             this.layerSelected = "floor";
-            this.floorButton.setTexture("floorIcon",1);
+            this.floorButton.setTexture("floorIcon", 1);
             this.emitter.emit("buildingLayerChanged", this.layerSelected);
         })
         //create wall button
-        this.wallButton = hud.add.sprite(500,74,"wallIcon");
+        this.wallButton = hud.add.sprite(500, 74, "wallIcon");
         this.wallButton.setDepth(this.depth);
         this.wallButton.setScale(.75);
         this.wallButton.setVisible(false);
@@ -376,11 +385,11 @@ export class BuildMenu {
             this.clearLists();
             this.wallList.style.display = "block";
             this.layerSelected = "wall";
-            this.wallButton.setTexture("wallIcon",1);
+            this.wallButton.setTexture("wallIcon", 1);
             this.emitter.emit("buildingLayerChanged", this.layerSelected);
         })
         //create roof button
-        this.roofButton = hud.add.sprite(500,44,"roofIcon");
+        this.roofButton = hud.add.sprite(500, 44, "roofIcon");
         this.roofButton.setDepth(this.depth);
         this.roofButton.setScale(.75);
         this.roofButton.setVisible(false);
@@ -390,11 +399,11 @@ export class BuildMenu {
             this.clearLists();
             this.roofList.style.display = "block";
             this.layerSelected = "roof";
-            this.roofButton.setTexture("roofIcon",1);
+            this.roofButton.setTexture("roofIcon", 1);
             this.emitter.emit("buildingLayerChanged", this.layerSelected);
         })
         //create special Object button
-        this.specialObjectButton = hud.add.sprite(543,73,"doorIcon");
+        this.specialObjectButton = hud.add.sprite(543, 73, "doorIcon");
         this.specialObjectButton.setDepth(this.depth);
         this.specialObjectButton.setScale(1);
         this.specialObjectButton.setVisible(false);
@@ -404,7 +413,7 @@ export class BuildMenu {
             this.clearLists();
             this.specialList.style.display = "block";
             this.layerSelected = "special";
-            this.specialObjectButton.setTexture("doorIcon",1);
+            this.specialObjectButton.setTexture("doorIcon", 1);
             this.emitter.emit("buildingLayerChanged", this.layerSelected);
         })
     }
@@ -416,8 +425,8 @@ export class BuildMenu {
      * @param buttonX where to place the button on the x plane
      * @param buttonY where to place the button on the y plane
      */
-    placeToggleButton(hud: Hud, buttonX: number, buttonY: number){
-        if(this.buildingToggleButton){
+    placeToggleButton(hud: Hud, buttonX: number, buttonY: number) {
+        if (this.buildingToggleButton) {
             this.buildingToggleButton.x = buttonX;
             this.buildingToggleButton.y = buttonY;
         } else {
@@ -440,8 +449,8 @@ export class BuildMenu {
      * selected item
      * @param newItem The new item to add the border to 
      */
-    swapItemSelection(newItem: HTMLLIElement){
-        if (this.currentSelectedItem){
+    swapItemSelection(newItem: HTMLLIElement) {
+        if (this.currentSelectedItem) {
             this.currentSelectedItem.style.borderStyle = "none";
         }
         this.currentSelectedItem = newItem;
@@ -449,11 +458,11 @@ export class BuildMenu {
     }
 
     /**Used to import all the tiles it is possible to use for building */
-    importTiles(){
+    importTiles() {
         /*Eventually these will be enumerated in a file but for now it is all
         generated here */
         this.tiles = [];
-        for(let i = 0; i < 8; i++){
+        for (let i = 0; i < 8; i++) {
             this.tiles[i] = {
                 tileSetKey: "testBuildSpriteSheet",
                 tileSetOffSet: i,
@@ -482,11 +491,11 @@ export class BuildMenu {
         this.visible = show;
     }
 
-     /**
-     * Sets the depth for just the toggle button 
-     * @param newDepth The depth to set the toggle button at
-     */
-    setToggleButtonDepth(newDepth: number){
+    /**
+    * Sets the depth for just the toggle button 
+    * @param newDepth The depth to set the toggle button at
+    */
+    setToggleButtonDepth(newDepth: number) {
         this.buildingToggleButton.setDepth(newDepth);
     }
 
@@ -494,7 +503,7 @@ export class BuildMenu {
      * Sets the depth for the whole build menu
      * @param newDepth The depth to set the toggle button at
      */
-    setDepth(newDepth: number){
+    setDepth(newDepth: number) {
         this.dom.setDepth(newDepth);
         this.pickButton.setDepth(newDepth);
         this.hammerButton.setDepth(newDepth);
@@ -511,20 +520,20 @@ export class BuildMenu {
      * to clear the layer within other classes that use this
      * data 
      */
-    clearLayerSelect(emitEvent: boolean = true){
+    clearLayerSelect(emitEvent: boolean = true) {
         //clear the string holder layer's string key
         this.layerSelected = "";
         //make sure no button shows as selected
-        this.floorButton.setTexture("floorIcon",0);
-        this.wallButton.setTexture("wallIcon",0);
-        this.roofButton.setTexture("roofIcon",0);
-        this.specialObjectButton.setTexture("doorIcon",0);
+        this.floorButton.setTexture("floorIcon", 0);
+        this.wallButton.setTexture("wallIcon", 0);
+        this.roofButton.setTexture("roofIcon", 0);
+        this.specialObjectButton.setTexture("doorIcon", 0);
         //if passed in to, emit global event
-        if(emitEvent){
+        if (emitEvent) {
             this.emitter.emit("clearBuildingLayer");
         }
         //clear current selected tile
-        if (this.currentSelectedItem){
+        if (this.currentSelectedItem) {
             this.currentSelectedItem.style.borderStyle = "none";
             this.currentSelectedItem = null;
         }
@@ -539,20 +548,20 @@ export class BuildMenu {
      * to clear the layer within other classes that use this
      * data 
      */
-    clearToolSelect(emitEvent: boolean = true){
+    clearToolSelect(emitEvent: boolean = true) {
         //make sure to clear the string holding tools string key
         this.toolSelected = "";
         //make sure no button shows as selected
         this.hammerButton.setTexture("hammerIcon", 0);
         this.pickButton.setTexture("pickIcon", 0);
         //if passed in to, emit global event
-        if(emitEvent){
+        if (emitEvent) {
             this.emitter.emit("clearBuildingTool");
         }
     }
 
     /**Clears which lists are being displayed */
-    clearLists(){
+    clearLists() {
         this.floorList.style.display = "none";
         this.wallList.style.display = "none";
         this.roofList.style.display = "none";

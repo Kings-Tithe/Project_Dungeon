@@ -20,6 +20,7 @@
   "private": true,
   "dependencies": {
     "phaser": "^3.23.0",
+    "simplebar": "^5.2.1",
     "yarn": "^1.22.4"
   },
   "devDependencies": {
