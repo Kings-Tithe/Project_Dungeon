@@ -2,6 +2,7 @@ import { Hud } from "../scenes/overlays/Hud";
 import { GAME_WIDTH } from "../tools/Globals";
 import { SignalManager } from "../services/SignalManager";
 import SimpleBar from 'simplebar';
+import 'simplebar/dist/simplebar.css';
 
 
 export class BuildMenu {
@@ -139,16 +140,14 @@ export class BuildMenu {
         this.menuDiv.style.borderStyle = "solid";
         this.menuDiv.style.borderColor = "#915b20";
         this.menuDiv.style.borderWidth = "8px";
-        this.menuDiv.style.overflowY = "auto";
+        this.menuDiv.style.overflow = "auto";
         this.menuDiv.style.borderRadius = "30px";
         this.menuDiv.id = "mainDiv";
 
         let style = document.createElement("style");
-        style.innerHTML = ".simplebar-scrollbar { height: 500px; background-color: #0F0; }";
+        style.type = 'text/css';
+        // style.innerHTML = "ul { background-color: #0F0; }\n";
         this.menuDiv.appendChild(style);
-
-        let bar = new SimpleBar(this.menuDiv);
-        console.log(bar);
 
     }
 
@@ -377,6 +376,7 @@ export class BuildMenu {
      * @param buttonY where to place the button on the y plane
      */
     placeToggleButton(hud: Hud, buttonX: number, buttonY: number) {
+        var wtf = false;
         if (this.buildingToggleButton) {
             this.buildingToggleButton.x = buttonX;
             this.buildingToggleButton.y = buttonY;
@@ -386,10 +386,16 @@ export class BuildMenu {
             this.buildingToggleButton.setScale(2);
             this.buildingToggleButton.setInteractive();
             this.buildingToggleButton.on("pointerdown", () => {
+
                 if (this.inBuildingMode) {
                     this.exitBuildMode();
                 } else {
                     this.enterBuildMode();
+                    if (!wtf) {
+                        let bar = new SimpleBar(this.menuDiv);
+                        console.log(bar);
+                        wtf = true;
+                    }    
                 }
             })
         }
