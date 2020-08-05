@@ -150,55 +150,6 @@ export class BuildMenu {
         let bar = new SimpleBar(this.menuDiv);
         console.log(bar);
 
-        // let scrollCursor = document.createElement("div");
-        // scrollCursor.style.width = '20px';
-        // scrollCursor.style.height = '20px';
-        // scrollCursor.style.borderRadius = '10px';
-        // scrollCursor.style.position = 'absolute';
-        // scrollCursor.style.right = '3px';
-        // scrollCursor.style.top = '10px';
-        // scrollCursor.style.backgroundColor = "#FFF";
-        // scrollCursor.draggable = true;
-        // this.menuDiv.appendChild(scrollCursor);
-
-        // let down = 0;
-
-        // scrollCursor.onmousedown = ()=>{
-        //     down++;
-        // }
-
-        // scrollCursor.onmouseup = ()=>{
-        //     down? down-- : null;
-        // }
-
-        // scrollCursor.onmouseleave = ()=>{
-        //     down? down-- : null;
-        // }
-
-        // scrollCursor.onmousemove = (ev)=>{
-        //     if(down){
-        //         // not working yet
-        //         scrollCursor.style.top = `${ev.y}px`;
-        //     }
-        // }
-
-        // this.menuDiv.onscroll = ()=>{
-        //     let visualHeight = this.menuDiv.clientHeight - 30;
-        //     let offset = this.menuDiv.scrollTop;
-        //     let maxOffset = this.menuDiv.scrollHeight - visualHeight;
-        //     let scrollPercent = offset / maxOffset;
-        //     let visualOffset = scrollPercent * visualHeight;
-        //     let cursorPosition = offset + visualOffset + 10;
-        //     scrollCursor.style.top = `${cursorPosition}px`;
-        // }
-
-        // let styling = document.createElement('style');
-        // styling.type = "text/css";
-        // styling.innerHTML = "#mainDiv::-webkit-scrollbar { display:none; }\n";
-        // styling.innerHTML += "#mainDiv::-webkit-scrollbar-track { background: #754a1a; }\n";
-        // styling.innerHTML += "#mainDiv::-webkit-scrollbar-thumb { background: #b87327; }\n";
-        // styling.innerHTML += "#mainDiv::-webkit-scrollbar-thumb:hover { background: #8c581f; }\n";
-        // this.menuDiv.appendChild(styling);
     }
 
     /**Used to fill the layers lists with tiles from this.tiles */
