@@ -64,7 +64,7 @@ signals.on('evil-king-death', ()=>{
 ```
 
 ### Files & Folders
-Source files have no particular naming convention though **camelCase** or **snake_case** are generally preferred. In addition, files in the same folder should preferably use the same naming convention.
+Source files have no particular naming convention though **camelCase** or **snake_case** are generally preferred. (**PascalCase** may be used when a file's main export is a class) In addition, files in the same folder should preferably use the same naming convention.
 
 For script files in the root directory, we prefer **dot.case** (dots separating words). Even still, in the root directory there are exceptions. For example, Node's `package-lock.json`. This file cannot be renamed and thus does not follow our conventions.
 
