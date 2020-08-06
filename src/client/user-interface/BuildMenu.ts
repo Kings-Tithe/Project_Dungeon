@@ -13,12 +13,8 @@ export class BuildMenu {
     //HTML Elements
     /** A div that holds the entire menu */
     private menuDiv: HTMLDivElement;
-    /**A border that goes around the main div */
-    private borderDiv: HTMLDivElement;
     /**Refernce to the Phaser dom used here */
-    public MenuDom: Phaser.GameObjects.DOMElement;
-    /**Refernce to the Phaser dom used here */
-    public borderDom: Phaser.GameObjects.DOMElement;
+    public dom: Phaser.GameObjects.DOMElement;
     /**Used to hold the lists for the 4 layers */
     private floorList;
     private wallList;
@@ -98,14 +94,10 @@ export class BuildMenu {
         this.menuDiv.appendChild(this.roofList);
         this.menuDiv.appendChild(this.specialList);
         //create dom and add the main div
-        this.borderDom = this.hud.add.dom(0,0,this.borderDiv);
-        this.borderDom.setDepth(this.depth)
-        this.borderDom.setOrigin(0);
-        this.borderDom.setVisible(false);
-        this.MenuDom = this.hud.add.dom(0,0,this.menuDiv);
-        this.MenuDom.setDepth(this.depth + 1)
-        this.MenuDom.setOrigin(0);
-        this.MenuDom.setVisible(false);
+        this.dom = this.hud.add.dom((GAME_WIDTH - 256) - 15, 18, this.menuDiv);
+        this.dom.setDepth(this.depth)
+        this.dom.setOrigin(0);
+        this.dom.setVisible(false);
         //create and set small top screen buttons
         this.createBuildButtons(hud);
 
@@ -143,7 +135,6 @@ export class BuildMenu {
         this.menuDiv.style.width = '256px';
         this.menuDiv.style.height = '684px';
         this.menuDiv.style.padding = "0px";
-        this.menuDiv.style.margin = "0px";
         this.menuDiv.style.backgroundImage = "url('./assets/images/user-interface/wooden_Background.png')";
         this.menuDiv.style.backgroundAttachment = "fixed";
         this.menuDiv.style.backgroundRepeat = "round";
@@ -153,24 +144,7 @@ export class BuildMenu {
         this.menuDiv.style.borderWidth = "8px";
         this.menuDiv.style.overflow = "auto";
         this.menuDiv.style.borderRadius = "30px";
-        this.menuDiv.style.border
-        this.menuDiv.style.overflowY = "auto";
-        this.menuDiv.style.float = "left";
         this.menuDiv.id = "mainDiv";
-
-        //create border div
-        this.borderDiv = document.createElement("div");
-        this.borderDiv.style.width = '256px';
-        this.borderDiv.style.height = '684px';
-        this.borderDiv.style.backgroundColor = "#915b20";
-        this.borderDiv.style.position = "absolute";
-        this.borderDiv.style.top = "18px";
-        this.borderDiv.style.left = (GAME_WIDTH-256-18).toString() + "px";
-        this.borderDiv.style.zIndex = "1";
-        this.borderDiv.style.borderStyle = "solid";
-        this.borderDiv.style.borderColor = "#915b20";
-        this.borderDiv.style.borderWidth = "10px";
-        this.borderDiv.style.borderRadius = "30px";
 
         let style = document.createElement("style");
         style.type = 'text/css';
@@ -202,7 +176,7 @@ export class BuildMenu {
         this.wallList.style.padding = "0px";
         this.wallList.style.margin = "0px";
         //populate list
-        for (let i = 1; i < 8; i++) {
+        for (let i = 1; i < 32; i++) {
             let newItem = this.createListItem(this.tiles[i % 8]);
             this.wallList.appendChild(newItem);
         }
@@ -350,14 +324,12 @@ export class BuildMenu {
         this.floorButton.setVisible(false);
         this.floorButton.setInteractive()
         this.floorButton.on("pointerdown", () => {
-            if (this.layerSelected != "floor"){
-                this.clearLayerSelect(false);
-                this.clearLists();
-                this.floorList.style.display = "block";
-                this.layerSelected = "floor";
-                this.floorButton.setTexture("floorIcon", 1);
-                this.emitter.emit("buildingLayerChanged", this.layerSelected);
-            }
+            this.clearLayerSelect(false);
+            this.clearLists();
+            this.floorList.style.display = "block";
+            this.layerSelected = "floor";
+            this.floorButton.setTexture("floorIcon", 1);
+            this.emitter.emit("buildingLayerChanged", this.layerSelected);
         })
         //create wall button
         this.wallButton = hud.add.sprite(500, 74, "wallIcon");
@@ -366,14 +338,12 @@ export class BuildMenu {
         this.wallButton.setVisible(false);
         this.wallButton.setInteractive()
         this.wallButton.on("pointerdown", () => {
-            if (this.layerSelected != "wall"){
-                this.clearLayerSelect(false);
-                this.clearLists();
-                this.wallList.style.display = "block";
-                this.layerSelected = "wall";
-                this.wallButton.setTexture("wallIcon", 1);
-                this.emitter.emit("buildingLayerChanged", this.layerSelected);   
-            }
+            this.clearLayerSelect(false);
+            this.clearLists();
+            this.wallList.style.display = "block";
+            this.layerSelected = "wall";
+            this.wallButton.setTexture("wallIcon", 1);
+            this.emitter.emit("buildingLayerChanged", this.layerSelected);
         })
         //create roof button
         this.roofButton = hud.add.sprite(500, 44, "roofIcon");
@@ -382,14 +352,12 @@ export class BuildMenu {
         this.roofButton.setVisible(false);
         this.roofButton.setInteractive()
         this.roofButton.on("pointerdown", () => {
-            if (this.layerSelected != "roof"){
-                this.clearLayerSelect(false);
-                this.clearLists();
-                this.roofList.style.display = "block";
-                this.layerSelected = "roof";
-                this.roofButton.setTexture("roofIcon", 1);
-                this.emitter.emit("buildingLayerChanged", this.layerSelected);
-            }
+            this.clearLayerSelect(false);
+            this.clearLists();
+            this.roofList.style.display = "block";
+            this.layerSelected = "roof";
+            this.roofButton.setTexture("roofIcon", 1);
+            this.emitter.emit("buildingLayerChanged", this.layerSelected);
         })
         //create special Object button
         this.specialObjectButton = hud.add.sprite(543, 73, "doorIcon");
@@ -398,14 +366,12 @@ export class BuildMenu {
         this.specialObjectButton.setVisible(false);
         this.specialObjectButton.setInteractive()
         this.specialObjectButton.on("pointerdown", () => {
-            if (this.layerSelected != "special"){
-                this.clearLayerSelect(false);
-                this.clearLists();
-                this.specialList.style.display = "block";
-                this.layerSelected = "special";
-                this.specialObjectButton.setTexture("doorIcon", 1);
-                this.emitter.emit("buildingLayerChanged", this.layerSelected);   
-            }
+            this.clearLayerSelect(false);
+            this.clearLists();
+            this.specialList.style.display = "block";
+            this.layerSelected = "special";
+            this.specialObjectButton.setTexture("doorIcon", 1);
+            this.emitter.emit("buildingLayerChanged", this.layerSelected);
         })
     }
 
@@ -476,8 +442,7 @@ export class BuildMenu {
      * inverse of the current state
      */
     toggle(show = !this.visible) {
-        this.MenuDom.setVisible(show);
-        this.borderDom.setVisible(show);
+        this.dom.setVisible(show);
         this.buttonBackdrop.setVisible(show);
         this.flipRightButton.setVisible(show);
         this.flipLeftButton.setVisible(show);
@@ -503,6 +468,7 @@ export class BuildMenu {
      * @param newDepth The depth to set the toggle button at
      */
     setDepth(newDepth: number) {
+        this.dom.setDepth(newDepth);
         this.pickButton.setDepth(newDepth);
         this.hammerButton.setDepth(newDepth);
         this.flipLeftButton.setDepth(newDepth);
@@ -583,10 +549,8 @@ export class BuildMenu {
         //emit that we are no longer in build mode
         this.emitter.emit("exitBuildMode");
         //deselect current selected item
-        if(this.currentSelectedItem){
-            this.currentSelectedItem.style.borderStyle = "none";
-            this.currentSelectedItem = null;
-        }
+        this.currentSelectedItem.style.borderStyle = "none";
+        this.currentSelectedItem = null;
     }
 
 }
