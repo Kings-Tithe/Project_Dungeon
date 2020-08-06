@@ -123,7 +123,7 @@ export class Island extends Phaser.Scene {
     update() {
         this.player.updatePlayerInput();
         this.player.update();
-        this.Builder.update(this.player);
+        this.Builder.update(this.player, [this.walkLayer,this.overheadLayer]);
     }
 
     /**

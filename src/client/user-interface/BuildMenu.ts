@@ -161,7 +161,7 @@ export class BuildMenu {
         this.borderDiv = document.createElement("div");
         this.borderDiv.style.width = '256px';
         this.borderDiv.style.height = '684px';
-        this.borderDiv.style.backgroundColor = "#915b20"
+        this.borderDiv.style.backgroundColor = "#915b20";
         this.borderDiv.style.position = "absolute";
         this.borderDiv.style.top = "18px";
         this.borderDiv.style.left = (GAME_WIDTH-256-18).toString() + "px";
@@ -345,12 +345,14 @@ export class BuildMenu {
         this.floorButton.setVisible(false);
         this.floorButton.setInteractive()
         this.floorButton.on("pointerdown", () => {
-            this.clearLayerSelect(false);
-            this.clearLists();
-            this.floorList.style.display = "block";
-            this.layerSelected = "floor";
-            this.floorButton.setTexture("floorIcon", 1);
-            this.emitter.emit("buildingLayerChanged", this.layerSelected);
+            if (this.layerSelected != "floor"){
+                this.clearLayerSelect(false);
+                this.clearLists();
+                this.floorList.style.display = "block";
+                this.layerSelected = "floor";
+                this.floorButton.setTexture("floorIcon", 1);
+                this.emitter.emit("buildingLayerChanged", this.layerSelected);
+            }
         })
         //create wall button
         this.wallButton = hud.add.sprite(500, 74, "wallIcon");
@@ -359,12 +361,14 @@ export class BuildMenu {
         this.wallButton.setVisible(false);
         this.wallButton.setInteractive()
         this.wallButton.on("pointerdown", () => {
-            this.clearLayerSelect(false);
-            this.clearLists();
-            this.wallList.style.display = "block";
-            this.layerSelected = "wall";
-            this.wallButton.setTexture("wallIcon", 1);
-            this.emitter.emit("buildingLayerChanged", this.layerSelected);
+            if (this.layerSelected != "wall"){
+                this.clearLayerSelect(false);
+                this.clearLists();
+                this.wallList.style.display = "block";
+                this.layerSelected = "wall";
+                this.wallButton.setTexture("wallIcon", 1);
+                this.emitter.emit("buildingLayerChanged", this.layerSelected);   
+            }
         })
         //create roof button
         this.roofButton = hud.add.sprite(500, 44, "roofIcon");
@@ -373,12 +377,14 @@ export class BuildMenu {
         this.roofButton.setVisible(false);
         this.roofButton.setInteractive()
         this.roofButton.on("pointerdown", () => {
-            this.clearLayerSelect(false);
-            this.clearLists();
-            this.roofList.style.display = "block";
-            this.layerSelected = "roof";
-            this.roofButton.setTexture("roofIcon", 1);
-            this.emitter.emit("buildingLayerChanged", this.layerSelected);
+            if (this.layerSelected != "roof"){
+                this.clearLayerSelect(false);
+                this.clearLists();
+                this.roofList.style.display = "block";
+                this.layerSelected = "roof";
+                this.roofButton.setTexture("roofIcon", 1);
+                this.emitter.emit("buildingLayerChanged", this.layerSelected);
+            }
         })
         //create special Object button
         this.specialObjectButton = hud.add.sprite(543, 73, "doorIcon");
@@ -387,12 +393,14 @@ export class BuildMenu {
         this.specialObjectButton.setVisible(false);
         this.specialObjectButton.setInteractive()
         this.specialObjectButton.on("pointerdown", () => {
-            this.clearLayerSelect(false);
-            this.clearLists();
-            this.specialList.style.display = "block";
-            this.layerSelected = "special";
-            this.specialObjectButton.setTexture("doorIcon", 1);
-            this.emitter.emit("buildingLayerChanged", this.layerSelected);
+            if (this.layerSelected != "special"){
+                this.clearLayerSelect(false);
+                this.clearLists();
+                this.specialList.style.display = "block";
+                this.layerSelected = "special";
+                this.specialObjectButton.setTexture("doorIcon", 1);
+                this.emitter.emit("buildingLayerChanged", this.layerSelected);   
+            }
         })
     }
 

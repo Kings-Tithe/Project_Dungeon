@@ -79,34 +79,7 @@ export class Hud extends Phaser.Scene {
 
         //events to listen for
         this.signals = SignalManager.get();
-        this.signals.on("changePortrait", this.changePortraitSprite, this);
-        this.signals.on("pause-down", () => {
-            if(this.paused){
-                this.pauseFog.visible = false;
-                this.pauseText.visible = false;
-                if(this.buildMenu.visible){
-                    this.buildMenu.MenuDom.setVisible(true);
-                    this.buildMenu.borderDom.setVisible(true);
-                }
-                for(let i = 0; i < this.pausedScenes.length; i++){
-                    this.scene.resume(this.pausedScenes[i]);
-                }
-                this.paused = false;
-            } else {
-                this.paused = true;
-                this.pauseFog.visible = true;
-                this.pauseText.visible = true;
-                console.log(this.buildMenu.visible)
-                if(this.buildMenu.visible){
-                    this.buildMenu.MenuDom.setVisible(false);
-                    this.buildMenu.borderDom.setVisible(false);
-                }
-            }
-        })
-        this.signals.on("pausing", (incomingScene: string) => {
-            this.pausedScenes.push(incomingScene);
-        })
-    
+        this.addListeners();
 
         this.characterSheet = new CharacterSheet(this);
     }
@@ -125,7 +98,7 @@ export class Hud extends Phaser.Scene {
             // Backtick (or tilde) key (`, ~) even opens/closes the console
             if (ev.which == '96') {
                 // Toggle the display of the console and phaser controls
-                //con.toggleDisplay(this.game.input.keyboard);
+                con.toggleDisplay(this.game.input.keyboard);
             }
         });
 
@@ -170,6 +143,36 @@ export class Hud extends Phaser.Scene {
         } else {
             this.portrait.setTexture(spritekey);
         }
+    }
+
+    addListeners(){
+        this.signals.on("changePortrait", this.changePortraitSprite, this);
+        this.signals.on("pause-down", () => {
+            if(this.paused){
+                this.pauseFog.visible = false;
+                this.pauseText.visible = false;
+                if(this.buildMenu.visible){
+                    this.buildMenu.MenuDom.setVisible(true);
+                    this.buildMenu.borderDom.setVisible(true);
+                }
+                for(let i = 0; i < this.pausedScenes.length; i++){
+                    this.scene.resume(this.pausedScenes[i]);
+                }
+                this.paused = false;
+            } else {
+                this.paused = true;
+                this.pauseFog.visible = true;
+                this.pauseText.visible = true;
+                console.log(this.buildMenu.visible)
+                if(this.buildMenu.visible){
+                    this.buildMenu.MenuDom.setVisible(false);
+                    this.buildMenu.borderDom.setVisible(false);
+                }
+            }
+        })
+        this.signals.on("pausing", (incomingScene: string) => {
+            this.pausedScenes.push(incomingScene);
+        })
     }
 
 }

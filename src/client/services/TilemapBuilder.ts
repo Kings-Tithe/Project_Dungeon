@@ -37,14 +37,8 @@ export class TilemapBuilder {
     cursorDepth: number;
 
     //dynamic layers
-    /**Layer used for building floor tiles */
-    floorLayer: Phaser.Tilemaps.DynamicTilemapLayer;
-    /**Layer used for building wall tiles */
-    wallLayer: Phaser.Tilemaps.DynamicTilemapLayer;
-    /**Layer used for building floor tiles */
-    roofLayer: Phaser.Tilemaps.DynamicTilemapLayer;
-    /**Layer used for building floor tiles */
-    specialLayer: Phaser.Tilemaps.DynamicTilemapLayer;
+    /**holds all the dynamic layers we build on */
+    buildingLayers: {[key: string] :Phaser.Tilemaps.DynamicTilemapLayer};
 
     // Handles signals from other scenes/classes
     signals: SignalManager;
@@ -133,16 +127,18 @@ export class TilemapBuilder {
     createLayers(map: Phaser.Tilemaps.Tilemap){
         //eventually this will be imported in but for now it is hardcoded
         this.testBuildSpriteSheet = map.addTilesetImage("testBuildSpriteSheet");
+
+        this.buildingLayers = {};
         //create new black dynamic layers
-        this.floorLayer = map.createBlankDynamicLayer("floor", [this.testBuildSpriteSheet]);
-        this.wallLayer = map.createBlankDynamicLayer("wall", [this.testBuildSpriteSheet]);
-        this.roofLayer = map.createBlankDynamicLayer("roof", [this.testBuildSpriteSheet]);
-        this.specialLayer = map.createBlankDynamicLayer("special", [this.testBuildSpriteSheet]);
+        this.buildingLayers["floor"] = map.createBlankDynamicLayer("floor", [this.testBuildSpriteSheet]);
+        this.buildingLayers["wall"] = map.createBlankDynamicLayer("wall", [this.testBuildSpriteSheet]);
+        this.buildingLayers["roof"] = map.createBlankDynamicLayer("roof", [this.testBuildSpriteSheet]);
+        this.buildingLayers["special"] = map.createBlankDynamicLayer("special", [this.testBuildSpriteSheet]);
         //set depths
-        this.floorLayer.depth = this.lowerDepth + 0.1;
-        this.wallLayer.depth = this.lowerDepth + 0.2;
-        this.specialLayer.depth = this.lowerDepth + 0.3;
-        this.roofLayer.depth = this.upperDepth;
+        this.buildingLayers["floor"].depth = this.lowerDepth + 0.1;
+        this.buildingLayers["wall"].depth = this.lowerDepth + 0.2;
+        this.buildingLayers["special"].depth = this.lowerDepth + 0.3;
+        this.buildingLayers["roof"].depth = this.upperDepth;
     }
 
     /**Sets up varibles and logic for when entering build mode */
@@ -168,8 +164,8 @@ export class TilemapBuilder {
      * @param player The player to add collison to all the party members of 
      * */
     addCollisionToPlayer(player: Player){
-        player.addCollisionByLayer(this.wallLayer);
-        player.addCollisionByLayer(this.specialLayer);
+        player.addCollisionByLayer(this.buildingLayers["wall"]);
+        player.addCollisionByLayer(this.buildingLayers["special"]);
     }
 
     /**
@@ -178,7 +174,7 @@ export class TilemapBuilder {
      *  */
     setUpperDepth(newDepth: number){
         this.upperDepth = newDepth;
-        this.roofLayer.depth = this.upperDepth;
+        this.buildingLayers["roof"].depth = this.upperDepth;
     }
 
     /**
@@ -187,9 +183,9 @@ export class TilemapBuilder {
      *  */
     setLowerDepth(newDepth: number){
         this.lowerDepth = newDepth;
-        this.floorLayer.depth = this.lowerDepth + 0.1;
-        this.wallLayer.depth = this.lowerDepth + 0.2;
-        this.specialLayer.depth = this.lowerDepth + 0.3;
+        this.buildingLayers["floor"].depth = this.lowerDepth + 0.1;
+        this.buildingLayers["wall"].depth = this.lowerDepth + 0.2;
+        this.buildingLayers["special"].depth = this.lowerDepth + 0.3;
     }
 
     /**
@@ -207,67 +203,109 @@ export class TilemapBuilder {
     /**
      * Update function called in the update loop to run the logic for moving and placing blocks when in build mode. 
      * @param player what player is doing the building here and we should check around to allow building
+     * @param checkLayers a set of layers to check over before building
      * */
-    update(player: Player) {
-        if(this.inBuildMode && this.currentTile){
+    update(player: Player, checkLayers: (Phaser.Tilemaps.StaticTilemapLayer | Phaser.Tilemaps.DynamicTilemapLayer)[] = []) {
+        if(this.inBuildMode){
             //grab the cursor's current point in the world taking into account the camera
             let worldPoint = <Phaser.Math.Vector2>this.currentScene.input.activePointer.positionToCamera(this.currentScene.cameras.main);
-            let worldTile: Phaser.Math.Vector2 = this.floorLayer.worldToTileXY(worldPoint.x, worldPoint.y,true);
-            let tilecoord = this.floorLayer.tileToWorldXY(worldTile.x, worldTile.y);
+            let worldTile: Phaser.Math.Vector2 = this.buildingLayers["floor"].worldToTileXY(worldPoint.x, worldPoint.y,true);
+            let tilecoord: Phaser.Math.Vector2 = this.buildingLayers["floor"].tileToWorldXY(worldTile.x, worldTile.y);
             //move cursor tile
-            this.cursorTile.x = tilecoord.x + 8;
-            this.cursorTile.y = tilecoord.y + 8;
+            if (this.currentTile){
+                this.cursorTile.x = tilecoord.x + 8;
+                this.cursorTile.y = tilecoord.y + 8;
+            }
             //move cursor hammer
             this.toolCursor.x = worldPoint.x - 10;
             this.toolCursor.y = worldPoint.y - 10;
-            //check if a block could be placed this update
-            let canPlace: boolean = true;
+            //check there is nothing already on the check layers
+            let nothingOnOtherLayers: boolean = true;
+            for (let i = 0; i < checkLayers.length; i ++){
+                if(checkLayers[i].getTileAtWorldXY(worldPoint.x, worldPoint.y)){
+                    nothingOnOtherLayers = false;
+                }
+            }
+
+            if (nothingOnOtherLayers){
+                if(this.toolSelected == "hammer" && this.currentTile){
+                    this._checkBuildBlock(player,tilecoord);
+                } else if (this.toolSelected == "pick") {
+                    this._checkRemoveBlock(player,tilecoord);
+                } else {
+                    this.toolCursor.setVisible(false);
+                }
+            } else {
+                if(this.cursorTile){
+                    this.cursorTile.setVisible(false);
+                }
+                this.toolCursor.setVisible(false);
+            }
+        }
+    }
+
+    /**An internal function for checking if to show the cursors and if to place a block at the cursors place
+     * it is called in the update function only under certain perset conditions. 
+     */
+    _checkBuildBlock(player: Player, tilecoord: Phaser.Math.Vector2){
+        /*run a set of checks to see if the action attemping to be preformed is possible,
+        all values start true and may be changed to false by a check */
+        let withinRadius: boolean = true;
+        let notBuildingOnPlayer: boolean = true;
+        //check for radius around player
+        let differenceX = Math.abs(player.party[0].sprite.x - tilecoord.x);
+        let differenceY = Math.abs(player.party[0].sprite.y - tilecoord.y)
+        if(Math.hypot(differenceX, differenceY) > 125){
+            withinRadius = false;
+        }
+        //check we are not building on the player
+        let playerBounds = player.party[0].sprite.getBounds();
+        let tilebounds = new Phaser.Geom.Rectangle(tilecoord.x, tilecoord.y, 16, 16);
+        if(Phaser.Geom.Rectangle.Overlaps(playerBounds,tilebounds)){
+            notBuildingOnPlayer = false;
+        }
+        //determine if to show the cursors
+        if(withinRadius && ((this.layerSelected == "floor" || this.layerSelected == "roof") || notBuildingOnPlayer)){
+            this.cursorTile.setVisible(true);
+            this.toolCursor.setVisible(true);
+        } else {
+            this.cursorTile.setVisible(false);
+            this.toolCursor.setVisible(false);
+        }
+
+        if (withinRadius && this.currentScene.input.manager.activePointer.isDown){
+            if(this.layerSelected == "floor" || this.layerSelected == "roof"){
+                this.hammeringTween.play();
+                let tilesetStart = this.testBuildSpriteSheet.firstgid;
+                let tile = this.buildingLayers[this.layerSelected].putTileAtWorldXY(tilesetStart + this.currentTile.tileSetOffSet, tilecoord.x, tilecoord.y);
+                tile.rotation = Phaser.Math.DegToRad(this.rotation);
+            } else if (notBuildingOnPlayer){
+                this.hammeringTween.play();
+                let tilesetStart = this.testBuildSpriteSheet.firstgid;
+                let tile = this.buildingLayers["wall"].putTileAtWorldXY(tilesetStart + this.currentTile.tileSetOffSet, tilecoord.x, tilecoord.y);
+                tile.rotation = Phaser.Math.DegToRad(this.rotation);
+                tile.setCollision(true);
+            }
+        }
+    }
+
+    _checkRemoveBlock(player: Player, tilecoord: Phaser.Math.Vector2){
             //check for radius around player
             let differenceX = Math.abs(player.party[0].sprite.x - tilecoord.x);
             let differenceY = Math.abs(player.party[0].sprite.y - tilecoord.y)
-            if(Math.hypot(differenceX, differenceY) > 125){
-                canPlace = false;
+            //determine if to show the cursors
+            if(this.cursorTile){
+                this.cursorTile.setVisible(false);  
             }
-            //check we are not building on the player
-            let playerBounds = player.party[0].sprite.getBounds();
-            let tilebounds = new Phaser.Geom.Rectangle(tilecoord.x, tilecoord.y, 16, 16);
-            if(Phaser.Geom.Rectangle.Overlaps(playerBounds,tilebounds)){
-                canPlace = false;
-            }
-            //determine if to show the cursors or not
-            if(canPlace && this.toolSelected == "hammer"){
-                this.cursorTile.setVisible(true);
-                this.toolCursor.setVisible(true);
-            } else if (canPlace && this.toolSelected == "pick"){
-                this.cursorTile.setVisible(false);
+            if(!(Math.hypot(differenceX, differenceY) > 125)){
                 this.toolCursor.setVisible(true);
             } else {
-                this.cursorTile.setVisible(false);
                 this.toolCursor.setVisible(false);
             }
-            //define what to do when clicking in build mode
-            if (this.currentScene.input.manager.activePointer.isDown && this.currentTile && canPlace) {
+            if(!(Math.hypot(differenceX, differenceY) > 125) && this.currentScene.input.manager.activePointer.isDown){
                 this.hammeringTween.play();
-                if(this.toolSelected == "hammer"){
-                    if(this.layerSelected == "floor"){
-                        let tilesetStart = this.testBuildSpriteSheet.firstgid;
-                        let tile = this.floorLayer.putTileAtWorldXY(tilesetStart + this.currentTile.tileSetOffSet, worldPoint.x, worldPoint.y);
-                        tile.rotation = Phaser.Math.DegToRad(this.rotation);
-                    } else if (this.layerSelected == "wall"){
-                        let tilesetStart = this.testBuildSpriteSheet.firstgid;
-                        let tile = this.wallLayer.putTileAtWorldXY(tilesetStart + this.currentTile.tileSetOffSet, worldPoint.x, worldPoint.y);
-                        tile.rotation = Phaser.Math.DegToRad(this.rotation);
-                        tile.setCollision(true);
-                    }
-                } else if (this.toolSelected == "pick"){
-                    if(this.layerSelected == "floor"){
-                        this.floorLayer.removeTileAtWorldXY(worldPoint.x, worldPoint.y);
-                    } else if (this.layerSelected == "wall") {
-                        this.wallLayer.removeTileAtWorldXY(worldPoint.x, worldPoint.y);
-                    }
-                }
+                this.buildingLayers[this.layerSelected].removeTileAtWorldXY(tilecoord.x, tilecoord.y);
             }
-        }
     }
 
     /**
@@ -326,10 +364,12 @@ export class TilemapBuilder {
 
         this.signals.on("buildingLayerChanged", (newCurrentLayer: string) => {
             this.layerSelected = newCurrentLayer;
+            this.currentTile = null;
         })
 
         this.signals.on("clearBuildingLayer", (newCurrentLayer: string) => {
             this.layerSelected = "";
+            this.currentTile = null;
         })
 
         this.signals.on("clearBuildingTool", (newCurrentLayer: string) => {
