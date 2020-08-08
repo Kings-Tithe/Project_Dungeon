@@ -52,7 +52,7 @@
          "name":"flags",
          "objects":[
                 {
-                 "height":31,
+                 "height":37,
                  "id":1,
                  "name":"",
                  "properties":[
@@ -64,9 +64,9 @@
                  "rotation":0,
                  "type":"",
                  "visible":true,
-                 "width":15,
+                 "width":10.3333333333333,
                  "x":1,
-                 "y":561
+                 "y":555
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -5550,6 +5550,92 @@
                 }, 
                 {
                  "id":255,
+                 "properties":[
+                        {
+                         "name":"passThru",
+                         "type":"bool",
+                         "value":false
+                        }]
+                }],
+         "tilewidth":16
+        }, 
+        {
+         "columns":4,
+         "firstgid":605,
+         "image":"..\/images\/tilesets\/testBuildSpriteSheet.png",
+         "imageheight":32,
+         "imagewidth":64,
+         "margin":0,
+         "name":"testBuildSpriteSheet",
+         "spacing":0,
+         "tilecount":8,
+         "tileheight":16,
+         "tiles":[
+                {
+                 "id":0,
+                 "properties":[
+                        {
+                         "name":"passThru",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":1,
+                 "properties":[
+                        {
+                         "name":"passThru",
+                         "type":"bool",
+                         "value":false
+                        }]
+                }, 
+                {
+                 "id":2,
+                 "properties":[
+                        {
+                         "name":"passThru",
+                         "type":"bool",
+                         "value":false
+                        }]
+                }, 
+                {
+                 "id":3,
+                 "properties":[
+                        {
+                         "name":"passThru",
+                         "type":"bool",
+                         "value":false
+                        }]
+                }, 
+                {
+                 "id":4,
+                 "properties":[
+                        {
+                         "name":"passThru",
+                         "type":"bool",
+                         "value":false
+                        }]
+                }, 
+                {
+                 "id":5,
+                 "properties":[
+                        {
+                         "name":"passThru",
+                         "type":"bool",
+                         "value":false
+                        }]
+                }, 
+                {
+                 "id":6,
+                 "properties":[
+                        {
+                         "name":"passThru",
+                         "type":"bool",
+                         "value":false
+                        }]
+                }, 
+                {
+                 "id":7,
                  "properties":[
                         {
                          "name":"passThru",

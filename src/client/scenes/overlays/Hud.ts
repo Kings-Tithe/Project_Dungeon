@@ -85,22 +85,22 @@ export class Hud extends Phaser.Scene {
     }
 
     create() {
-        // Create a game console
-        let con = Console.get(this);
+        // // Create a game console
+        // let con = Console.get(this);
         // Create a buidling menu ui element
         this.buildMenu = BuildMenu.get(this);
         this.buildMenu.setDepth(4);
         this.buildMenu.placeToggleButton(this,130,52);
         this.buildMenu.setToggleButtonDepth(5);
 
-        // Listen for keypress and handle hud events
-        hookToMethod(document, 'onkeypress', (ret, ev) => {
-            // Backtick (or tilde) key (`, ~) even opens/closes the console
-            if (ev.which == '96') {
-                // Toggle the display of the console and phaser controls
-                con.toggleDisplay(this.game.input.keyboard);
-            }
-        });
+        // // Listen for keypress and handle hud events
+        // hookToMethod(document, 'onkeypress', (ret, ev) => {
+        //     // Backtick (or tilde) key (`, ~) even opens/closes the console
+        //     if (ev.which == '96') {
+        //         // Toggle the display of the console and phaser controls
+        //         con.toggleDisplay(this.game.input.keyboard);
+        //     }
+        // });
 
         //add control scheme
         this.controls.applyScheme(this, ["User Interface"]);

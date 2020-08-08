@@ -78,6 +78,9 @@ export class TilemapBuilder {
     /**keeps track of what layer is selected in the build menu */
     layerSelected: string;
 
+    //Handlers
+    handlers: {[key: string]: Function}
+
     /**creates our instance of this class, a new instance is created for
      * every scene, as such we don't need to worry about persisting things
      * across scenes.
@@ -96,6 +99,7 @@ export class TilemapBuilder {
         this.upperDepth = 0;
         this.lowerDepth = 0;
         this.cursorDepth = 0;
+        this.handlers = {};
         //create everything
         this.createLayers(map);
         this.createListeners();
@@ -104,6 +108,7 @@ export class TilemapBuilder {
 
     /**creates the cursor tool ans sets all its default values */
     createToolCursor(){
+        console.log("creating tool cursor");
         //create build mode hammer cursor
         this.toolCursor = this.currentScene.add.sprite(0, 0, "hammerIcon");
         this.toolCursor.setScale(1);
@@ -117,6 +122,7 @@ export class TilemapBuilder {
             repeat: 0,
             yoyo: true
         });
+        console.log("here",this.toolCursor);
     }
 
     /**
@@ -313,7 +319,7 @@ export class TilemapBuilder {
      * listeners are listen in one place
      */
     createListeners(){
-        this.signals.on("newTileSelected", (incomingTile: tiledata) => {
+        SignalManager.setupGlobalListener("newTileSelected",this.handlers,(incomingTile: tiledata) => {
             if (this.cursorTile){
                 this.cursorTile.setTexture(incomingTile.tileSetKey+"Table",incomingTile.tileSetOffSet);
             } else {
@@ -333,48 +339,63 @@ export class TilemapBuilder {
                 });
             }
             this.currentTile = incomingTile;
-        })
+        },this);
 
-        this.signals.on("rotate block right-down", () => {
+        SignalManager.setupGlobalListener("rotate block right-down", this.handlers,
+         () => {
             this.rotation += 90;
             if(this.cursorTile){
                 this.cursorTile.rotation = Phaser.Math.DegToRad(this.rotation);
             }
-        })
+        }, this);
 
-        this.signals.on("rotate block left-down", () => {
+        SignalManager.setupGlobalListener("rotate block left-down", this.handlers,
+         () => {
             this.rotation -= 90;
             if(this.cursorTile){
                 this.cursorTile.rotation = Phaser.Math.DegToRad(this.rotation);
             }
-        })
+        }, this);
 
-        this.signals.on("enterBuildMode", this.enterBuildMode.bind(this));
-        this.signals.on("exitBuildMode", this.exitBuildMode.bind(this));
+        SignalManager.setupGlobalListener("enterBuildMode", this.handlers,
+         this.enterBuildMode, this);
 
-        this.signals.on("buildMenuHammerSelected", () => {
+        SignalManager.setupGlobalListener("exitBuildMode", this.handlers,
+         this.exitBuildMode, this);
+
+        SignalManager.setupGlobalListener("buildMenuHammerSelected", this.handlers,
+         () => {
             this.toolSelected = "hammer";
             this.toolCursor.setTexture("hammerIcon");
-        })
+        }, this);
 
-        this.signals.on("buildMenuPickSelected", () => {
+        SignalManager.setupGlobalListener("buildMenuPickSelected", this.handlers,
+         () => {
             this.toolSelected = "pick";
             this.toolCursor.setTexture("pickIcon");
-        })
+        }, this);
 
-        this.signals.on("buildingLayerChanged", (newCurrentLayer: string) => {
+        SignalManager.setupGlobalListener("buildingLayerChanged", this.handlers,
+         (newCurrentLayer: string) => {
             this.layerSelected = newCurrentLayer;
             this.currentTile = null;
-        })
+        }, this);
 
-        this.signals.on("clearBuildingLayer", (newCurrentLayer: string) => {
+        SignalManager.setupGlobalListener("clearBuildingLayer", this.handlers,
+         (newCurrentLayer: string) => {
             this.layerSelected = "";
             this.currentTile = null;
-        })
+        }, this);
 
-        this.signals.on("clearBuildingTool", (newCurrentLayer: string) => {
+        SignalManager.setupGlobalListener("clearBuildingTool", this.handlers,
+         (newCurrentLayer: string) => {
             this.toolSelected = "";
-        })
+        }, this);
     }
     
+    clearListeners(){
+        for(let key of Object.keys(this.handlers)){
+            this.signals.off(key, this.handlers[key],this); 
+        }
+    }
 }

@@ -1,4 +1,5 @@
 import { Loader, GameObjects, Scene } from 'phaser';
+import { hookToMethod } from '../tools/Hook';
 
 /**
  * Loads assets (images, sound, etc) for use by the Phaser Engine. This means
@@ -33,6 +34,10 @@ export class LoadAssets extends Scene {
         this.load.image("outlineOfMan", `${this.assets}/images/free-use/outlineOfManBrown.png`);
         this.load.image("flipRightIcon", `${this.assets}/images/user-interface/icon_flip_right.png`);
         this.load.image("flipLeftIcon", `${this.assets}/images/user-interface/icon_flip_left.png`);
+        this.load.image("blueFlag", `${this.assets}/images/debugging/blueFlag.png`)
+        this.load.image("greenFlag", `${this.assets}/images/debugging/greenFlag.png`)
+        this.load.image("orangeFlag", `${this.assets}/images/debugging/orangeFlag.png`)
+        this.load.image("redFlag", `${this.assets}/images/debugging/redFlag.png`)
 
         // Loading Characters
         this.loadCharacter("greg");
@@ -61,8 +66,15 @@ export class LoadAssets extends Scene {
      * It runs after init() and preload() have completed
      */
     create() {
+        // Round physics positions to avoid ugly render artifacts
+        hookToMethod(Phaser.Physics.Arcade.Body.prototype, 'update', function () {
+            this.x = Math.round(this.x);
+            this.y = Math.round(this.y);
+        });
+        // Create the games hud scene
+        this.scene.launch('Hud');
         //start the next scene
-        this.scene.start('Island');
+        this.scene.start('IslandNorthWest');
     }
 
     /**

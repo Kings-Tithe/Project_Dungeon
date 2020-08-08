@@ -11,6 +11,7 @@ import { TilemapBuilder } from "../services/TilemapBuilder";
 Depth Table
 Depth   | Object/Tile
 ----------------------------------
+20      | Flags
 10      | Builder- Cursors
 8       | Builder- Upper Layers
 7       | Overhead Layer
@@ -26,7 +27,7 @@ Depth   | Object/Tile
  * one might look like. This will be used to test new features and game mechanics 
  * that will be used on the island.
  */
-export class Island extends Phaser.Scene {
+export class IslandNorth extends Phaser.Scene {
 
     /**Member Varibles */
 
@@ -35,6 +36,10 @@ export class Island extends Phaser.Scene {
     tilemapWidthInPixels: number;
     /**Used to store the height of the tilemap in Pixels */
     tilemapHeightInPixels: number;
+    /**Used to place the player on the x axis when moving scenes */
+    playerPlaceX: number;
+    /**Used to place the player on the y axis when moving scenes */
+    playerPlaceY: number;
 
     /**Tilemaps */
     /**The main map used in this scene */
@@ -74,16 +79,20 @@ export class Island extends Phaser.Scene {
      * of Phaser scenes
      */
     constructor() {
-        super("Island");
+        super("IslandNorth");
     }
 
     /** used to instantiate objects and set inital values where they apply
      * this runs in full before create()
      */
-    init() {
+    init(data) {
         this.cameras.main.setZoom(2);
         this.signals = SignalManager.get();
         this.controls = Controls.getInstance();
+        if(data){
+            this.playerPlaceX = data.x;
+            this.playerPlaceY = data.y;
+        }
     }
 
     /**Used to initally create all of our assets and set up the games scene/stage the
@@ -100,22 +109,20 @@ export class Island extends Phaser.Scene {
         this.Builder.setUpperDepth(8);
         this.Builder.setCursorDepth(10);
         //create player
-        this.player = new Player(this, this.tilemapWidthInPixels / 2, this.tilemapHeightInPixels / 2);
+        if(!this.playerPlaceX || !this.playerPlaceY){
+            this.playerPlaceX = this.tilemapWidthInPixels / 2;
+            this.playerPlaceY = this.tilemapHeightInPixels / 2;
+        }
+        this.player = new Player(this, this.playerPlaceX, this.playerPlaceY);
         this.player.setDepth(5);
         this.player.addPartyMemberByKey(this,"dreg");
         this.player.addCollisionByLayer(this.walkLayer);
-        this.Builder.addCollisionToPlayer(this.player)
+        this.Builder.addCollisionToPlayer(this.player);
         //setup control schemes
         this.controls.applyScheme(this,["Player", "Scene", "Building"]);
         /**setup the main camera */
         this.cameras.main.startFollow(this.player.party[0].sprite, true);
-        // Create the games hud scene
-        this.scene.launch('Hud');
-        // Round physics positions to avoid ugly render artifacts
-        hookToMethod(Phaser.Physics.Arcade.Body.prototype, 'update', function () {
-            this.x = Math.round(this.x);
-            this.y = Math.round(this.y);
-        });
+        this.createFlags();
     }
 
     /**A overwritten version of the game loop that is called around 60 times
@@ -156,7 +163,7 @@ export class Island extends Phaser.Scene {
 
     /**Creates and puts together the primary tilemap for this scene*/
     createTileMap() {
-        this.map = this.make.tilemap({ key: "islandUpleft" });
+        this.map = this.make.tilemap({ key: "islandNorthSector" });
         this.islandA1 = this.map.addTilesetImage("islandA1");
         this.islandA2 = this.map.addTilesetImage("islandA2");
         this.islandB = this.map.addTilesetImage("islandB");
@@ -173,5 +180,26 @@ export class Island extends Phaser.Scene {
         this.tilemapHeightInPixels = this.map.heightInPixels;
         this.tilemapWidthInPixels = this.map.widthInPixels;
         this.cameras.main.setBounds(0, 0, this.tilemapWidthInPixels, this.tilemapHeightInPixels);
+    }
+
+    createFlags(){
+        let flag: Phaser.GameObjects.Sprite;
+        this.map.getObjectLayer("flags").objects
+        .filter((tile)=>tile.id == 1)
+        .forEach((tile)=>{
+            flag = this.physics.add.sprite(tile.x, tile.y, 'orangeFlag');
+            flag.setOrigin(0,0);
+            flag.setScale(tile.width / flag.width, tile.height/ flag.height);
+        })
+        console.log(flag);
+        flag.setDepth(20);
+        flag.setAlpha(0);
+        //set collision with this flag
+        this.physics.add.overlap(this.player.party[0].sprite, flag, () => {
+            this.scene.start("IslandNorthWest", {
+                x: 1565,
+                y: 768
+            });
+        })
     }
 }

@@ -549,8 +549,10 @@ export class BuildMenu {
         //emit that we are no longer in build mode
         this.emitter.emit("exitBuildMode");
         //deselect current selected item
-        this.currentSelectedItem.style.borderStyle = "none";
-        this.currentSelectedItem = null;
+        if(this.currentSelectedItem){
+            this.currentSelectedItem.style.borderStyle = "none";
+            this.currentSelectedItem = null;
+        }
     }
 
 }
