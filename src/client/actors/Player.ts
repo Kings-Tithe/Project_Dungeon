@@ -103,8 +103,6 @@ export class Player {
      * @param key The sprite key for this party members sprite */
     addPartyMemberByKey(scene: Phaser.Scene, key: string, data?: ICharacterData){
         let characterClass: (typeof Character) = playableCharacterMap[key];
-        console.log(playableCharacterMap);
-        console.log(key,characterClass);
         //construct our new party member and add them to the party
         let newPartyMember;
         if(data){

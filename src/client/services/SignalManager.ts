@@ -13,11 +13,6 @@ export class SignalManager extends Phaser.Events.EventEmitter {
         //as long as we have an instance, return it
         return instance;
     }
-
-    static setupGlobalListener(key: string, storage: {[key: string]: Function}, handler: Function, context: any){
-        instance.on(key, handler.bind(context));
-        storage[key] = handler;
-    }
 }
 
 /**This is the varible used to store our one instance of our singlton class, this

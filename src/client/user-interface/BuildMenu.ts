@@ -100,6 +100,8 @@ export class BuildMenu {
         this.dom.setVisible(false);
         //create and set small top screen buttons
         this.createBuildButtons(hud);
+        //create listeners
+        this.createListeners();
 
         //select default layer: floor
         this.clearLayerSelect(false);
@@ -553,6 +555,20 @@ export class BuildMenu {
             this.currentSelectedItem.style.borderStyle = "none";
             this.currentSelectedItem = null;
         }
+    }
+
+    createListeners(){
+        this.emitter.on("newTilemapBuilder", () => {
+            this.emitter.emit("buildingLayerChanged", this.layerSelected);
+            if(this.toolSelected == "hammer"){
+                this.emitter.emit("buildMenuHammerSelected");
+            } else if (this.toolSelected == "pick"){
+                this.emitter.emit("buildMenuPickSelected");
+            }
+        });
+        this.emitter.on("sceneChange", () => {
+            this.exitBuildMode();
+        })
     }
 
 }

@@ -162,7 +162,6 @@ export class Hud extends Phaser.Scene {
                 this.paused = true;
                 this.pauseFog.visible = true;
                 this.pauseText.visible = true;
-                console.log(this.buildMenu.visible)
                 if(this.buildMenu.visible){
                     this.buildMenu.dom.setVisible(false);
                 }

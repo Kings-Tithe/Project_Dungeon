@@ -74,6 +74,10 @@ export class IslandNorth extends Phaser.Scene {
     //scene builder
     Builder: TilemapBuilder;
 
+    //Handlers
+    /**stores all the handlers for our events so we can turn them off later */
+    handlers: {[key: string]: Function}
+
     /**Calls to the parent constructor to construct the scene. Parents adds
      * the key of the scene that is passed in below to the game objects list
      * of Phaser scenes
@@ -137,28 +141,45 @@ export class IslandNorth extends Phaser.Scene {
      * Creates several listeners for various signals that may be important.
      */
     createListeners() {
-        this.signals = SignalManager.get();
+        this.handlers = {
+            "command": (command: string[]) => {
 
-        // Listens for commands from the console
-        this.signals.on("command", (command: string[]) => {
-
-            // This command adds a new party member on the island to follow you
-            if (command[0] == 'addtoparty') {
-                // Remove the actual command from the list of arguments
-                command.shift();
-                // For each party member name passed in, add them to the party
-                command.forEach((member: string) => {
-                    this.player.addPartyMemberByKey(this,member);
-                }, this);
+                // This command adds a new party member on the island to follow you
+                if (command[0] == 'addtoparty') {
+                    // Remove the actual command from the list of arguments
+                    command.shift();
+                    // For each party member name passed in, add them to the party
+                    command.forEach((member: string) => {
+                        this.player.addPartyMemberByKey(this,member);
+                    }, this);
+                }
+    
+            },
+            "pause scene-down": () => {
+                this.signals.emit("pausing","Island");
+                this.scene.pause("Island");
+                this.input.keyboard.resetKeys();
             }
+        }
 
-        }, this);
-
-        this.signals.on("pause scene-down",() => {
-            this.signals.emit("pausing","Island");
-            this.scene.pause("Island");
-            this.input.keyboard.resetKeys();
-        })
+        /*take the keys and functions in this.handlers and bind them to this 
+         scene then turn them on */
+        for(let key of Object.keys(this.handlers)){
+        this.handlers[key].bind(this);
+        this.signals.on(key, this.handlers[key]);
+        }
+    }
+    
+    /**Clears all the listeners in the global emitter from this class,
+     * meant to be used when swapping scenes or before destroying this
+     * class
+     */
+    clearListeners(){
+        for(let key of Object.keys(this.handlers)){
+            let before = this.signals.listenerCount(key);
+            this.signals.off(key, this.handlers[key]);
+            let after = this.signals.listenerCount(key);
+        }
     }
 
     /**Creates and puts together the primary tilemap for this scene*/
@@ -191,11 +212,13 @@ export class IslandNorth extends Phaser.Scene {
             flag.setOrigin(0,0);
             flag.setScale(tile.width / flag.width, tile.height/ flag.height);
         })
-        console.log(flag);
         flag.setDepth(20);
         flag.setAlpha(0);
         //set collision with this flag
         this.physics.add.overlap(this.player.party[0].sprite, flag, () => {
+            this.signals.emit("sceneChange");
+            this.Builder.clearListeners();
+            this.clearListeners();
             this.scene.start("IslandNorthWest", {
                 x: 1565,
                 y: 768

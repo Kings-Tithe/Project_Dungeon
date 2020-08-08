@@ -79,6 +79,7 @@ export class TilemapBuilder {
     layerSelected: string;
 
     //Handlers
+    /**stores all the handlers for our events so we can turn them off later */
     handlers: {[key: string]: Function}
 
     /**creates our instance of this class, a new instance is created for
@@ -104,11 +105,12 @@ export class TilemapBuilder {
         this.createLayers(map);
         this.createListeners();
         this.createToolCursor();
+        //grab the inital values need from the menu
+        this.signals.emit("newTilemapBuilder");
     }
 
-    /**creates the cursor tool ans sets all its default values */
+    /**creates the cursor tool and sets all its default values */
     createToolCursor(){
-        console.log("creating tool cursor");
         //create build mode hammer cursor
         this.toolCursor = this.currentScene.add.sprite(0, 0, "hammerIcon");
         this.toolCursor.setScale(1);
@@ -122,7 +124,6 @@ export class TilemapBuilder {
             repeat: 0,
             yoyo: true
         });
-        console.log("here",this.toolCursor);
     }
 
     /**
@@ -285,7 +286,7 @@ export class TilemapBuilder {
                 let tilesetStart = this.testBuildSpriteSheet.firstgid;
                 let tile = this.buildingLayers[this.layerSelected].putTileAtWorldXY(tilesetStart + this.currentTile.tileSetOffSet, tilecoord.x, tilecoord.y);
                 tile.rotation = Phaser.Math.DegToRad(this.rotation);
-            } else if (notBuildingOnPlayer){
+            } else if ((this.layerSelected == "wall" || this.layerSelected == "special") && notBuildingOnPlayer){
                 this.hammeringTween.play();
                 let tilesetStart = this.testBuildSpriteSheet.firstgid;
                 let tile = this.buildingLayers["wall"].putTileAtWorldXY(tilesetStart + this.currentTile.tileSetOffSet, tilecoord.x, tilecoord.y);
@@ -319,83 +320,95 @@ export class TilemapBuilder {
      * listeners are listen in one place
      */
     createListeners(){
-        SignalManager.setupGlobalListener("newTileSelected",this.handlers,(incomingTile: tiledata) => {
-            if (this.cursorTile){
-                this.cursorTile.setTexture(incomingTile.tileSetKey+"Table",incomingTile.tileSetOffSet);
-            } else {
-                //create build modes cursor tile
-                this.cursorTile = this.currentScene.add.sprite(0, 0, incomingTile.tileSetKey+"Table", incomingTile.tileSetOffSet);
-                this.cursorTile.setOrigin(.5,.5);
-                this.cursorTile.setAlpha(.7);
-                this.cursorTile.setDepth(this.cursorDepth + 0.2);
-                this.cursorTile.setVisible(false);
-                this.cursorTile.rotation = Phaser.Math.DegToRad(this.rotation);
-                this.cursorTween = this.currentScene.tweens.add({
-                    targets: this.cursorTile,
-                    alpha: .3,
-                    duration: 1000,
-                    repeat: -1,
-                    yoyo: true
-                });
+        this.handlers = {
+            "newTileSelected": (incomingTile: tiledata) => {
+                if (this.cursorTile){
+                    this.cursorTile.setTexture(incomingTile.tileSetKey+"Table",incomingTile.tileSetOffSet);
+                } else {
+                    //create build modes cursor tile
+                    this.cursorTile = this.currentScene.add.sprite(0, 0, incomingTile.tileSetKey+"Table", incomingTile.tileSetOffSet);
+                    this.cursorTile.setOrigin(.5,.5);
+                    this.cursorTile.setAlpha(.7);
+                    this.cursorTile.setDepth(this.cursorDepth + 0.2);
+                    this.cursorTile.setVisible(false);
+                    this.cursorTile.rotation = Phaser.Math.DegToRad(this.rotation);
+                    this.cursorTween = this.currentScene.tweens.add({
+                        targets: this.cursorTile,
+                        alpha: .3,
+                        duration: 1000,
+                        repeat: -1,
+                        yoyo: true
+                    });
+                }
+                this.currentTile = incomingTile;
+            },
+            "rotate block right-down": () => {
+                this.rotation += 90;
+                if(this.cursorTile){
+                    this.cursorTile.rotation = Phaser.Math.DegToRad(this.rotation);
+                }
+            },
+            "rotate block left-down": () => {
+                this.rotation -= 90;
+                if(this.cursorTile){
+                    this.cursorTile.rotation = Phaser.Math.DegToRad(this.rotation);
+                }
+            },
+
+            "enterBuildMode": () => {
+                this.inBuildMode = true;
+                if(this.cursorTile){
+                    this.cursorTween.resume();
+                }
+            },
+
+            "exitBuildMode": () => {
+                this.inBuildMode = false;
+                this.toolCursor.setVisible(false);
+                if(this.cursorTile){
+                    this.cursorTile.setVisible(false);
+                    this.cursorTween.pause();
+                }
+            },
+
+            "buildMenuHammerSelected":() => {
+                this.toolSelected = "hammer";
+                this.toolCursor.setTexture("hammerIcon");
+            },
+            "buildMenuPickSelected": () => {
+                this.toolSelected = "pick";
+                this.toolCursor.setTexture("pickIcon");
+            },
+            "buildingLayerChanged": (newCurrentLayer: string) => {
+                this.layerSelected = newCurrentLayer;
+                this.currentTile = null;
+            },
+            "clearBuildingLayer": (newCurrentLayer: string) => {
+                this.layerSelected = "";
+                this.currentTile = null;
+            },
+            "clearBuildingTool": (newCurrentLayer: string) => {
+                this.toolSelected = "";
             }
-            this.currentTile = incomingTile;
-        },this);
+        }
 
-        SignalManager.setupGlobalListener("rotate block right-down", this.handlers,
-         () => {
-            this.rotation += 90;
-            if(this.cursorTile){
-                this.cursorTile.rotation = Phaser.Math.DegToRad(this.rotation);
-            }
-        }, this);
-
-        SignalManager.setupGlobalListener("rotate block left-down", this.handlers,
-         () => {
-            this.rotation -= 90;
-            if(this.cursorTile){
-                this.cursorTile.rotation = Phaser.Math.DegToRad(this.rotation);
-            }
-        }, this);
-
-        SignalManager.setupGlobalListener("enterBuildMode", this.handlers,
-         this.enterBuildMode, this);
-
-        SignalManager.setupGlobalListener("exitBuildMode", this.handlers,
-         this.exitBuildMode, this);
-
-        SignalManager.setupGlobalListener("buildMenuHammerSelected", this.handlers,
-         () => {
-            this.toolSelected = "hammer";
-            this.toolCursor.setTexture("hammerIcon");
-        }, this);
-
-        SignalManager.setupGlobalListener("buildMenuPickSelected", this.handlers,
-         () => {
-            this.toolSelected = "pick";
-            this.toolCursor.setTexture("pickIcon");
-        }, this);
-
-        SignalManager.setupGlobalListener("buildingLayerChanged", this.handlers,
-         (newCurrentLayer: string) => {
-            this.layerSelected = newCurrentLayer;
-            this.currentTile = null;
-        }, this);
-
-        SignalManager.setupGlobalListener("clearBuildingLayer", this.handlers,
-         (newCurrentLayer: string) => {
-            this.layerSelected = "";
-            this.currentTile = null;
-        }, this);
-
-        SignalManager.setupGlobalListener("clearBuildingTool", this.handlers,
-         (newCurrentLayer: string) => {
-            this.toolSelected = "";
-        }, this);
+        /*take the keys and functions in this.handlers and bind them to this 
+         scene then turn them on */
+        for(let key of Object.keys(this.handlers)){
+            this.handlers[key].bind(this);
+            this.signals.on(key, this.handlers[key]);
+        }
     }
     
+    /**Clears all the listeners in the global emitter from this class,
+     * meant to be used when swapping scenes or before destroying this
+     * class
+     */
     clearListeners(){
         for(let key of Object.keys(this.handlers)){
-            this.signals.off(key, this.handlers[key],this); 
+            let before = this.signals.listenerCount(key);
+            this.signals.off(key, this.handlers[key]);
+            let after = this.signals.listenerCount(key);
         }
     }
 }
