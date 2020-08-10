@@ -5566,15 +5566,15 @@
          "tilewidth":16
         }, 
         {
-         "columns":4,
+         "columns":6,
          "firstgid":605,
          "image":"..\/images\/tilesets\/testBuildSpriteSheet.png",
          "imageheight":32,
-         "imagewidth":64,
+         "imagewidth":96,
          "margin":0,
          "name":"testBuildSpriteSheet",
          "spacing":0,
-         "tilecount":8,
+         "tilecount":12,
          "tileheight":16,
          "tiles":[
                 {
@@ -5614,24 +5614,6 @@
                         }]
                 }, 
                 {
-                 "id":4,
-                 "properties":[
-                        {
-                         "name":"passThru",
-                         "type":"bool",
-                         "value":false
-                        }]
-                }, 
-                {
-                 "id":5,
-                 "properties":[
-                        {
-                         "name":"passThru",
-                         "type":"bool",
-                         "value":false
-                        }]
-                }, 
-                {
                  "id":6,
                  "properties":[
                         {
@@ -5642,6 +5624,24 @@
                 }, 
                 {
                  "id":7,
+                 "properties":[
+                        {
+                         "name":"passThru",
+                         "type":"bool",
+                         "value":false
+                        }]
+                }, 
+                {
+                 "id":8,
+                 "properties":[
+                        {
+                         "name":"passThru",
+                         "type":"bool",
+                         "value":false
+                        }]
+                }, 
+                {
+                 "id":9,
                  "properties":[
                         {
                          "name":"passThru",

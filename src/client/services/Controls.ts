@@ -142,6 +142,14 @@ export class Controls {
             delayed: false,
             checkable: true
         }
+        this.schemes["Building"].actions["test-roof-mask"] = {
+            actionKey: "test-roof-mask", 
+            delayDuration: defaultdelayDuration, 
+            keyCode: Phaser.Input.Keyboard.KeyCodes.M,
+            key: null,  
+            delayed: false,
+            checkable: true
+        }
     }
 
     /**

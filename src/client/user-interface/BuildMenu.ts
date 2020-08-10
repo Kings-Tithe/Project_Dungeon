@@ -178,8 +178,8 @@ export class BuildMenu {
         this.wallList.style.padding = "0px";
         this.wallList.style.margin = "0px";
         //populate list
-        for (let i = 1; i < 32; i++) {
-            let newItem = this.createListItem(this.tiles[i % 8]);
+        for (let i = 1; i < 12; i++) {
+            let newItem = this.createListItem(this.tiles[i]);
             this.wallList.appendChild(newItem);
         }
 
@@ -188,7 +188,11 @@ export class BuildMenu {
         this.roofList.style.listStyle = "none";
         this.roofList.style.padding = "0px";
         this.roofList.style.margin = "0px";
-        //currently no tiles to populate with
+        //populate list
+        for (let i = 1; i < 12; i++) {
+            let newItem = this.createListItem(this.tiles[i]);
+            this.roofList.appendChild(newItem);
+        }
 
         //create special list
         this.specialList = document.createElement("ul");
@@ -428,7 +432,7 @@ export class BuildMenu {
         /*Eventually these will be enumerated in a file but for now it is all
         generated here */
         this.tiles = [];
-        for (let i = 0; i < 8; i++) {
+        for (let i = 0; i < 12; i++) {
             this.tiles[i] = {
                 tileSetKey: "testBuildSpriteSheet",
                 tileSetOffSet: i,
