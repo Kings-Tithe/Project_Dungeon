@@ -502,7 +502,10 @@ export class CharacterSheet {
             } else {
                 newIcon = this.currentScene.add.sprite(860,(55 * i) + 90,`${this.party[i].key}-portrait`);
             }
-            //check if the character sheet is currently open, set scale accordingly
+            //check if the character sheet is currently open
+            if(!this.toggleVisible){
+                newIcon.setVisible(false);
+            }
             newIcon.setScale(.75)
             newIcon.setDepth(this.depth);
             newIcon.setInteractive();

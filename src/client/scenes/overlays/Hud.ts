@@ -79,46 +79,28 @@ export class Hud extends Phaser.Scene {
 
         //events to listen for
         this.signals = SignalManager.get();
-        this.signals.on("changePortrait", this.changePortraitSprite, this);
-        this.signals.on("pause-down", () => {
-            if(this.paused){
-                this.pauseFog.visible = false;
-                this.pauseText.visible = false;
-                for(let i = 0; i < this.pausedScenes.length; i++){
-                    this.scene.resume(this.pausedScenes[i]);
-                }
-                this.paused = false;
-            } else {
-                this.paused = true;
-                this.pauseFog.visible = true;
-                this.pauseText.visible = true;
-            }
-        })
-        this.signals.on("pausing", (incomingScene: string) => {
-            this.pausedScenes.push(incomingScene);
-        })
-    
+        this.addListeners();
 
         this.characterSheet = new CharacterSheet(this);
     }
 
     create() {
-        // Create a game console
-        let con = Console.get(this);
+        // // Create a game console
+        // let con = Console.get(this);
         // Create a buidling menu ui element
         this.buildMenu = BuildMenu.get(this);
         this.buildMenu.setDepth(4);
         this.buildMenu.placeToggleButton(this,130,52);
         this.buildMenu.setToggleButtonDepth(5);
 
-        // Listen for keypress and handle hud events
-        hookToMethod(document, 'onkeypress', (ret, ev) => {
-            // Backtick (or tilde) key (`, ~) even opens/closes the console
-            if (ev.which == '96') {
-                // Toggle the display of the console and phaser controls
-                //con.toggleDisplay(this.game.input.keyboard);
-            }
-        });
+        // // Listen for keypress and handle hud events
+        // hookToMethod(document, 'onkeypress', (ret, ev) => {
+        //     // Backtick (or tilde) key (`, ~) even opens/closes the console
+        //     if (ev.which == '96') {
+        //         // Toggle the display of the console and phaser controls
+        //         con.toggleDisplay(this.game.input.keyboard);
+        //     }
+        // });
 
         //add control scheme
         this.controls.applyScheme(this, ["User Interface"]);
@@ -161,6 +143,33 @@ export class Hud extends Phaser.Scene {
         } else {
             this.portrait.setTexture(spritekey);
         }
+    }
+
+    addListeners(){
+        this.signals.on("changePortrait", this.changePortraitSprite, this);
+        this.signals.on("pause-down", () => {
+            if(this.paused){
+                this.pauseFog.visible = false;
+                this.pauseText.visible = false;
+                if(this.buildMenu.visible){
+                    this.buildMenu.dom.setVisible(true);
+                }
+                for(let i = 0; i < this.pausedScenes.length; i++){
+                    this.scene.resume(this.pausedScenes[i]);
+                }
+                this.paused = false;
+            } else {
+                this.paused = true;
+                this.pauseFog.visible = true;
+                this.pauseText.visible = true;
+                if(this.buildMenu.visible){
+                    this.buildMenu.dom.setVisible(false);
+                }
+            }
+        })
+        this.signals.on("pausing", (incomingScene: string) => {
+            this.pausedScenes.push(incomingScene);
+        })
     }
 
 }

@@ -1,5 +1,6 @@
 import * as Phaser from 'phaser';
-import { Island } from './scenes/Island';
+import { IslandNorthWest } from './scenes/IslandNorthWest';
+import { IslandNorth } from './scenes/IslandNorth'
 import { LoadAssets } from './scenes/LoadAssets';
 import { Hud } from './scenes/overlays/Hud';
 
@@ -13,7 +14,8 @@ const config: Phaser.Types.Core.GameConfig = {
     /** Primary scene objects */
     scene: [
         LoadAssets,
-        Island,
+        IslandNorthWest,
+        IslandNorth,
         Hud
     ],
 

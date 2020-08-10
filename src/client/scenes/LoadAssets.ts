@@ -1,4 +1,5 @@
 import { Loader, GameObjects, Scene } from 'phaser';
+import { hookToMethod } from '../tools/Hook';
 
 /**
  * Loads assets (images, sound, etc) for use by the Phaser Engine. This means
@@ -33,6 +34,10 @@ export class LoadAssets extends Scene {
         this.load.image("outlineOfMan", `${this.assets}/images/free-use/outlineOfManBrown.png`);
         this.load.image("flipRightIcon", `${this.assets}/images/user-interface/icon_flip_right.png`);
         this.load.image("flipLeftIcon", `${this.assets}/images/user-interface/icon_flip_left.png`);
+        this.load.image("blueFlag", `${this.assets}/images/debugging/blueFlag.png`)
+        this.load.image("greenFlag", `${this.assets}/images/debugging/greenFlag.png`)
+        this.load.image("orangeFlag", `${this.assets}/images/debugging/orangeFlag.png`)
+        this.load.image("redFlag", `${this.assets}/images/debugging/redFlag.png`)
 
         // Loading Characters
         this.loadCharacter("greg");
@@ -46,7 +51,7 @@ export class LoadAssets extends Scene {
         this.load.spritesheet("woodenBackground", `${this.assets}/images/user-interface/wooden_Background.png`, { frameWidth: 256, frameHeight: 72 })
         this.load.spritesheet("hammerIcon", `${this.assets}/images/user-interface/hammerIcon.png`, { frameWidth: 14, frameHeight: 18 })
         this.load.spritesheet("pickIcon", `${this.assets}/images/user-interface/pickIcon.png`, { frameWidth: 15, frameHeight: 17 })
-        this.load.spritesheet("doorIcon", `${this.assets}/images/user-interface/doorIcon.png`, { frameWidth: 26, frameHeight: 46 })
+        this.load.spritesheet("doorIcon", `${this.assets}/images/user-interface/doorIcon.png`, { frameWidth: 27, frameHeight: 47 })
         this.load.spritesheet("floorIcon", `${this.assets}/images/user-interface/floorIcon.png`, { frameWidth: 70, frameHeight: 16 })
         this.load.spritesheet("wallIcon", `${this.assets}/images/user-interface/wallIcon.png`, { frameWidth: 70, frameHeight: 35 })
         this.load.spritesheet("roofIcon", `${this.assets}/images/user-interface/roofIcon.png`, { frameWidth: 70, frameHeight: 47 })
@@ -61,8 +66,15 @@ export class LoadAssets extends Scene {
      * It runs after init() and preload() have completed
      */
     create() {
+        // Round physics positions to avoid ugly render artifacts
+        hookToMethod(Phaser.Physics.Arcade.Body.prototype, 'update', function () {
+            this.x = Math.round(this.x);
+            this.y = Math.round(this.y);
+        });
+        // Create the games hud scene
+        this.scene.launch('Hud');
         //start the next scene
-        this.scene.start('Island');
+        this.scene.start('IslandNorthWest');
     }
 
     /**
