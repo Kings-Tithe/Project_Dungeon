@@ -36,6 +36,8 @@ export class TilemapBuilder {
     lowerDepth: number;
     /**Used to store the depth of the cursors */
     cursorDepth: number;
+    /**Current radius of visible tiles underneath roofs */
+    roofLayerVision: number = 0;
 
     //dynamic layers
     /**holds all the dynamic layers we build on */
@@ -250,11 +252,8 @@ export class TilemapBuilder {
                 this.toolCursor.setVisible(false);
             }
         }
-        console.log(this.buildingLayers["roof"].hasTileAt(player.party[0].sprite.x, player.party[0].sprite.y));
-        let tileCoords = this.buildingLayers["roof"].worldToTileXY(player.party[0].sprite.x, player.party[0].sprite.y);
-        if(this.buildingLayers["roof"].hasTileAt(tileCoords.x, tileCoords.y)){
-            this.updateRoofVisible(player);
-        };
+        // console.log(this.buildingLayers["roof"].hasTileAt(player.party[0].sprite.x, player.party[0].sprite.y));
+        this.updateRoofVisible(player);
     }
 
     /**An internal function for checking if to show the cursors and if to place a block at the cursors place
@@ -325,11 +324,24 @@ export class TilemapBuilder {
      * checks a radius around the player and sets the alpha of tiles around the player
      */
     updateRoofVisible(player: Player) {
-        //varibles
-        let outerRadius = 200;
-        let innerRadius = 100;
+
+        // Varibles
+        const maxOuterRadius = 200;
+        let innerRadius = .5 * this.roofLayerVision;
+        let tileCoords = this.buildingLayers["roof"].worldToTileXY(player.party[0].sprite.x, player.party[0].sprite.y);
+        let underRoofTile = this.buildingLayers["roof"].hasTileAt(tileCoords.x, tileCoords.y);
+
+        if (underRoofTile) {
+            // Slowly (each update) increase the visible radius to a maximum
+            if (this.roofLayerVision < maxOuterRadius) this.roofLayerVision += 3;
+        }
+        else {
+            if (this.roofLayerVision > 0) this.roofLayerVision -=2; 
+        }
+
+        // Get the circle of tiles around the player
         let outerCircleOfTiles = this.buildingLayers["roof"].getTilesWithinShape(
-            new Phaser.Geom.Circle(player.party[0].sprite.x, player.party[0].sprite.y, outerRadius),
+            new Phaser.Geom.Circle(player.party[0].sprite.x, player.party[0].sprite.y, this.roofLayerVision),
             { isNotEmpty: true }
         );
 
@@ -366,7 +378,7 @@ export class TilemapBuilder {
                     let tx = tile.getCenterX();
                     let ty = tile.getCenterY();
                     let dist = Math.hypot(tx - player.party[0].sprite.x, ty - player.party[0].sprite.y);
-                    tile.setAlpha((dist - innerRadius) / (outerRadius - innerRadius));
+                    tile.setAlpha((dist - innerRadius) / (this.roofLayerVision - innerRadius));
                 }
             )
             innerCircleOfTiles.forEach(
@@ -410,6 +422,7 @@ export class TilemapBuilder {
                 }
             )
         }
+
     }
 
     /**
