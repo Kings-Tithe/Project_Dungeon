@@ -718,6 +718,7 @@ let specialTileData = [
         tileSetKey: "specialTiles",
         tileSetOffSet: 0,
         name: "Wooden Door",
-        count: 5
+        count: 5,
+        tag: "door"
     }
 ]

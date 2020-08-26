@@ -310,7 +310,7 @@ export class Character {
                 repeat: -1
             });
             //set players inital animation
-            this.sprite.anims.play(this.key + '-animation-walk-down');
+            //this.sprite.anims.play(this.key + '-animation-walk-down');
             this.sprite.anims.stop();
             this.facingDirection = "down";
     

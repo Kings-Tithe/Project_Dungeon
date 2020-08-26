@@ -3,6 +3,7 @@ import { Controls } from "./Controls";
 import { tiledata } from "../user-interface/BuildMenu";
 import { Player } from "../actors/Player";
 import { Tweens } from "phaser";
+import { BuildingTags } from "./BuildingTags";
 
 /**
  * This class is used on conjunction with the Build Menu class to
@@ -92,6 +93,10 @@ export class TilemapBuilder {
     /**A reference to the current scenes player */
     player: Player;
 
+    //tags
+    /**Stores all the tags used for special building items */
+    tags: BuildingTags;
+
     /**creates our instance of this class, a new instance is created for
      * every scene, as such we don't need to worry about persisting things
      * across scenes.
@@ -107,6 +112,7 @@ export class TilemapBuilder {
         this.layerSelected = "";
         this.signals = SignalManager.get();
         this.controls = Controls.getInstance();
+        this.tags = BuildingTags.get();
         this.upperDepth = 0;
         this.lowerDepth = 0;
         this.cursorDepth = 0;
@@ -527,6 +533,7 @@ export class TilemapBuilder {
         //if interactives process functions
         for(let i = 0; i < interactibles.length; i++){
             console.log(JSON.stringify(interactibles[i].properties));
+            this.tags.tags["door"](interactibles[i]);
         }
     }
 
