@@ -38,6 +38,8 @@ export class TilemapBuilder {
     cursorDepth: number;
     /**Current radius of visible tiles underneath roofs */
     roofLayerVision: number = 0;
+    /**Current radius of visible tiles around each non-leader party member */
+    partyRoofLayerVision: number = 0;
 
     //dynamic layers
     /**holds all the dynamic layers we build on */
@@ -68,8 +70,9 @@ export class TilemapBuilder {
     currentTile: tiledata;
 
     //tilesets
-    /**Tileset used to for the testing of the building mode */
-    testBuildSpriteSheet: Phaser.Tilemaps.Tileset;
+    /**Holds all the tilesets for the diffrent layers */
+    tileSets: {[key: string]: Phaser.Tilemaps.Tileset};
+    
 
     //booleans
     /**Used to tell weather this scene is currently in build mode or not */
@@ -84,6 +87,10 @@ export class TilemapBuilder {
     //Handlers
     /**stores all the handlers for our events so we can turn them off later */
     handlers: { [key: string]: Function }
+
+    //player
+    /**A reference to the current scenes player */
+    player: Player;
 
     /**creates our instance of this class, a new instance is created for
      * every scene, as such we don't need to worry about persisting things
@@ -135,15 +142,20 @@ export class TilemapBuilder {
      * @param map the map to create the layers in
      */
     createLayers(map: Phaser.Tilemaps.Tilemap) {
+        this.tileSets = {};
         //eventually this will be imported in but for now it is hardcoded
-        this.testBuildSpriteSheet = map.addTilesetImage("testBuildSpriteSheet");
+        this.tileSets["floor"] = map.addTilesetImage("floorTiles");
+        this.tileSets["wall"] = map.addTilesetImage("wallTiles");
+        this.tileSets["roof"] = map.addTilesetImage("roofTiles");
+        this.tileSets["special"] = map.addTilesetImage("specialTiles");
 
         this.buildingLayers = {};
+        let builderTileSetArray = [this.tileSets["floor"], this.tileSets["wall"], this.tileSets["roof"], this.tileSets["special"]];
         //create new black dynamic layers
-        this.buildingLayers["floor"] = map.createBlankDynamicLayer("floor", [this.testBuildSpriteSheet]);
-        this.buildingLayers["wall"] = map.createBlankDynamicLayer("wall", [this.testBuildSpriteSheet]);
-        this.buildingLayers["roof"] = map.createBlankDynamicLayer("roof", [this.testBuildSpriteSheet]);
-        this.buildingLayers["special"] = map.createBlankDynamicLayer("special", [this.testBuildSpriteSheet]);
+        this.buildingLayers["floor"] = map.createBlankDynamicLayer("floor", builderTileSetArray);
+        this.buildingLayers["wall"] = map.createBlankDynamicLayer("wall", builderTileSetArray);
+        this.buildingLayers["roof"] = map.createBlankDynamicLayer("roof", builderTileSetArray);
+        this.buildingLayers["special"] = map.createBlankDynamicLayer("special", builderTileSetArray);
         //set depths
         this.buildingLayers["floor"].depth = this.lowerDepth + 0.1;
         this.buildingLayers["wall"].depth = this.lowerDepth + 0.2;
@@ -252,8 +264,9 @@ export class TilemapBuilder {
                 this.toolCursor.setVisible(false);
             }
         }
-        // console.log(this.buildingLayers["roof"].hasTileAt(player.party[0].sprite.x, player.party[0].sprite.y));
         this.updateRoofVisible(player);
+        //will need to reconfigure later but just for testing for now
+        this.player = player;
     }
 
     /**An internal function for checking if to show the cursors and if to place a block at the cursors place
@@ -271,7 +284,9 @@ export class TilemapBuilder {
             withinRadius = false;
         }
         //check we are not building on the player
-        let playerBounds = player.party[0].sprite.getBounds();
+        let playerBounds: any = {};
+        // player.party[0].sprite.getBounds();
+        (<Phaser.Physics.Arcade.Body>player.party[0].sprite.body).getBounds(playerBounds);
         let tilebounds = new Phaser.Geom.Rectangle(tilecoord.x, tilecoord.y, 16, 16);
         if (Phaser.Geom.Rectangle.Overlaps(playerBounds, tilebounds)) {
             notBuildingOnPlayer = false;
@@ -288,13 +303,13 @@ export class TilemapBuilder {
         if (withinRadius && this.currentScene.input.manager.activePointer.isDown) {
             if (this.layerSelected == "floor" || this.layerSelected == "roof") {
                 this.hammeringTween.play();
-                let tilesetStart = this.testBuildSpriteSheet.firstgid;
+                let tilesetStart = this.tileSets[this.layerSelected].firstgid;
                 let tile = this.buildingLayers[this.layerSelected].putTileAtWorldXY(tilesetStart + this.currentTile.tileSetOffSet, tilecoord.x, tilecoord.y);
                 tile.rotation = Phaser.Math.DegToRad(this.rotation);
             } else if ((this.layerSelected == "wall" || this.layerSelected == "special") && notBuildingOnPlayer) {
                 this.hammeringTween.play();
-                let tilesetStart = this.testBuildSpriteSheet.firstgid;
-                let tile = this.buildingLayers["wall"].putTileAtWorldXY(tilesetStart + this.currentTile.tileSetOffSet, tilecoord.x, tilecoord.y);
+                let tilesetStart = this.tileSets[this.layerSelected].firstgid;
+                let tile = this.buildingLayers[this.layerSelected].putTileAtWorldXY(tilesetStart + this.currentTile.tileSetOffSet, tilecoord.x, tilecoord.y);
                 tile.rotation = Phaser.Math.DegToRad(this.rotation);
                 tile.setCollision(true);
             }
@@ -327,16 +342,19 @@ export class TilemapBuilder {
 
         // Varibles
         const maxOuterRadius = 200;
+        const maxPartyRadius = 60;
         let innerRadius = .5 * this.roofLayerVision;
         let tileCoords = this.buildingLayers["roof"].worldToTileXY(player.party[0].sprite.x, player.party[0].sprite.y);
         let underRoofTile = this.buildingLayers["roof"].hasTileAt(tileCoords.x, tileCoords.y);
 
-        if (underRoofTile) {
+        if (underRoofTile || this.inBuildMode) {
             // Slowly (each update) increase the visible radius to a maximum
             if (this.roofLayerVision < maxOuterRadius) this.roofLayerVision += 3;
+            if (this.partyRoofLayerVision < maxPartyRadius) this.partyRoofLayerVision += 2;
         }
         else {
-            if (this.roofLayerVision > 0) this.roofLayerVision -=2; 
+            if (this.roofLayerVision > 0) this.roofLayerVision -=2;
+            if (this.partyRoofLayerVision > 40) this.partyRoofLayerVision -= 1; 
         }
 
         // Get the circle of tiles around the player
@@ -344,20 +362,51 @@ export class TilemapBuilder {
             new Phaser.Geom.Circle(player.party[0].sprite.x, player.party[0].sprite.y, this.roofLayerVision),
             { isNotEmpty: true }
         );
+        //get the circle of tiles around each of the non-leader party characters
+        let partyCircleArray = [];
+        for(let i = 1; i < player.party.length; i++){
+            let newCircle = this.buildingLayers["roof"].getTilesWithinShape(
+                new Phaser.Geom.Circle(player.party[i].sprite.x, player.party[i].sprite.y, this.partyRoofLayerVision),
+                { isNotEmpty: true }
+            );
+            partyCircleArray.push(newCircle);
+        }
 
         // In build mode nearby roof tiles should all be see through but
         // visible
         if (this.inBuildMode) {
             if (this.layerSelected == "roof") {
+                //set alpha for leader
                 outerCircleOfTiles.forEach(
                     (tile) => {
                         tile.setAlpha(0.5);
                     }
                 )
+                //set alpha for other party members
+                partyCircleArray.forEach(
+                    (circle: Phaser.Tilemaps.Tile[]) => {
+                        circle.forEach(
+                            (tile) => {
+                                tile.setAlpha(0.5);
+                            }
+                        )
+                    }
+                )
             } else {
+                //set alpha for leader
                 outerCircleOfTiles.forEach(
                     (tile) => {
                         tile.setAlpha(0.1);
+                    }
+                )
+                //set alpha for other party members
+                partyCircleArray.forEach(
+                    (circle: Phaser.Tilemaps.Tile[]) => {
+                        circle.forEach(
+                            (tile) => {
+                                tile.setAlpha(0.5);
+                            }
+                        )
                     }
                 )
             }
@@ -365,6 +414,36 @@ export class TilemapBuilder {
         // Outside of build mode, roof tiles are invisible very near to the
         // player and are less faded as distance increases
         else {
+            /*here we do the non-leader party member's tiles so the leader;s below can
+            override the if need be */
+            for(let i = 1; i < player.party.length; i++){
+                // The inner circle represents the tiles which should completely disappear
+                // in the immediate radius of the player
+                let partyInnerCircleOfTiles = this.buildingLayers["roof"].getTilesWithinShape(
+                    new Phaser.Geom.Circle(player.party[i].sprite.x, player.party[i].sprite.y, (this.partyRoofLayerVision * .25)),
+                    { isNotEmpty: true }
+                );
+    
+                // Set every tile in the circle to be see through
+                partyCircleArray[i-1].forEach(
+                    (tile: Phaser.Tilemaps.Tile) => {
+                        let tx = tile.getCenterX();
+                        let ty = tile.getCenterY();
+                        let dist = Math.hypot(tx - player.party[i].sprite.x, ty - player.party[i].sprite.y);
+                        let newAlpha = (dist - (this.partyRoofLayerVision * .5)) / (this.partyRoofLayerVision - (this.partyRoofLayerVision * .5));
+                        //only set the alpha if it is lower then the tiles current alpha
+                        if(newAlpha < tile.alpha){
+                            tile.setAlpha(newAlpha);
+                        }
+                    }
+                )
+                partyInnerCircleOfTiles.forEach(
+                    (tile) => {
+                        tile.setAlpha(0);
+                    }
+                )
+            }
+
             // The inner circle represents the tiles which should completely disappear
             // in the immediate radius of the player
             let innerCircleOfTiles = this.buildingLayers["roof"].getTilesWithinShape(
@@ -378,7 +457,11 @@ export class TilemapBuilder {
                     let tx = tile.getCenterX();
                     let ty = tile.getCenterY();
                     let dist = Math.hypot(tx - player.party[0].sprite.x, ty - player.party[0].sprite.y);
-                    tile.setAlpha((dist - innerRadius) / (this.roofLayerVision - innerRadius));
+                    let newAlpha = (dist - innerRadius) / (this.roofLayerVision - innerRadius);
+                    //only set the alpha if it is lower then the tiles current alpha
+                    if(newAlpha < tile.alpha){
+                        tile.setAlpha(newAlpha);
+                    }
                 }
             )
             innerCircleOfTiles.forEach(
@@ -393,6 +476,16 @@ export class TilemapBuilder {
         let untimedTiles = outerCircleOfTiles.filter(
             (tile) => {
                 return !tile["fadeTimer"];
+            }
+        )
+        partyCircleArray.forEach(
+            (circle: Phaser.Tilemaps.Tile[]) => {
+                let partyUntimedTiles = circle.filter(
+                    (tile) => {
+                        return !tile["fadeTimer"];
+                    }
+                )
+                untimedTiles = untimedTiles.concat(partyUntimedTiles);
             }
         )
 
@@ -422,7 +515,19 @@ export class TilemapBuilder {
                 }
             )
         }
+    }
 
+    checkForInteractives(){
+        //check the area around the player for interactive blocks
+        let interactibles: Phaser.Tilemaps.Tile[] = this.buildingLayers["special"].getTilesWithinShape(
+            new Phaser.Geom.Circle(this.player.party[0].sprite.x, this.player.party[0].sprite.y, 30),
+            { isNotEmpty: true }
+        );
+        console.log(interactibles.length);
+        //if interactives process functions
+        for(let i = 0; i < interactibles.length; i++){
+            console.log(JSON.stringify(interactibles[i].properties));
+        }
     }
 
     /**
@@ -433,10 +538,10 @@ export class TilemapBuilder {
         this.handlers = {
             "newTileSelected": (incomingTile: tiledata) => {
                 if (this.cursorTile) {
-                    this.cursorTile.setTexture(incomingTile.tileSetKey + "Table", incomingTile.tileSetOffSet);
+                    this.cursorTile.setTexture(incomingTile.tileSetKey, incomingTile.tileSetOffSet);
                 } else {
                     //create build modes cursor tile
-                    this.cursorTile = this.currentScene.add.sprite(0, 0, incomingTile.tileSetKey + "Table", incomingTile.tileSetOffSet);
+                    this.cursorTile = this.currentScene.add.sprite(0, 0, incomingTile.tileSetKey, incomingTile.tileSetOffSet);
                     this.cursorTile.setOrigin(.5, .5);
                     this.cursorTile.setAlpha(.7);
                     this.cursorTile.setDepth(this.cursorDepth + 0.2);
@@ -499,6 +604,9 @@ export class TilemapBuilder {
             },
             "clearBuildingTool": (newCurrentLayer: string) => {
                 this.toolSelected = "";
+            },
+            "interact-down": () => {
+                this.checkForInteractives();
             }
         }
 

@@ -40,14 +40,14 @@ export class LoadAssets extends Scene {
         this.load.image("redFlag", `${this.assets}/images/debugging/redFlag.png`)
 
         // Loading Characters
-        this.loadCharacter("greg");
-        this.loadCharacter("dreg");
-        this.loadCharacter("craig");
-        this.loadCharacter("meg");
+        this.loadCharacter("wizard");
 
 
         // Loading Spritesheets
-        this.load.spritesheet("testBuildSpriteSheetTable", `${this.assets}/images/tilesets/testBuildSpriteSheet.png`, { frameWidth: 16, frameHeight: 16 })
+        this.load.spritesheet("floorTiles", `${this.assets}/images/tilesets/flooring.png`, { frameWidth: 16, frameHeight: 16 })
+        this.load.spritesheet("wallTiles", `${this.assets}/images/tilesets/walls.png`, { frameWidth: 16, frameHeight: 16 })
+        this.load.spritesheet("roofTiles", `${this.assets}/images/tilesets/roofing.png`, { frameWidth: 16, frameHeight: 16 })
+        this.load.spritesheet("specialTiles", `${this.assets}/images/tilesets/special.png`, { frameWidth: 16, frameHeight: 16 })
         this.load.spritesheet("woodenBackground", `${this.assets}/images/user-interface/wooden_Background.png`, { frameWidth: 256, frameHeight: 72 })
         this.load.spritesheet("hammerIcon", `${this.assets}/images/user-interface/hammerIcon.png`, { frameWidth: 14, frameHeight: 18 })
         this.load.spritesheet("pickIcon", `${this.assets}/images/user-interface/pickIcon.png`, { frameWidth: 15, frameHeight: 17 })
@@ -92,7 +92,7 @@ export class LoadAssets extends Scene {
      * in default format, default format is png
      */
     loadCharacter(characterKey: string, fileFormat: string = ".png"){
-        this.load.spritesheet(characterKey + "-spritesheet" , this.assets + "/images/characters/" + characterKey + "Spritesheet" + fileFormat, { frameWidth: 32, frameHeight: 32 });
+        this.load.spritesheet(characterKey + "-spritesheet" , this.assets + "/images/characters/" + characterKey + "Spritesheet" + fileFormat, { frameWidth: 64, frameHeight: 64 });
         this.load.image(characterKey + "-portrait", this.assets + "/images/characters/portraits/" + characterKey + "Portrait" + fileFormat);
     }
 

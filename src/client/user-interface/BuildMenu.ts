@@ -167,8 +167,8 @@ export class BuildMenu {
         this.floorList.style.padding = "0px";
         this.floorList.style.margin = "0px";
         //populate list
-        for (let i = 0; i < 1; i++) {
-            let newItem = this.createListItem(this.tiles[i]);
+        for (let i = 0; i < floorTileData.length; i++) {
+            let newItem = this.createListItem(floorTileData[i]);
             this.floorList.appendChild(newItem);
         }
 
@@ -178,8 +178,8 @@ export class BuildMenu {
         this.wallList.style.padding = "0px";
         this.wallList.style.margin = "0px";
         //populate list
-        for (let i = 1; i < 12; i++) {
-            let newItem = this.createListItem(this.tiles[i]);
+        for (let i = 0; i < wallTileData.length; i++) {
+            let newItem = this.createListItem(wallTileData[i]);
             this.wallList.appendChild(newItem);
         }
 
@@ -189,8 +189,8 @@ export class BuildMenu {
         this.roofList.style.padding = "0px";
         this.roofList.style.margin = "0px";
         //populate list
-        for (let i = 1; i < 12; i++) {
-            let newItem = this.createListItem(this.tiles[i]);
+        for (let i = 0; i < roofTileData.length; i++) {
+            let newItem = this.createListItem(roofTileData[i]);
             this.roofList.appendChild(newItem);
         }
 
@@ -199,7 +199,11 @@ export class BuildMenu {
         this.specialList.style.listStyle = "none";
         this.specialList.style.padding = "0px";
         this.specialList.style.margin = "0px";
-        //currently no tiles to populate with
+        //populate list
+        for (let i = 0; i < specialTileData.length; i++) {
+            let newItem = this.createListItem(specialTileData[i]);
+            this.specialList.appendChild(newItem);
+        }
 
         // Style the list items, this creates the back and forth color pattern on the lists
         let styling = document.createElement('style');
@@ -226,7 +230,6 @@ export class BuildMenu {
         item.style.margin = "0px";
         item.style.padding = "0px";
         item.style.borderColor = "yellow";
-        // item.style.width = "110%";
         // Image of the block
         let image = document.createElement('img');
         image.style.width = "56px";
@@ -237,7 +240,7 @@ export class BuildMenu {
         had to prevent this because it caused an infinite build on the mouse */
         image.ondragstart = () => { return false; };
         // Image data passed in a base 64 string
-        image.src = this.hud.textures.getBase64('testBuildSpriteSheetTable', tile.tileSetOffSet);
+        image.src = this.hud.textures.getBase64(tile.tileSetKey, tile.tileSetOffSet);
         // Side text is a list within the list (so it's elements can be top->bottom)
         let textsList = document.createElement('ul');
         textsList.style.display = "inline-block";
@@ -430,16 +433,8 @@ export class BuildMenu {
     /**Used to import all the tiles it is possible to use for building */
     importTiles() {
         /*Eventually these will be enumerated in a file but for now it is all
-        generated here */
-        this.tiles = [];
-        for (let i = 0; i < 12; i++) {
-            this.tiles[i] = {
-                tileSetKey: "testBuildSpriteSheet",
-                tileSetOffSet: i,
-                name: "TestTile",
-                count: ((i * 10) % 3) + 1
-            }
-        }
+        made at the bottom of the file */
+        console.log(floorTileData)
     }
 
     /**
@@ -588,3 +583,141 @@ export interface tiledata {
     name: string,
     count: number
 }
+
+let floorTileData = [
+    {
+        tileSetKey: "floorTiles",
+        tileSetOffSet: 0,
+        name: "bark",
+        count: 1
+    },
+    {
+        tileSetKey: "floorTiles",
+        tileSetOffSet: 1,
+        name: "Cobble 01",
+        count: 2
+    },
+    {
+        tileSetKey: "floorTiles",
+        tileSetOffSet: 2,
+        name: "Cobble 02",
+        count: 3
+    },
+    {
+        tileSetKey: "floorTiles",
+        tileSetOffSet: 3,
+        name: "Plank",
+        count: 4
+    },
+    {
+        tileSetKey: "floorTiles",
+        tileSetOffSet: 4,
+        name: "Plank Path",
+        count: 5
+    }
+]
+
+let wallTileData = [
+    {
+        tileSetKey: "wallTiles",
+        tileSetOffSet: 0,
+        name: "Stone Coat End",
+        count: 5 
+    },
+    {
+        tileSetKey: "wallTiles",
+        tileSetOffSet: 1,
+        name: "Stone Coat Straight",
+        count: 5 
+    },
+    {
+        tileSetKey: "wallTiles",
+        tileSetOffSet: 2,
+        name: "Stone Coat Corner",
+        count: 5 
+    },
+    {
+        tileSetKey: "wallTiles",
+        tileSetOffSet: 3,
+        name: "Stone Coat Tri-Way",
+        count: 5 
+    },
+    {
+        tileSetKey: "wallTiles",
+        tileSetOffSet: 4,
+        name: "Stone Coat End 02",
+        count: 5 
+    },
+    {
+        tileSetKey: "wallTiles",
+        tileSetOffSet: 5,
+        name: "Stone Coat Block",
+        count: 5 
+    },
+    {
+        tileSetKey: "wallTiles",
+        tileSetOffSet: 6,
+        name: "Iron Small Brick",
+        count: 5 
+    },
+    {
+        tileSetKey: "wallTiles",
+        tileSetOffSet: 7,
+        name: "Mason Big Brick",
+        count: 5 
+    },
+    {
+        tileSetKey: "wallTiles",
+        tileSetOffSet: 8,
+        name: "Mason Small Brick",
+        count: 5 
+    },
+    {
+        tileSetKey: "wallTiles",
+        tileSetOffSet: 9,
+        name: "Iron Big Brick",
+        count: 5 
+    }
+]
+
+let roofTileData = [
+    {
+        tileSetKey: "roofTiles",
+        tileSetOffSet: 0,
+        name: "Red Tiles",
+        count: 5 
+    },
+    {
+        tileSetKey: "roofTiles",
+        tileSetOffSet: 1,
+        name: "Blue Weave",
+        count: 5 
+    },
+    {
+        tileSetKey: "roofTiles",
+        tileSetOffSet: 2,
+        name: "Red Sloped",
+        count: 5 
+    },
+    {
+        tileSetKey: "roofTiles",
+        tileSetOffSet: 3,
+        name: "Iron Tiles",
+        count: 5 
+    },
+    {
+        tileSetKey: "roofTiles",
+        tileSetOffSet: 4,
+        name: "Wooden Covering",
+        count: 5 
+    },
+]
+
+let specialTileData = [
+    {
+        tileSetKey: "specialTiles",
+        tileSetOffSet: 0,
+        name: "Wooden Door",
+        count: 5
+    }
+]

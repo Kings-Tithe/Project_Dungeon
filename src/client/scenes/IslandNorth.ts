@@ -119,7 +119,7 @@ export class IslandNorth extends Phaser.Scene {
         }
         this.player = new Player(this, this.playerPlaceX, this.playerPlaceY);
         this.player.setDepth(5);
-        this.player.addPartyMemberByKey(this,"dreg");
+        this.player.addPartyMemberByKey(this,"wizard");
         this.player.addCollisionByLayer(this.walkLayer);
         this.Builder.addCollisionToPlayer(this.player);
         //setup control schemes
