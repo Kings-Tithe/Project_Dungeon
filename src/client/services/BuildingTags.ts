@@ -20,7 +20,16 @@ export class BuildingTags {
     loadTags(){
         this.tags = {
             "door": (doorTile: Phaser.Tilemaps.Tile) => {
-                doorTile.rotation += 90;
+                if(doorTile.flipX == false){
+                    doorTile.rotation += Phaser.Math.DegToRad(90);
+                    doorTile.setFlipX(true);
+                    doorTile.setCollision(false,false,false,false)
+                } else {
+                    doorTile.rotation -= Phaser.Math.DegToRad(90);
+                    doorTile.setFlipX(false);
+                    doorTile.setCollision(true,true,true,true);
+                }
+                
             }
         }
     }

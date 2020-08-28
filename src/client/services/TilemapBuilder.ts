@@ -11,7 +11,7 @@ import { BuildingTags } from "./BuildingTags";
  * the picking of the tools and tiles placed by this class. They
  * are seperate both because one is a ui class while one is a functional
  * class and because one stays on the hud and the other directly edits
- * many diffrent scenes. Since this one edits many scenes it can'y hold and
+ * many diffrent scenes. Since this one edits many scenes it can't hold tilemaps and
  * graghics it's self and is only funcitons for editing existing tilemaps.
  */
 export class TilemapBuilder {
@@ -307,17 +307,18 @@ export class TilemapBuilder {
         }
 
         if (withinRadius && this.currentScene.input.manager.activePointer.isDown) {
-            if (this.layerSelected == "floor" || this.layerSelected == "roof") {
+            if(this.layerSelected != ''){
                 this.hammeringTween.play();
                 let tilesetStart = this.tileSets[this.layerSelected].firstgid;
-                let tile = this.buildingLayers[this.layerSelected].putTileAtWorldXY(tilesetStart + this.currentTile.tileSetOffSet, tilecoord.x, tilecoord.y);
+                let index = tilesetStart + this.currentTile.tileSetOffSet;
+                let tile = this.buildingLayers[this.layerSelected].putTileAtWorldXY(index, tilecoord.x, tilecoord.y);
                 tile.rotation = Phaser.Math.DegToRad(this.rotation);
-            } else if ((this.layerSelected == "wall" || this.layerSelected == "special") && notBuildingOnPlayer) {
-                this.hammeringTween.play();
-                let tilesetStart = this.tileSets[this.layerSelected].firstgid;
-                let tile = this.buildingLayers[this.layerSelected].putTileAtWorldXY(tilesetStart + this.currentTile.tileSetOffSet, tilecoord.x, tilecoord.y);
-                tile.rotation = Phaser.Math.DegToRad(this.rotation);
-                tile.setCollision(true);
+                if ((this.layerSelected == "wall" || this.layerSelected == "special") && notBuildingOnPlayer) {
+                    tile.setCollision(true,true,true,true);
+                    tile.properties = this.tileSets[this.layerSelected].getTileProperties(index);
+                    console.log(this.tileSets[this.layerSelected].tileProperties);
+                    console.log(tile.properties);
+                }                
             }
         }
     }
@@ -526,11 +527,10 @@ export class TilemapBuilder {
     checkForInteractives(){
         //check the area around the player for interactive blocks
         let interactibles: Phaser.Tilemaps.Tile[] = this.buildingLayers["special"].getTilesWithinShape(
-            new Phaser.Geom.Circle(this.player.party[0].sprite.x, this.player.party[0].sprite.y, 30),
+            new Phaser.Geom.Circle(this.player.party[0].sprite.x, this.player.party[0].sprite.y, 32),
             { isNotEmpty: true }
         );
-        console.log(interactibles.length);
-        //if interactives process functions
+        //if there are interactives process functions
         for(let i = 0; i < interactibles.length; i++){
             console.log(JSON.stringify(interactibles[i].properties));
             this.tags.tags["door"](interactibles[i]);
