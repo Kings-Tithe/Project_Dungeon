@@ -184,7 +184,6 @@ export class IslandNorth extends Phaser.Scene {
 
     /**Creates and puts together the primary tilemap for this scene*/
     createTileMap() {
-        this.map = this.make.tilemap({ key: "islandNorthSector" });
         this.islandA1 = this.map.addTilesetImage("islandA1");
         this.islandA2 = this.map.addTilesetImage("islandA2");
         this.islandB = this.map.addTilesetImage("islandB");

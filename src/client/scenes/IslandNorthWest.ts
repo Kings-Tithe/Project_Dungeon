@@ -6,6 +6,7 @@ import { Console } from "../user-interface/Console";
 import { SignalManager } from "../services/SignalManager";
 import { tiledata } from "../user-interface/BuildMenu";
 import { TilemapBuilder } from "../services/TilemapBuilder";
+import { TilemapManager } from "../services/TilemapManager";
 
 /*
 Depth Table
@@ -41,25 +42,9 @@ export class IslandNorthWest extends Phaser.Scene {
     /**Used to place the player on the y axis when moving scenes */
     playerPlaceY: number;
 
-    /**Tilemaps */
+    /**Tilemap managers */
     /**The main map used in this scene */
-    map: Phaser.Tilemaps.Tilemap;
-
-    /**Tilesets */
-    /**Tileset used to construct this.map */
-    islandA1: Phaser.Tilemaps.Tileset;
-    /**Tileset used to construct this.map */
-    islandA2: Phaser.Tilemaps.Tileset;
-    /**Tileset used to construct this.map */
-    islandB: Phaser.Tilemaps.Tileset;
-
-    /**Static Layers */
-    /**Is the basic background layer that everything else is placed over */
-    backgroundLayer: Phaser.Tilemaps.StaticTilemapLayer;
-    /**The layer of stuff the player walks on or into depending on the passThru property */
-    walkLayer: Phaser.Tilemaps.StaticTilemapLayer;
-    /**A layer of things that sit above the player and adds a sense of depth */
-    overheadLayer: Phaser.Tilemaps.StaticTilemapLayer;
+    mapManager: TilemapManager;
 
     /**Player */
     /**The Player containing our party and other relevent details */
@@ -108,7 +93,7 @@ export class IslandNorthWest extends Phaser.Scene {
         this.createListeners();
         //create tilempa and tilemap builder
         this.createTileMap();
-        this.Builder = new TilemapBuilder(this,this.map);
+        this.Builder = new TilemapBuilder(this,this.mapManager.map);
         this.Builder.setLowerDepth(2);
         this.Builder.setUpperDepth(8);
         this.Builder.setCursorDepth(10);
@@ -185,28 +170,22 @@ export class IslandNorthWest extends Phaser.Scene {
 
     /**Creates and puts together the primary tilemap for this scene*/
     createTileMap() {
-        this.map = this.make.tilemap({ key: "islandUpleft" });
-        this.islandA1 = this.map.addTilesetImage("islandA1");
-        this.islandA2 = this.map.addTilesetImage("islandA2");
-        this.islandB = this.map.addTilesetImage("islandB");
-        this.backgroundLayer = this.map.createStaticLayer("background", [this.islandA1, this.islandA2], 0, 0);
-        this.walkLayer = this.map.createStaticLayer("walk", [this.islandA1, this.islandB], 0, 0);
-        this.overheadLayer = this.map.createStaticLayer("overhead", [this.islandB], 0, 0);
-        //make sure the layers appear where they are supposed to in relation to the player
-        this.backgroundLayer.depth = 2.1;
-        this.walkLayer.depth = 2.2;
-        this.overheadLayer.depth = 7.1;
-        //set collision for the walk layer 
-        this.walkLayer.setCollisionByProperty({ passThru: false });
+        this.mapManager = new TilemapManager("islandUpleft", this);
+        this.mapManager.addTileset("islandA1");
+        this.mapManager.addTileset("islandA2");
+        this.mapManager.addTileset("islandB");
+        this.mapManager.addLayer("background", ["islandA1", "islandA2"],2.1);
+        this.mapManager.addLayer("walk", ["islandA1", "islandB"],2.2, true);
+        this.mapManager.addLayer("overhead", ["islandB"],7.1);
         //set varibles values to their proper values based on newly created tilemap 
-        this.tilemapHeightInPixels = this.map.heightInPixels;
-        this.tilemapWidthInPixels = this.map.widthInPixels;
+        this.tilemapHeightInPixels = this.mapManager.map.heightInPixels;
+        this.tilemapWidthInPixels = this.mapManager.map.widthInPixels;
         this.cameras.main.setBounds(0, 0, this.tilemapWidthInPixels, this.tilemapHeightInPixels);
     }
 
     createFlags(){
         let flag: Phaser.GameObjects.Sprite;
-        this.map.getObjectLayer("flags").objects
+        this.mapManager.map.getObjectLayer("flags").objects
         .filter((tile)=>tile.id == 2)
         .forEach((tile)=>{
             flag = this.physics.add.sprite(tile.x, tile.y, 'orangeFlag');
