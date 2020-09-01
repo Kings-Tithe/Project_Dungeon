@@ -50,4 +50,37 @@ export class TilemapManager {
         //return the created layer in case it needs to be stored by the user
         return this.layers[key];
     }
+
+    getLayer(key: string): Phaser.Tilemaps.StaticTilemapLayer | Phaser.Tilemaps.DynamicTilemapLayer{
+        return this.layers[key];
+    }
+
+    getSize(): Phaser.Math.Vector2{
+        let size = new Phaser.Math.Vector2(this.map.widthInPixels,this.map.heightInPixels);
+        return size;
+    }
+
+    //Need to reevalute how we make flags
+    // createFlags(){
+    //     let flag: Phaser.GameObjects.Sprite;
+    //     this.mapManager.map.getObjectLayer("flags").objects
+    //     .filter((tile)=>tile.id == 2)
+    //     .forEach((tile)=>{
+    //         flag = this.physics.add.sprite(tile.x, tile.y, 'orangeFlag');
+    //         flag.setOrigin(0,0);
+    //         flag.setScale(tile.width / flag.width, tile.height/ flag.height);
+    //     })
+    //     flag.setDepth(20);
+    //     flag.setAlpha(0);
+    //     //set collision with this flag
+    //     this.physics.add.overlap(this.player.party[0].sprite, flag, () => {
+    //         this.signals.emit("sceneChange");
+    //         this.Builder.clearListeners();
+    //         this.clearListeners();
+    //         this.scene.start("IslandNorth", {
+    //             x: 30,
+    //             y: 575
+    //         });
+    //     })
+    // }
 }

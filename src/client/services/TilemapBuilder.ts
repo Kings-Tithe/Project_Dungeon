@@ -202,7 +202,7 @@ export class TilemapBuilder {
      *  */
     setUpperDepth(newDepth: number) {
         this.upperDepth = newDepth;
-        this.buildingLayers["roof"].depth = this.upperDepth;
+        // this.buildingLayers["roof"].depth = this.upperDepth;
     }
 
     /**
@@ -214,6 +214,7 @@ export class TilemapBuilder {
         this.buildingLayers["floor"].depth = this.lowerDepth + 0.1;
         this.buildingLayers["wall"].depth = this.lowerDepth + 0.2;
         this.buildingLayers["special"].depth = this.lowerDepth + 0.3;
+        this.buildingLayers["roof"].depth = this.lowerDepth + 0.4;
     }
 
     /**

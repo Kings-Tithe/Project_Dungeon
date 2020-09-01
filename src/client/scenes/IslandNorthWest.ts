@@ -33,10 +33,6 @@ export class IslandNorthWest extends Phaser.Scene {
     /**Member Varibles */
 
     /**Numbers */
-    /**Used to store the width of the tilemap in pixels */
-    tilemapWidthInPixels: number;
-    /**Used to store the height of the tilemap in Pixels */
-    tilemapHeightInPixels: number;
     /**Used to place the player on the x axis when moving scenes */
     playerPlaceX: number;
     /**Used to place the player on the y axis when moving scenes */
@@ -91,81 +87,24 @@ export class IslandNorthWest extends Phaser.Scene {
     create() {
         //these are needed asap and as such are created first
         this.createListeners();
-        //create tilempa and tilemap builder
+        //create tilemap manager and tilemap builder
         this.createTileMap();
         this.Builder = new TilemapBuilder(this,this.mapManager.map);
-        this.Builder.setLowerDepth(2);
-        this.Builder.setUpperDepth(8);
-        this.Builder.setCursorDepth(10);
         //create player
-        if(!this.playerPlaceX || !this.playerPlaceY){
-            this.playerPlaceX = this.tilemapWidthInPixels / 2;
-            this.playerPlaceY = this.tilemapHeightInPixels / 2;
-        }
-        this.player = new Player(this, this.playerPlaceX, this.playerPlaceY);
-        this.player.setDepth(5);
-        this.player.addPartyMemberByKey(this,"wizard");
-        this.player.addPartyMemberByKey(this,"wizard");
-        this.player.addCollisionByLayer(this.walkLayer);
+        this.createPlayer();
         this.Builder.addCollisionToPlayer(this.player);
         //setup control schemes
         this.controls.applyScheme(this,["Player", "Scene", "Building"]);
         /**setup the main camera */
         this.cameras.main.startFollow(this.player.party[0].sprite, true);
-        this.createFlags();
+        this.setDepths();
     }
 
-    /**A overwritten version of the game loop that is called around 60 times
-     * a second by the game */
+    /**The game loop that is called around 60 times a second by the game */
     update() {
         this.player.updatePlayerInput();
         this.player.update();
-        this.Builder.update(this.player, [this.walkLayer,this.overheadLayer]);
-    }
-
-    /**
-     * Creates several listeners for various signals that may be important.
-     */
-    createListeners() {
-        this.handlers = {
-            "command": (command: string[]) => {
-
-                // This command adds a new party member on the island to follow you
-                if (command[0] == 'addtoparty') {
-                    // Remove the actual command from the list of arguments
-                    command.shift();
-                    // For each party member name passed in, add them to the party
-                    command.forEach((member: string) => {
-                        this.player.addPartyMemberByKey(this,member);
-                    }, this);
-                }
-    
-            },
-            "pause scene-down": () => {
-                this.signals.emit("pausing","Island");
-                this.scene.pause("Island");
-                this.input.keyboard.resetKeys();
-            }
-        }
-
-        /*take the keys and functions in this.handlers and bind them to this 
-         scene then turn them on */
-        for(let key of Object.keys(this.handlers)){
-        this.handlers[key].bind(this);
-        this.signals.on(key, this.handlers[key]);
-        }
-    }
-    
-    /**Clears all the listeners in the global emitter from this class,
-     * meant to be used when swapping scenes or before destroying this
-     * class
-     */
-    clearListeners(){
-        for(let key of Object.keys(this.handlers)){
-            let before = this.signals.listenerCount(key);
-            this.signals.off(key, this.handlers[key]);
-            let after = this.signals.listenerCount(key);
-        }
+        this.Builder.update(this.player, [this.mapManager.getLayer("walk"),this.mapManager.getLayer("overhead")]);
     }
 
     /**Creates and puts together the primary tilemap for this scene*/
@@ -177,32 +116,67 @@ export class IslandNorthWest extends Phaser.Scene {
         this.mapManager.addLayer("background", ["islandA1", "islandA2"],2.1);
         this.mapManager.addLayer("walk", ["islandA1", "islandB"],2.2, true);
         this.mapManager.addLayer("overhead", ["islandB"],7.1);
-        //set varibles values to their proper values based on newly created tilemap 
-        this.tilemapHeightInPixels = this.mapManager.map.heightInPixels;
-        this.tilemapWidthInPixels = this.mapManager.map.widthInPixels;
-        this.cameras.main.setBounds(0, 0, this.tilemapWidthInPixels, this.tilemapHeightInPixels);
+        //set cameras bounds
+        this.cameras.main.setBounds(0, 0, this.mapManager.getSize().x, this.mapManager.getSize().y);
     }
 
-    createFlags(){
-        let flag: Phaser.GameObjects.Sprite;
-        this.mapManager.map.getObjectLayer("flags").objects
-        .filter((tile)=>tile.id == 2)
-        .forEach((tile)=>{
-            flag = this.physics.add.sprite(tile.x, tile.y, 'orangeFlag');
-            flag.setOrigin(0,0);
-            flag.setScale(tile.width / flag.width, tile.height/ flag.height);
-        })
-        flag.setDepth(20);
-        flag.setAlpha(0);
-        //set collision with this flag
-        this.physics.add.overlap(this.player.party[0].sprite, flag, () => {
-            this.signals.emit("sceneChange");
-            this.Builder.clearListeners();
-            this.clearListeners();
-            this.scene.start("IslandNorth", {
-                x: 30,
-                y: 575
-            });
-        })
+    createPlayer(){
+        if(!this.playerPlaceX || !this.playerPlaceY){
+            this.playerPlaceX = this.mapManager.getSize().x / 2;
+            this.playerPlaceY = this.mapManager.getSize().y / 2;
+        }
+        this.player = new Player(this, this.playerPlaceX, this.playerPlaceY);
+        this.player.addPartyMemberByKey(this,"wizard");
+        this.player.addCollisionByLayer(this.mapManager.getLayer("walk"));
     }
+
+    setDepths(){
+        this.player.setDepth(5);
+        this.Builder.setLowerDepth(2);
+        this.Builder.setUpperDepth(8);
+        this.Builder.setCursorDepth(10);
+    }
+
+        /**Creates several listeners for various signals that may be important. */
+        createListeners() {
+            this.handlers = {
+                "command": (command: string[]) => {
+    
+                    // This command adds a new party member on the island to follow you
+                    if (command[0] == 'addtoparty') {
+                        // Remove the actual command from the list of arguments
+                        command.shift();
+                        // For each party member name passed in, add them to the party
+                        command.forEach((member: string) => {
+                            this.player.addPartyMemberByKey(this,member);
+                        }, this);
+                    }
+        
+                },
+                "pause scene-down": () => {
+                    this.signals.emit("pausing","Island");
+                    this.scene.pause("Island");
+                    this.input.keyboard.resetKeys();
+                }
+            }
+    
+            /*take the keys and functions in this.handlers and bind them to this 
+             scene then turn them on */
+            for(let key of Object.keys(this.handlers)){
+            this.handlers[key].bind(this);
+            this.signals.on(key, this.handlers[key]);
+            }
+        }
+        
+        /**Clears all the listeners in the global emitter from this class,
+         * meant to be used when swapping scenes or before destroying this
+         * class
+         */
+        clearListeners(){
+            for(let key of Object.keys(this.handlers)){
+                let before = this.signals.listenerCount(key);
+                this.signals.off(key, this.handlers[key]);
+                let after = this.signals.listenerCount(key);
+            }
+        }
 }
