@@ -24,14 +24,18 @@ export class BuildingTags {
                     doorTile.rotation += Phaser.Math.DegToRad(90);
                     doorTile.setFlipX(true);
                     doorTile.setCollision(false,false,false,false)
-                } else {
+                }
+            },
+            "door-leave": (doorTile: Phaser.Tilemaps.Tile) => {
                     doorTile.rotation -= Phaser.Math.DegToRad(90);
                     doorTile.setFlipX(false);
                     doorTile.setCollision(true,true,true,true);
-                }
-                
             }
         }
+    }
+
+    setupAreaBlock(){
+        //hold on
     }
 }
 

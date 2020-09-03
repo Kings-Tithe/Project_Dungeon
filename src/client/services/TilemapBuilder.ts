@@ -244,6 +244,7 @@ export class TilemapBuilder {
             if (this.currentTile) {
                 this.cursorTile.x = tilecoord.x + 8;
                 this.cursorTile.y = tilecoord.y + 8;
+                console.log(tilecoord);
             }
             //move cursor hammer
             this.toolCursor.x = worldPoint.x - 10;
@@ -274,6 +275,8 @@ export class TilemapBuilder {
         this.updateRoofVisible(player);
         //will need to reconfigure later but just for testing for now
         this.player = player;
+
+        this.checkForAreaBlocks();
     }
 
     /**An internal function for checking if to show the cursors and if to place a block at the cursors place
@@ -308,20 +311,30 @@ export class TilemapBuilder {
         }
 
         if (withinRadius && this.currentScene.input.manager.activePointer.isDown) {
-            if(this.layerSelected != ''){
+            if(this.layerSelected != '' && this.layerSelected != "special"){
                 this.hammeringTween.play();
                 let tilesetStart = this.tileSets[this.layerSelected].firstgid;
                 let index = tilesetStart + this.currentTile.tileSetOffSet;
                 let tile = this.buildingLayers[this.layerSelected].putTileAtWorldXY(index, tilecoord.x, tilecoord.y);
                 tile.rotation = Phaser.Math.DegToRad(this.rotation);
-                if ((this.layerSelected == "wall" || this.layerSelected == "special") && notBuildingOnPlayer) {
+                if ((this.layerSelected == "wall") && notBuildingOnPlayer) {
                     tile.setCollision(true,true,true,true);
                     tile.properties = this.tileSets[this.layerSelected].getTileProperties(index);
-                    console.log(this.tileSets[this.layerSelected].tileProperties);
-                    console.log(tile.properties);
                 }                
+            } else if (this.layerSelected == "special"){
+                this._buildSpecialBlock(tilecoord.x, tilecoord.y,this.currentTile.tileSetOffSet);
             }
         }
+    }
+
+    _buildSpecialBlock(x: number, y: number,offset: number){
+        this.hammeringTween.play();
+        let testTile = this.currentScene.physics.add.sprite(x,y,"wallTiles",offset);
+        testTile.depth = 100;
+        //testTile.setOrigin(.5,.5);
+        testTile.x = this.cursorTile.x + 8;
+        testTile.y = this.cursorTile.y + 8;
+        console.log(this.cursorTile.x,this.cursorTile.y)
     }
 
     _checkRemoveBlock(player: Player, tilecoord: Phaser.Math.Vector2) {
@@ -538,6 +551,28 @@ export class TilemapBuilder {
         }
     }
 
+    checkForAreaBlocks(){
+        //check the area around the player for area blocks
+        let areaBlocks: Phaser.Tilemaps.Tile[] = this.buildingLayers["special"].getTilesWithinShape(
+            new Phaser.Geom.Circle(this.player.party[0].sprite.x, this.player.party[0].sprite.y, 32),
+            { isNotEmpty: true }
+        );
+        //if there are interactives process functions
+        for(let i = 0; i < areaBlocks.length; i++){
+            console.log(JSON.stringify(areaBlocks[i].properties));
+            this.tags.tags["door"](areaBlocks[i]);
+            setTimeout(() => {
+                let checkArea: Phaser.Tilemaps.Tile[] = this.buildingLayers["special"].getTilesWithinShape(
+                    new Phaser.Geom.Circle(this.player.party[0].sprite.x, this.player.party[0].sprite.y, 32),
+                    { isNotEmpty: true }
+                );
+                if(checkArea.includes(areaBlocks[i])){
+                    this.tags.tags["door-leave"](areaBlocks[i]);
+                }
+            },500)
+        }
+    }
+
     /**
      * Creates all the listerns used by this class, this also allows the file to stay organized as all the
      * listeners are listen in one place
@@ -550,7 +585,7 @@ export class TilemapBuilder {
                 } else {
                     //create build modes cursor tile
                     this.cursorTile = this.currentScene.add.sprite(0, 0, incomingTile.tileSetKey, incomingTile.tileSetOffSet);
-                    this.cursorTile.setOrigin(.5, .5);
+                    //this.cursorTile.setOrigin(0,0);
                     this.cursorTile.setAlpha(.7);
                     this.cursorTile.setDepth(this.cursorDepth + 0.2);
                     this.cursorTile.setVisible(false);
