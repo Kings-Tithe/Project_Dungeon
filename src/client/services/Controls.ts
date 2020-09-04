@@ -110,14 +110,6 @@ export class Controls {
             delayed: false,
             checkable: true
         }
-        this.schemes["Player"].actions["interact"] = {
-            actionKey: "interact", 
-            delayDuration: defaultdelayDuration, 
-            keyCode: Phaser.Input.Keyboard.KeyCodes.E,
-            key: null,  
-            delayed: false,
-            checkable: true
-        }
         this.schemes["Scene"].actions["pause scene"] = {
             actionKey: "pauseScene", 
             delayDuration: defaultdelayDuration, 
@@ -146,14 +138,6 @@ export class Controls {
             actionKey: "pause", 
             delayDuration: defaultdelayDuration, 
             keyCode: Phaser.Input.Keyboard.KeyCodes.Q,
-            key: null,  
-            delayed: false,
-            checkable: true
-        }
-        this.schemes["Building"].actions["test-roof-mask"] = {
-            actionKey: "test-roof-mask", 
-            delayDuration: defaultdelayDuration, 
-            keyCode: Phaser.Input.Keyboard.KeyCodes.M,
             key: null,  
             delayed: false,
             checkable: true

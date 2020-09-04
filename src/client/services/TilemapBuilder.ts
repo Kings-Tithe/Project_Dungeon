@@ -244,7 +244,6 @@ export class TilemapBuilder {
             if (this.currentTile) {
                 this.cursorTile.x = tilecoord.x + 8;
                 this.cursorTile.y = tilecoord.y + 8;
-                console.log(tilecoord);
             }
             //move cursor hammer
             this.toolCursor.x = worldPoint.x - 10;
@@ -275,8 +274,6 @@ export class TilemapBuilder {
         this.updateRoofVisible(player);
         //will need to reconfigure later but just for testing for now
         this.player = player;
-
-        this.checkForAreaBlocks();
     }
 
     /**An internal function for checking if to show the cursors and if to place a block at the cursors place
@@ -327,14 +324,15 @@ export class TilemapBuilder {
         }
     }
 
-    _buildSpecialBlock(x: number, y: number,offset: number){
+    _buildSpecialBlock(x: number, y: number, offset: number){
         this.hammeringTween.play();
-        let testTile = this.currentScene.physics.add.sprite(x,y,"wallTiles",offset);
+        let testTile = this.currentScene.physics.add.sprite(x,y,"specialTiles",offset);
         testTile.depth = 100;
-        //testTile.setOrigin(.5,.5);
         testTile.x = this.cursorTile.x + 8;
         testTile.y = this.cursorTile.y + 8;
-        console.log(this.cursorTile.x,this.cursorTile.y)
+        testTile.body.setSize(48,48);
+        testTile.setDataEnabled();
+        this.tags.applyTag("door",testTile,this.player,this.currentScene);
     }
 
     _checkRemoveBlock(player: Player, tilecoord: Phaser.Math.Vector2) {
@@ -538,41 +536,6 @@ export class TilemapBuilder {
         }
     }
 
-    checkForInteractives(){
-        //check the area around the player for interactive blocks
-        let interactibles: Phaser.Tilemaps.Tile[] = this.buildingLayers["special"].getTilesWithinShape(
-            new Phaser.Geom.Circle(this.player.party[0].sprite.x, this.player.party[0].sprite.y, 32),
-            { isNotEmpty: true }
-        );
-        //if there are interactives process functions
-        for(let i = 0; i < interactibles.length; i++){
-            console.log(JSON.stringify(interactibles[i].properties));
-            this.tags.tags["door"](interactibles[i]);
-        }
-    }
-
-    checkForAreaBlocks(){
-        //check the area around the player for area blocks
-        let areaBlocks: Phaser.Tilemaps.Tile[] = this.buildingLayers["special"].getTilesWithinShape(
-            new Phaser.Geom.Circle(this.player.party[0].sprite.x, this.player.party[0].sprite.y, 32),
-            { isNotEmpty: true }
-        );
-        //if there are interactives process functions
-        for(let i = 0; i < areaBlocks.length; i++){
-            console.log(JSON.stringify(areaBlocks[i].properties));
-            this.tags.tags["door"](areaBlocks[i]);
-            setTimeout(() => {
-                let checkArea: Phaser.Tilemaps.Tile[] = this.buildingLayers["special"].getTilesWithinShape(
-                    new Phaser.Geom.Circle(this.player.party[0].sprite.x, this.player.party[0].sprite.y, 32),
-                    { isNotEmpty: true }
-                );
-                if(checkArea.includes(areaBlocks[i])){
-                    this.tags.tags["door-leave"](areaBlocks[i]);
-                }
-            },500)
-        }
-    }
-
     /**
      * Creates all the listerns used by this class, this also allows the file to stay organized as all the
      * listeners are listen in one place
@@ -647,9 +610,6 @@ export class TilemapBuilder {
             },
             "clearBuildingTool": (newCurrentLayer: string) => {
                 this.toolSelected = "";
-            },
-            "interact-down": () => {
-                this.checkForInteractives();
             }
         }
 
