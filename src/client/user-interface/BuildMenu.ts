@@ -409,7 +409,6 @@ export class BuildMenu {
                     this.enterBuildMode();
                     if (!wtf) {
                         let bar = new SimpleBar(this.menuDiv);
-                        console.log(bar);
                         wtf = true;
                     }    
                 }

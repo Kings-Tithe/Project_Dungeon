@@ -23,23 +23,23 @@ export class BuildingTags {
         this.tags["door"] = {
             type: "area",
             setup: (scene: Phaser.Scene, object: Phaser.GameObjects.Sprite, player: Player) => {
+                //set inital data
+                object.setData("doorOpen", false);
                 scene.physics.add.overlap(player.party[0].sprite, object,() => {
-                    //set inital data
-                    object.setData("doorOpen", false);
                     //if the door is closed and we are now within range
                     if(object.getData("doorOpen") == false){
                         //opens the door
                         this.tags["door"].main(object);
-                        //if the interval to that they have left the area has not been created, create it
+                        //if the interval to check if they have left the area has not been created, create it
                         if(object.data.get("interval") == undefined){
-                        let interval = setInterval(() => {
-                                //check if we are still within the door's area, if we're not, run optinal and reset interval
-                                if(scene.physics.overlap(player.party[0].sprite, object) == false){
-                                    this.tags["door"].optional(object);
-                                }
-                                clearInterval(object.getData("interval"));
-                                object.setData("interval", undefined);
-                            },750);
+                            let interval = setInterval(() => {
+                                    //check if we are still within the door's area, if we're not, run optinal and reset interval
+                                    if(scene.physics.overlap(player.party[0].sprite, object) == false){
+                                        this.tags["door"].optional(object);
+                                        clearInterval(object.getData("interval"));
+                                        object.setData("interval", undefined);
+                                    }
+                                },750);
                             //after creating the interval store in within the sprites data
                             object.data.set("interval", interval);
                         }
