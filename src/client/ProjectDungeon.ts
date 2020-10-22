@@ -49,9 +49,11 @@ const config: Phaser.Types.Core.GameConfig = {
     /** Allows dom elements to be added to phaser's managers */
     dom: {
         createContainer: true
+    },
+    fps: {
+        target: 60
     }
 };
-
 /** This is the primary Phaser game object. After construction it
  * will automatically transition to the first scene in the scene array.
  */

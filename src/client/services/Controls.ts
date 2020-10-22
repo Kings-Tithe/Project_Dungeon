@@ -105,7 +105,7 @@ export class Controls {
         this.schemes["Player"].actions["change leader"] = {
             actionKey: "change leader", 
             delayDuration: defaultdelayDuration, 
-            keyCode: Phaser.Input.Keyboard.KeyCodes.E,
+            keyCode: Phaser.Input.Keyboard.KeyCodes.C,
             key: null,  
             delayed: false,
             checkable: true

@@ -284,40 +284,40 @@ export class Character {
             /**animation for character walking right */
             scene.anims.create({
                 key: this.key + '-animation-walk-right',
-                frames: scene.anims.generateFrameNumbers(spriteKey, { start: 8, end: 15 }),
-                frameRate: 7,
+                frames: scene.anims.generateFrameNumbers(spriteKey, { start: 12, end: 15 }),
+                frameRate: 8,
                 repeat: -1
             });
             //animation for character walking up
             scene.anims.create({
                 key: this.key + '-animation-walk-up',
-                frames: scene.anims.generateFrameNumbers(spriteKey, { start: 16, end: 23 }),
-                frameRate: 7,
+                frames: scene.anims.generateFrameNumbers(spriteKey, { start: 8, end: 11 }),
+                frameRate: 8,
                 repeat: -1
             });
             //animation for character walking down
             scene.anims.create({
                 key: this.key + '-animation-walk-down',
-                frames: scene.anims.generateFrameNumbers(spriteKey, { start: 24, end: 31 }),
-                frameRate: 7,
+                frames: scene.anims.generateFrameNumbers(spriteKey, { start: 0, end: 3 }),
+                frameRate: 8,
                 repeat: -1
             });
             //animation for character walking left
             scene.anims.create({
                 key: this.key + '-animation-walk-left',
-                frames: scene.anims.generateFrameNumbers(spriteKey, { start: 32, end: 39 }),
-                frameRate: 7,
+                frames: scene.anims.generateFrameNumbers(spriteKey, { start: 4, end: 7 }),
+                frameRate: 8,
                 repeat: -1
             });
             //set players inital animation
-            this.sprite.anims.play(this.key + '-animation-walk-down');
+            //this.sprite.anims.play(this.key + '-animation-walk-down');
             this.sprite.anims.stop();
             this.facingDirection = "down";
     
             //set hitbox to cover lower 16x16 block of character, around it's feet
             let body = <Phaser.Physics.Arcade.Body>this.sprite.body;
             body.setSize(16, 16, false);
-            body.setOffset(8, 16);   
+            body.setOffset(24, 32);   
         } else {
             console.log("You must give the character class a key before trying to use it.");
             return;

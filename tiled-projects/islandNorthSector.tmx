@@ -6,48 +6,23 @@
  <tileset firstgid="1" source="tilesets/islandA1.tsx"/>
  <tileset firstgid="109" source="tilesets/islandA2.tsx"/>
  <tileset firstgid="349" source="tilesets/islandB.tsx"/>
- <tileset firstgid="605" name="testBuildSpriteSheet" tilewidth="16" tileheight="16" tilecount="8" columns="4">
-  <image source="../assets/images/tilesets/testBuildSpriteSheet.png" width="64" height="32"/>
+ <tileset firstgid="605" name="floorTiles" tilewidth="16" tileheight="16" tilecount="50" columns="5">
+  <image source="../assets/images/tilesets/flooring.png" width="80" height="160"/>
+ </tileset>
+ <tileset firstgid="655" name="roofTiles" tilewidth="16" tileheight="16" tilecount="50" columns="5">
+  <image source="../assets/images/tilesets/roofing.png" width="80" height="160"/>
+ </tileset>
+ <tileset firstgid="705" name="specialTiles" tilewidth="16" tileheight="16" tilecount="50" columns="5">
+  <image source="../assets/images/tilesets/special.png" width="80" height="160"/>
   <tile id="0">
    <properties>
-    <property name="passThru" type="bool" value="true"/>
+    <property name="Interactive" type="bool" value="true"/>
+    <property name="tags" value="&quot;door&quot;"/>
    </properties>
   </tile>
-  <tile id="1">
-   <properties>
-    <property name="passThru" type="bool" value="false"/>
-   </properties>
-  </tile>
-  <tile id="2">
-   <properties>
-    <property name="passThru" type="bool" value="false"/>
-   </properties>
-  </tile>
-  <tile id="3">
-   <properties>
-    <property name="passThru" type="bool" value="false"/>
-   </properties>
-  </tile>
-  <tile id="4">
-   <properties>
-    <property name="passThru" type="bool" value="false"/>
-   </properties>
-  </tile>
-  <tile id="5">
-   <properties>
-    <property name="passThru" type="bool" value="false"/>
-   </properties>
-  </tile>
-  <tile id="6">
-   <properties>
-    <property name="passThru" type="bool" value="false"/>
-   </properties>
-  </tile>
-  <tile id="7">
-   <properties>
-    <property name="passThru" type="bool" value="false"/>
-   </properties>
-  </tile>
+ </tileset>
+ <tileset firstgid="755" name="wallTiles" tilewidth="16" tileheight="16" tilecount="10" columns="5">
+  <image source="../assets/images/tilesets/walls.png" width="80" height="32"/>
  </tileset>
  <layer id="1" name="background" width="100" height="100">
   <data encoding="csv">

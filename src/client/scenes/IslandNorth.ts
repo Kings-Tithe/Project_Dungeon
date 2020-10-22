@@ -119,7 +119,7 @@ export class IslandNorth extends Phaser.Scene {
         }
         this.player = new Player(this, this.playerPlaceX, this.playerPlaceY);
         this.player.setDepth(5);
-        this.player.addPartyMemberByKey(this,"dreg");
+        this.player.addPartyMemberByKey(this,"wizard");
         this.player.addCollisionByLayer(this.walkLayer);
         this.Builder.addCollisionToPlayer(this.player);
         //setup control schemes
@@ -184,7 +184,6 @@ export class IslandNorth extends Phaser.Scene {
 
     /**Creates and puts together the primary tilemap for this scene*/
     createTileMap() {
-        this.map = this.make.tilemap({ key: "islandNorthSector" });
         this.islandA1 = this.map.addTilesetImage("islandA1");
         this.islandA2 = this.map.addTilesetImage("islandA2");
         this.islandB = this.map.addTilesetImage("islandB");
